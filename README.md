@@ -134,3 +134,46 @@ public class App {
 // "Hello, my name is Danilo and I'm 36 years old and I'm 1.80m tall"
 // "1,80"
 ```
+
+### Aula 25 - Processamento e Casting
+O fato de o Java ter mais de um tipo para variáveis de mesma intenção, por exemplo os tipos **int** e **double**, faz com que alguns comportamentos estranhos possam acontecer. Por exemplo, caso você tente assinalar uma variável **int** para uma variável **double**, você precisaria apenas adicionar um 0 como casas decimais. Mas ao contrário, o Java imagina que isso vai gerar uma perda do dado, e por isso levanta um erro. 
+
+Nesses casos, se o valor decimal realmente pode ser desprezado, não basta alocar a variável **double** na **int**, também é preciso fazer o *casting* indicando na operação que você está ciente dessa perda dos dados e que quer seguir com essa intenção.
+
+Agora, imagina que você tenha dois valores **int** e faça uma conta que gere um resultado decimal, por exemplo 9 / 4 que deveria gerar 2.25. Nesse caso, caso o Java entende que se os inputs da conta foram de dois números inteiros, o esperado para a saída também seja um número inteiro, portanto, mesmo que você coloque em uma variável do tipo float, ela já teve o seu valor decimal desprezado.
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        int a, b;
+        double resultado;
+        a = 9;
+        b = 4;
+
+        resultado = a / b;
+        
+        System.out.println(resultado);
+    }
+}
+
+// 2.0
+```
+
+Então, você além de fazer a declaração da variável no tipo adequado, no momento do alocar o valor, você ainda precisa indiciar que o processamento deve ser feito no formato desejado também. Então o exemplo acima ficaria da seguinte forma:
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        int a, b;
+        double resultado;
+        a = 9;
+        b = 4;
+
+        resultado = (double) a / b;
+        
+        System.out.println(resultado);
+    }
+}
+
+// 2.25
+```
