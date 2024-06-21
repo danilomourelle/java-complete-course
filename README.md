@@ -861,7 +861,7 @@ Apenas para fins de esclarecimento, um elemento declarado como `public` poderá 
 
 Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
 
-## Seção 10 - Memória, Arrays e Listas
+## Seção 10: Memória, Arrays e Listas
 
 ### Aula 87: Tipos referência vs Tipos valor
     
@@ -1135,3 +1135,159 @@ Acontece que alguns desses transformadores apresentam uma ação de finalizaçã
 Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
 
 Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.
+
+## Seção 11: Dates
+
+### Aula 111: Objetos do tipo de datas
+    
+O Java vai ter os mesmo conceitos para datas e horas, sendo o formato local, que é sem informação de um TZ associado, e padrão ISO, e por falar em padrão ISO isso independe da linguagem então ela vai ter o formato `yyyy-MM-ddThh:mm:ss.xxxZ`. 
+
+Diferentemente do JavaScript que utiliza basicamente a classe `Date` para tudo, o Java vai apresentar classes especificas para cada tipo de situação. Uma informação de data local vai utilizar a classe `LocalDate`, enquanto que uma informação de data-hora local vai utilizar a classe `LocalDateTime`. Já a informação no formato ISO vai utilizar a classe `Instant`. Cabe ressaltar que um **LocalDateTime** pode existir sem a informação de horário, enquanto que um **LocalDate** vai descartar qualquer informação de horário.
+
+A operação mais básica com essas classes é a obtenção de valor do momento da execução, e para isso basta utilizar o método `now()` das classes. Abaixo seguem exemplos com cada classe:
+
+```java
+LocalDate today = LocalDate.now();
+LocalDateTime now = LocalDateTime.now();
+Instant nowISO = Instant.now();
+
+// 2024-06-19
+// 2024-06-19T11:55:30.302942
+// 2024-06-19T14:55:30.302942Z
+```
+
+Outra operação muito comum é quando nós temos uma string que representa um momento e nós precisamos converter isso em um objeto com os valores definidos pela string. Esse tipo de instancia pré-definida se dá utilizando o método `parse()`.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+Instant nowISOFromTZ = Instant.parse("2024-06-19T11:55:30.302942-03:00");
+
+// 2024-06-19
+// 2024-06-19T11:55:30.302942
+// 2024-06-19T14:55:30.302942Z
+// 2024-06-19T14:55:30.302942Z
+```
+
+Agora, no caso de essa string não estar no formato ISO, o que a gente precisa fazer é avisar o `parser()` qual é o formato que deve ser considerado na string. Para isso, existe uma outra classe utilizada para indicar o tipo do formato utilizado por uma string que é a classe `DateTimeFormatter`. A documentação da classe está nesse [link](https://docs.oracle.com/en%2Fjava%2Fjavase%2F22%2Fdocs%2Fapi%2F%2F/java.base/java/time/format/DateTimeFormatter.html) 
+
+```java
+String stringDate = "19/06/2024";
+DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+LocaDate date = LocalDate.parse(stringDate, format);
+
+// 2024-06-19
+```
+
+```java
+String stringDate = "19/06/2024 12:30";
+DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+LocalDateTime date = LocalDateTime.parse(stringDate, format);
+
+// 2024-06-19T12:30
+```
+
+Como última opção, é a criação de um objeto de data quando nós temos os valores de ano, mês, hora ou minuto de forma individual. Para isso as classes apresentam um método `.of()`. Por ser uma condição com várias combinações possíveis, esse método vai ter várias sobrecargas, então é bom dar uma olhada nas opções quando for utilizar.
+
+```java
+int year = 2024;
+int month = 06;
+int day = 19;
+int hour = 12;
+int minute = 00;
+
+LocalDate date = LocalDate.of(year, month, day);
+LocalDateTime datetime = LocalDateTime.of(year, month, day, hour, minute);
+
+// 2024-06-19
+// 2024-06-19T12:00
+```
+    
+### Aula 112: Parse Dates
+    
+Para fazer o parse de um objeto com informação de data, temos que os objetos vão apresentar o método `.toString()`, sendo que por padrão ele sempre vai retornar uma string representativa no formato ISO.
+
+Agora, caso seja necessário obter um string em algum outro formato específico, basta usar a mesma classe de formatação para fazer essa conversão. Para isso há duas opções de comando, sendo uma delas `date.format(formatter)` e a outra `formatter.format(date)`. Ou seja, usando o método `.format()` seja no objeto de data, seja no objeto do estilo de formatação.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+System.out.println(today.format(fmt1));
+System.out.println(fmt1.format(today));
+
+// 19/06/2024
+// 19/06/2024
+```
+
+Esse método funciona também para o **LocalDateTime**, mas falha um pouco para um **Instant** já que ele não tem o método *.format()* e quando utilizado deve sempre ser considerado o TZ da informação. Por isso, quando utilizar o formatador com esse tipo, deve-se utilizar exclusivamente o método do formatador, passando o **Instant** como argumento. E mais do que isso, esse formatador, precisa indicar qual o TZ que vai ser considerado na impressão.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+
+DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+DateTimeFormatter fmt2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+DateTimeFormatter fmt3 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+
+System.out.println(fmt1.format(today));
+System.out.println(fmt2.format(now));
+System.out.println(fmt3.format(nowISO));
+
+// 19/06/2024
+// 19/06/2024 11:55:30
+// 19/06/2024 11:55:30 -> repare que a data original estava como 14:55 UTC
+```
+
+Parece uma boa ideia padronizar então sempre ter a formatação com o método sendo chamado do formatador, e não ficar misturando as possibilidades. Outra detalhe é que caso se tente usar um **Instant** com um formatador sem a informação de TZ ele vai gerar um erro. Isso vale inclusive para os formatadores pré definidos na classe. 
+
+Esse TZ que deve ser acrescentado, tem a classe `ZoneId` que além de fornecer alguns métodos que vão retornar ajudar a retornar a informação de zona, tem também um método `.getAvailableZoneIds()` que retorna uma série de valores que podem ser utilizados como referência, como IANAs por exemplo.
+
+### Aula 113: Convertendo Instant em Local
+    
+Para fazer a conversão de um objeto **Instant** em um **Local** vamos ter algumas opções, sendo uma delas utilizando um método estático da classe *target* e a outra forma, é transformar o objeto **Instant** em um do tipo **ZonedDateTime** e então em um **LocalDate** com os métodos de instância.
+
+```java
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+
+LocalDate today = LocalDate.ofInstant(nowISO, ZoneId.of("America/Sao_Paulo"));
+LocalDate today2 = nowISO.atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate();
+```
+
+Os objetos de data vão ter vários métodos, seria interessante ir lendo a assinatura deles conforme for abrindo no Intellisense. Eles vão ter métodos clássicos para isolar a informação de dia, de mês entre outros dados.
+    
+### Aula 114: Calculo com datas
+    
+Após a criação de uma data, esse objeto é imutável, portanto quando necessário, uma nova instancia precisa ser criada com o novo valor. Os objetos de data vão apresentar um série de métodos que podem retornar um novo objeto calculado com a diferença desejada. Os principais métodos das classes **LocalDate** e **LocalDateTime** vão somar ou subtrair uma quantidade de tempo e por isso eles vão ter um prefixo comum como `.minusDays()` e `.minusWeeks()` para subtrair e `.plusDays()` e `.plusWeeks()` para somar.
+
+Já os objetos da classe **Instant**, eles vão apresentar um método um pouco diferente. Ele apresenta menos métodos, mas em compensação tem um mais genérico que é o `.minus()` que vai aceitar um número, e uma unidade de medida. O mesmo acontece para o método `.plus()`.
+
+Para essa unidade de medida o Java disponibiliza a classe `ChronoUnit` que vai conter valores estáticos que vão servir para preencher o campo da forma correta.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDate yesterday = today.minusDays(1);
+
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+LocalDateTime minus24Hours = now.minusHours(24);
+
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+Instant tomorrow = nowISO.plus(1, ChronoUnit.DAYS);
+```
+
+Para calcular a distância entre duas data, o Java vai ter a classe `Duration` e ela vai ter um método estético `.between()` que pode ser utilizado para se obter o objeto de duração entre duas datas. Esse objeto vai ter os seu métodos para que o seu valor possa ser obtido em um formato mais adequado. Por exemplo, é possível utilizar o método `.toDays()` que vai retornar o valore dessa duração em dias.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDate yesterday = today.minusDays(1);
+
+Duration duration = Duration.between(today, yesterday);
+System.out.println(duration.toDays());
+```
+
+Porém, esse método aceita apenas **LocalDateTime**, ou seja, se a gente tiver objetos do tipo **LocalDate**, a gente precisa primeiro transformá-los para acrescentar a informação de horário, e para isso a gente pode utilizar o método `.atTime()` onde a gente pode especifica uma hora e minuto, ou podemos usar o método `.atStartOfDay()` que vai considerar o 00:00.
+    
