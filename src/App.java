@@ -1,24 +1,36 @@
-import java.util.Random;
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Triangle;
 
 public class App {
 	public static void main(String[] args) throws Exception {
-		String hello = buildHelloWorld();
-		int times = buildRandomNumber();
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
 
-		printTextNthTimes(hello, times);
-	}
+		Triangle x, y;
+		x = new Triangle();
+		y = new Triangle();
 
-	public static String buildHelloWorld() {
-		return "Hello World!!";
-	}
+		System.out.println("Enter the measures of triangle X: ");
+		x.a = scanner.nextDouble();
+		x.b = scanner.nextDouble();
+		x.c = scanner.nextDouble();
 
-	public static int buildRandomNumber() {
-		return new Random().nextInt(10);
-	}
+		System.out.println("Enter the measures of triangle Y: ");
+		y.a = scanner.nextDouble();
+		y.b = scanner.nextDouble();
+		y.c = scanner.nextDouble();
+		
+		double areaX = x.calculateArea();
+		double areaY = y.calculateArea();
 
-	public static void printTextNthTimes(String text, int times) {
-		for (int index = 0; index < times; index++) {
-			System.out.println(text);
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
 		}
+
+		scanner.close();
 	}
 }

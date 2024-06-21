@@ -460,3 +460,208 @@ Depois dessa indicação do retorno, ela fica um pouco mais normal. Você coloca
 Com essa assinatura feita, basta abrir as chaves e implementar a lógica da mesma forma que outras linguagens. Para retornar um valor, também como no JavaScript, basta colocar a palavra chave `return` juntamente do valor a ser retornado. Se a função não tiver um **return**, então precisa indicar que a função tem um retorno do tipo `void`.
 
 Por serem métodos, não há nada que determine uma ordem de declaração e depois de utilização. Então um método lá embaixo no arquivo pode estar sendo usado lá na parte de cima, sem problemas. Mas vale ressaltar que caso a classe tenha algum método marcado como estático, este só poderá utilizar outros métodos desde que eles também sejam do tipo estático. Por outro lado, métodos de instância estão livres para utilizar métodos estáticos.
+
+## Seção 8: Introdução a Programação Orientada a Objetos
+
+### Aula 64-67: Utilizando Orientação a Objeto
+
+Vamos fazer um programa que vai receber as 3 medidas de dois triângulos, calcular a área de cada um e imprimir qual dos dois triângulos é maior. A fórmula para se calcular a área de um triângulo utilizando as medidas dos lados é `sqrt(p * (p - A) * (p - B) * (p - C))` onde `p = (A + B + C) / 2` e A, B e C são as medidas do triângulo.
+
+Se a gente fosse fazer isso tudo dentro do método *main* da classe principal, seria algo desse tipo:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		double xA, xB, xC, yA, yB, yC;
+		
+		System.out.println("Enter the measures of triangle X: ");
+		xA = scanner.nextDouble();
+		xB = scanner.nextDouble();
+		xC = scanner.nextDouble();
+		
+		System.out.println("Enter the measures of triangle Y: ");
+		yA = scanner.nextDouble();
+		yB = scanner.nextDouble();
+		yC = scanner.nextDouble();
+		
+		double p = (xA + xB + xC) / 2.0;
+		double areaX = Math.sqrt(p * (p - xA) * (p - xB) * (p - xC));
+		
+		p = (yA + yB + yC) / 2.0;
+		double areaY = Math.sqrt(p * (p - yA) * (p - yB) * (p - yC));
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+Mas a gente pode começar a migrar isso para orientação e objeto. Com isso a gente já consegue imaginar que o principal sujeito do programa é o triângulo. Então a gente pode representar o triângulo em uma classe (nesses casos é chamada de entidade).
+
+```java
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+}
+```
+
+Aqui, tem uma coisa interessante que o curso não comentou, mas arquivos de classes irmãs podem se ver sem problemas de importação. Então caso essa nova classe **Triangle** seja irmã da classe **App**, basta sair usando sem maiores problemas. Agora, com a separação de conceitos, a ideia é que até os arquivos sejam separados em pastas com o mesmo contexto. Essas pastas acabam tendo um conceito de *package* no Java.
+
+Um *package* tem algumas regrinhas. Primeiro que todas as classes dentro desse package precisam ter em seu início uma expressão para indicar que faz parte dele, então se nós consideramos a nossa classe **Triangle** como um elemento no *package entities*, o nosso arquivo vai estar localizado em `src/entities` e ele vai ter a seguinte alteração:
+
+```java
+package entities;
+
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+}
+```
+
+Já a nossa **main** vai poder utilizar essa classe depois de importar o `entities.Triangle`. Então uma alteração apenas considerando que agora as medidas dos lados vão fazer parte de um objeto seria mais ou menos assim:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Triangle;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		Triangle x, y;
+		x = new Triangle();
+		y = new Triangle();
+
+		System.out.println("Enter the measures of triangle X: ");
+		x.a = scanner.nextDouble();
+		x.b = scanner.nextDouble();
+		x.c = scanner.nextDouble();
+
+		System.out.println("Enter the measures of triangle Y: ");
+		y.a = scanner.nextDouble();
+		y.b = scanner.nextDouble();
+		y.c = scanner.nextDouble();
+		
+		double p = (x.a + x.b + x.c) / 2.0;
+		double areaX = Math.sqrt(p * (p - x.a) * (p - x.b) * (p - x.c));
+		
+		p = (y.a + y.b + y.c) / 2.0;
+		double areaY = Math.sqrt(p * (p - y.a) * (p - y.b) * (p - y.c));
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+Beleza, os dados já ficaram relacionados, mas ainda tem muita coisa para melhorar, como o calculo da área. Se a fórmula calcula a área do triângulo, então faz sentido que isso seja um método da classe.
+
+```java
+package entities;
+
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+
+  public double calculateArea() {
+    double p = (a + b + c) / 2.0;
+    double area = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+
+    return area;
+  }
+}
+```
+
+Engraçado, aparentemente não tem o `this` em Java. Não sei se isso é bom, porque ôô tópico difícil né, ou ruim, porque eu finalmente entendi essa bagaça. Vamos esperar as próximas aulas para ver o que rola.
+
+A nossa **main** agora pode ficar assim:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Triangle;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		Triangle x, y;
+		x = new Triangle();
+		y = new Triangle();
+
+		System.out.println("Enter the measures of triangle X: ");
+		x.a = scanner.nextDouble();
+		x.b = scanner.nextDouble();
+		x.c = scanner.nextDouble();
+
+		System.out.println("Enter the measures of triangle Y: ");
+		y.a = scanner.nextDouble();
+		y.b = scanner.nextDouble();
+		y.c = scanner.nextDouble();
+		
+		double areaX = x.calculateArea();
+		double areaY = y.calculateArea();
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+A aula 67 traz a demonstração do `this` em Java. Aparentemente você pode acessar diretamente qualquer atributo da classe dentro dos métodos. O uso do `this` vai acabar ficando restrito apenas em casos de conflitos de nome entre um atributo e um parâmetro de um método. Então nesses casos, você usa para explicitamente reforçar quem é quem.
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Bom, poderia apenas proibir o conflito de nome, forçar que o parâmetro se chamasse por exemplo `quantityToAdd`, `quantityToRemove`. Vamos continuar a ver as próximas aulas.
