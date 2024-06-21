@@ -698,3 +698,13 @@ public String toString() {
 Coisas ensinadas pela IA: A anotação `@Override` mostra para o compilador que está é uma função que irá sobrescrever um método de uma super classe. Ela não é obrigatória, mas é legal usar porque com ela, o compilador checa a cadeia para ver se a função realmente existe e se tem a mesma assinatura. Se essa verificação falhar, ele interrompe a compilação. 
 
 Por outro lado, sem a anotação, ele simplesmente vai compilar e você pode acabar tendo um método novo em caso de erro de digitação, ou criar um comportamento errante caso a assinatura não seja a mesma. Portanto use isso.
+
+### Aula 71 - Membros estáticos
+
+A ideia é que você pode colocar alguns elementos de uma classe, sejam atributos, sejam métodos como sendo do tipo estáticos. Isso vai indicar que o elemento não depende de uma instância da classe, eles são independentes dos valores do objeto em si, fazendo com que esse elementos sejam chamados sempre a partir da classe e não do objeto, por exemplo `Math.sqrt()`.
+
+Esse tipo de uso vai ser muito comum quando se cria uma coleção de funções em um mesmo contexto, e você agrupa todas elas em uma classe que vai representar esse contexto. Os métodos devem sempre utilizar dados recebidos por parâmetros. Novamente um exemplo é a classe `Math`. Vale ressaltar que em classes com métodos estáticos e não estáticos, você não pode chamar um método não estático em um estático, uma vez que isso abre a possibilidade dele depender de dados do objeto, o que vai na contra mão do conceito de estático.
+
+Outra situação é que se usa uma classe com elementos estáticos é quando você tem um conjunto de dados constantes, que não devem ser alterados, e também apresentam um contexto em comum. Então você declara uma classe como todos esses atributos como estáticos. Um exemplo disso é o `Locale.US` onde **US** é um atributo estático da classe **Locale**.
+
+Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.
