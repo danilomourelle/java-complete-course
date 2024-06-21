@@ -448,3 +448,15 @@ public class App {
 ## Seção 6: Estruturas de repetição
 
 Também como o JavaScript, o Java possui as mesmas estruturas básicas de repetição, tanto o `while`, `do/while`, e o `for`. Todos funcionam da mesma maneira que no JS.
+
+## Seção 7: Outros tópicos básicos
+
+Como o Java é uma linguagem orientada a objeto (de orientada não tem nada, parece mais uma obrigatoriedade mesmo), as funções basicamente serão métodos em alguma classe.
+
+A declaração de uma função se dá pelas indicações dela na classe, por exemplo `public static`, e depois precisa indicar o tipo do dado que será retornado pela função. Então se ela volta um número inteiro, precisa colocar `int`, se ela volta um texto, precisa colocar `String`.
+
+Depois dessa indicação do retorno, ela fica um pouco mais normal. Você coloca o nome da função, abre os parênteses e coloca os parâmetros. Um detalhe é que como a linguagem é fortemente tipada, esse parâmetros precisam indicar o tipo de dado que ele espera receber.
+
+Com essa assinatura feita, basta abrir as chaves e implementar a lógica da mesma forma que outras linguagens. Para retornar um valor, também como no JavaScript, basta colocar a palavra chave `return` juntamente do valor a ser retornado. Se a função não tiver um **return**, então precisa indicar que a função tem um retorno do tipo `void`.
+
+Por serem métodos, não há nada que determine uma ordem de declaração e depois de utilização. Então um método lá embaixo no arquivo pode estar sendo usado lá na parte de cima, sem problemas. Mas vale ressaltar que caso a classe tenha algum método marcado como estático, este só poderá utilizar outros métodos desde que eles também sejam do tipo estático. Por outro lado, métodos de instância estão livres para utilizar métodos estáticos.
