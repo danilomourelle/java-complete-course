@@ -177,3 +177,189 @@ public class App {
 
 // 2.25
 ```
+
+### Aula 26-27 - Entrada de dados
+
+Em uma interação com o usuário, é provável que se faça necessário a entrada de dados que serão utilizados para um processamento. Para entradas de texto via terminal, o Java disponibiliza uma classe chamada **Scanner** que pode se acoplar ao sistema de entrada padrão do programa, e com isso coletar informações em durante a execução.
+
+Essa classe também precisa ser importada da lib *utils* e um objeto deve ser instanciado. E aqui acontece uma outra coisa estranha do Java, esse objeto, em algum momento, precisa indicar que parou de observar o input. Inclusive o VSCode já mostra um warnning caso não identifique o fechamento do objeto. Então um exemplo simples de como usar a classe ficaria assim:
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+       Scanner scanner = new Scanner(System.in);
+       
+       scanner.close(); // fecha a observação do objeto 
+       }
+}
+```
+
+Esse objeto, como vai ficar escutando pelos inputs do terminal, apresenta alguns métodos que vão fazer a captura do valor inserido. Entre eles temos o método `next` que pega pela primeira palavra inserida, mesmo que mais de uma seja enviada, apenas a primeira será capturada.
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+       Scanner scanner = new Scanner(System.in);
+       
+       String text = scanner.next();
+       // Digitado "Foo Bar" no terminal
+       System.out.println(text);
+       scanner.close();
+       }
+}
+
+// "Foo"
+```
+
+Outro método do objeto Scanner é o `nextInt` que vai pegar esse valor mas no formato numérico e não na sua correspondência de texto como o anterior faz.
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+       Scanner scanner = new Scanner(System.in);
+       
+       int num = scanner.next();
+       // Digitado "23 45" no terminal
+       System.out.println(num);
+       scanner.close();
+       }
+}
+
+// 23
+```
+
+Porém esse último caso tem um detalhe, todo número tem o seu correspondente em string, então o método **next**, se receber um número, ele converte para o formato string. Uma soma desse valor, iria concatenar as strings ao invés de somar, mas o input seria aceito. Já o método **nextInt** ele precisa receber um número inteiro, e como nem todo texto pode ser convertido, caso o input seja algo como “lorem ipsum”, isso vai gerar uma exceção na entrada do valor.
+
+Se for necessário ler um número flutuante, existe o método `nextDouble` e este sofre efeitos do indicador de decimal, igual já comentado anteriormente. Então se o programa for configurado para receber um número utilizando `.` como indicador, e o input ser passado com uma `,` vai gerar um erro.
+
+O único detalhe desse caso é que diferente dos métodos de impressão, o objeto Scanner não aceita um parâmetro de localização, e por isso é preciso fazer no contexto do programa, e se necessário desfazer após a captura do dado.
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+       Locale.setDefault(Locale.US);
+       Scanner scanner = new Scanner(System.in);
+       
+       double num = scanner.nextDouble();
+       // 2324.12313 23411.12314 no terminal
+       System.out.println(num);
+       scanner.close();
+       }
+}
+
+// 2324.12313
+```
+
+Sem a linha `Locale.setDefault(Locale.US)`, ao inserir números usando `.` como indicador decimal, um erro será lançado. Agora, depois da definição de Locale, teremos um erro caso um valor com `,` seja enviado.
+
+Em todos os exemplos acima, a gente passou mais de um valor, separado por espaços, e os métodos pegavam apenas o primeiro. Isso quer dizer que o espaço cria um ponto de quebra da informação, e isso pode ser utilizado para solicitar mais de um dado em um mesmo input. 
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+       Scanner scanner = new Scanner(System.in);
+       
+       String text = scanner.next();
+       int num = scanner.nextInt();
+       double num2 = scanner.nextDouble();
+       
+       // Digitado "Foo 23 35.696" no terminal
+       System.out.printf("Texto: %s\nNúmero inteiro: %d\nNúmero decimal: %.3f\n", text, num, num2);
+       scanner.close();
+    }
+}
+
+// "Texto: Foo"
+// "Número inteiro: 23"
+// "Número decilmal: 35,696"
+```
+
+Obviamente, da mesma forma que um input individual, essa forma de vários dados em uma mesma linha então sujeitos a uma validação do tipo, lançando uma exceção caso o tipo passado não corresponda ao tipo esperado.
+
+Além dessas formas de dados individuais, também é possível pegar todo o conteúdo de uma linha como se fosse um único dado, como um texto. Para isso você deve usar o método `nextLine`. Porém, vamos para mais uma bizarrice da linguagem, você pode ter uma quebra de linha presa nessas situações. Como assim?
+
+Caso você utilize algum dos outros métodos comentados acima, você vai inserir o valor e digitar o *Enter* como uma confirmação de dado, mas acontece que isso insere uma quebra de linha que fica presa, já que os métodos param ao final do dado em si e não do EOL, então essa quebra fica acumulada, fazendo com que o primeiro uso desse método, que busca pelo EOL, já encontre esse acúmulo, sem nenhum dado.
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+	    Scanner scanner = new Scanner(System.in);
+       
+	    int x;
+			String s1, s2, s3;
+			x = scanner .nextInt();    // Vai gerar uma quebra de linha presa;
+			s1 = scanner .nextLine();  // Vai pegar a quebra pendente sem valor
+			s2 = scanner .nextLine();  
+			s3 = scanner .nextLine();
+			
+			// Digitado 32 -> Enter
+			// Digitado "Hello There!" -> Enter
+			// Digitado "How are you?" -> Enter
+			
+			System.out.println("DADOS DIGITADOS:");
+			System.out.println(x);
+			System.out.println(s1);
+			System.out.println(s2);
+			System.out.println(s3);
+	    
+	    scanner.close();
+    }
+}
+// DADOS DIGITADOS:
+// 23
+// ""
+// "Hello There!"
+// "How are you?"
+
+```
+
+Então, senta que lá vem a gambiarra. Nesses casos você faz uma chamada extra para o `nextLine` apenas para descartar essa quebra de linha pendente.
+
+```java
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+	    Scanner scanner = new Scanner(System.in);
+       
+	    int x;
+			String s1, s2, s3;
+			x = scanner .nextInt();    // Vai gerar uma quebra de linha presa;
+			scanner.nextLine();        // Vai descartar a quebra pendente;
+			s1 = scanner .nextLine();  // Vai pegar o valor desejado
+			s2 = scanner .nextLine();  
+			s3 = scanner .nextLine();
+			
+			// Digitado 32 -> Enter
+			// Digitado "Hello There!" -> Enter
+			// Digitado "How are you?" -> Enter
+			// Digitado "Let's have some dinner tonight?" -> Enter
+			
+			System.out.println("DADOS DIGITADOS:");
+			System.out.println(x);
+			System.out.println(s1);
+			System.out.println(s2);
+			System.out.println(s3);
+	    
+	    scanner.close();
+    }
+}
+// DADOS DIGITADOS:
+// 23
+// "Hello There!"
+// "How are you?"
+// "Let's have some dinner tonight?"
+```
