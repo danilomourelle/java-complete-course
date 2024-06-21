@@ -665,3 +665,36 @@ public class Product {
 ```
 
 Bom, poderia apenas proibir o conflito de nome, forçar que o parâmetro se chamasse por exemplo `quantityToAdd`, `quantityToRemove`. Vamos continuar a ver as próximas aulas.
+
+### Aula 68: Imprimindo um objeto
+
+Uma coisa interessante do Java é que toda classe existente é criada herdando os métodos da classe nativa `Object`. Essa classe apresenta um método `.toString()` que faz a conversão do objeto em uma string. Essa conversão acontece automaticamente quando o sistema identifica que o objeto está sendo impresso, isso significa que para imprimir no console basta utilizar o `System.out.print(objeto)`, e ele automaticamente faz a chamada do **.toString** por baixo do panos.
+
+Acontece que isso pode gerar um comportamento estranho, já que a função original pode não ser aquilo que se imagina, então é comum que classes tenham um método de mesmo nome para sobrescrever o comportamento original.
+
+Aí foi apresentado alguns macetes de conversão de números, sem que seja dentro da própria função de impressão. Então no exemplo da classe de Produtos, poderíamos ter uma função assim:
+
+```java
+public String toString() {
+	return name
+		+ ", $ "
+		+ String.format("%.2f", price)
+		+ ", "
+		+ quantity
+		+ " units, Total: $ "
+		+ String.format("%.2f", totalValueInStock());
+}
+```
+
+Repare que o objeto nativo **String** apresenta um método que vai receber a formatação e o valor numérico a ser formatado. Inclusive esse método pode ser utilizado como uma forma de se fazer uma espécie de *template string* do JavaScript. Na verdade, ela faz igual no **.printf**, mas ao invés de imprimir, ela retorna a string formatada.
+
+```java
+@Override
+public String toString() {
+    return String.format("%s, $ %.2f, %d units, Total: $ %.2f", name, price, quantity, totalValueInStock());
+}
+```
+
+Coisas ensinadas pela IA: A anotação `@Override` mostra para o compilador que está é uma função que irá sobrescrever um método de uma super classe. Ela não é obrigatória, mas é legal usar porque com ela, o compilador checa a cadeia para ver se a função realmente existe e se tem a mesma assinatura. Se essa verificação falhar, ele interrompe a compilação. 
+
+Por outro lado, sem a anotação, ele simplesmente vai compilar e você pode acabar tendo um método novo em caso de erro de digitação, ou criar um comportamento errante caso a assinatura não seja a mesma. Portanto use isso.
