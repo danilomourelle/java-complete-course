@@ -1206,3 +1206,44 @@ LocalDateTime datetime = LocalDateTime.of(year, month, day, hour, minute);
 // 2024-06-19T12:00
 ```
     
+### Aula 112: Parse Dates
+    
+Para fazer o parse de um objeto com informação de data, temos que os objetos vão apresentar o método `.toString()`, sendo que por padrão ele sempre vai retornar uma string representativa no formato ISO.
+
+Agora, caso seja necessário obter um string em algum outro formato específico, basta usar a mesma classe de formatação para fazer essa conversão. Para isso há duas opções de comando, sendo uma delas `date.format(formatter)` e a outra `formatter.format(date)`. Ou seja, usando o método `.format()` seja no objeto de data, seja no objeto do estilo de formatação.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+System.out.println(today.format(fmt1));
+System.out.println(fmt1.format(today));
+
+// 19/06/2024
+// 19/06/2024
+```
+
+Esse método funciona também para o **LocalDateTime**, mas falha um pouco para um **Instant** já que ele não tem o método *.format()* e quando utilizado deve sempre ser considerado o TZ da informação. Por isso, quando utilizar o formatador com esse tipo, deve-se utilizar exclusivamente o método do formatador, passando o **Instant** como argumento. E mais do que isso, esse formatador, precisa indicar qual o TZ que vai ser considerado na impressão.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+
+DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+DateTimeFormatter fmt2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+DateTimeFormatter fmt3 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneId.systemDefault());
+
+System.out.println(fmt1.format(today));
+System.out.println(fmt2.format(now));
+System.out.println(fmt3.format(nowISO));
+
+// 19/06/2024
+// 19/06/2024 11:55:30
+// 19/06/2024 11:55:30 -> repare que a data original estava como 14:55 UTC
+```
+
+Parece uma boa ideia padronizar então sempre ter a formatação com o método sendo chamado do formatador, e não ficar misturando as possibilidades. Outra detalhe é que caso se tente usar um **Instant** com um formatador sem a informação de TZ ele vai gerar um erro. Isso vale inclusive para os formatadores pré definidos na classe. 
+
+Esse TZ que deve ser acrescentado, tem a classe `ZoneId` que além de fornecer alguns métodos que vão retornar ajudar a retornar a informação de zona, tem também um método `.getAvailableZoneIds()` que retorna uma série de valores que podem ser utilizados como referência, como IANAs por exemplo.
+    
