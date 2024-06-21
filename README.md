@@ -373,3 +373,74 @@ public class App {
 Agora entre subtipos numéricos, ele aceita a comparação mas o comportamento pareceu meio errante. Comparando **float** com **double**, ele retorna verdadeiro para `0.0f` e `0.0`, mas retorna falso para `0.5f` e `0.5`. Comparação entre **float** e **int** funciona com valores diferentes de 0, e vão retornar verdadeiro apenas nos casos em que o número decimal apresentar apenas 0 após a vírgula. Esse mesmo comportamento acontece ao compartar **int** e **double.**
 
 A questão da comparação entre **float** e **double**, segundo o Inteligência Artificial (GitHub Copilot), vai ter esse comportamento pela questão que o primeiro é um número flutuante de 32 bits de única precisão, enquanto que o segundo é um valor de 64 bits com uma dupla precisão. Então 0.4 nos dois tipos acaba apresentando um diferença nesse calculo da precisão. O que faz essa comparação ser considerada falso. (Nessa o JavaScript também tem as suas loucuras).
+
+### Aula 35-40 - Condicionais
+
+O Java tem basicamente a mesma programação condicional do JavaScript. 
+
+Vai ter a estrutura de `if/else` podendo aninhar mais de um e até fazer a cadeia com os `else if`.
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        int x = 10;
+
+        if (x < 10) {
+            System.out.println("Menor que 10");
+        } else if (x == 10) {
+            System.out.println("Igual a 10");
+        } else {
+            System.out.println("Maior que 10");
+        }
+    }
+}
+```
+
+Vai ter a estrutura de `switch/case`:
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        int number;
+        String weekDay;
+
+       switch (number) {
+        case 1:
+            weekDay = "Sunday";
+            break;
+        case 2:
+            weekDay = "Monday";
+            break;
+        case 3:
+            weekDay = "Tuesday";
+            break;
+        case 4:
+            weekDay = "Wednesday";
+            break;
+        case 5:
+            weekDay = "Thursday";
+            break;
+        case 6:
+            weekDay = "Friday";
+            break;
+        case 7:
+            weekDay = "Saturday";
+            break;
+        default:
+            weekDay = "Invalid day";
+            break;
+       }
+    }
+}
+```
+
+E tem também o operador ternário, que funciona como uma espécie de `if/else` mas com uma complexidade bem mais baixa e normalmente utilizada para se atribuir um valor em formato condicional
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        int hours = 0;
+        String greetings = hours < 12 ? "Good Morning" : "Good Afternoon";
+    }
+}
+```
