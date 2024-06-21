@@ -363,3 +363,13 @@ public class App {
 // "How are you?"
 // "Let's have some dinner tonight?"
 ```
+
+## Seção 5: Estrutura condicional
+
+### Aula 33 - Expressões comparativas
+
+É basicamente a mesma coisa do JavaScript, mas aqui a comparação de igualdade se dá com apenas `==`. O vídeo não fala, mas fazendo um teste no VSCode, uma comparação entre tipos diferentes, ele já nem deixou fazer, por exemplo `10 == "10"`. Não é que vai retornar um falso, ele simplesmente nem deixa fazer essa comparação.
+
+Agora entre subtipos numéricos, ele aceita a comparação mas o comportamento pareceu meio errante. Comparando **float** com **double**, ele retorna verdadeiro para `0.0f` e `0.0`, mas retorna falso para `0.5f` e `0.5`. Comparação entre **float** e **int** funciona com valores diferentes de 0, e vão retornar verdadeiro apenas nos casos em que o número decimal apresentar apenas 0 após a vírgula. Esse mesmo comportamento acontece ao compartar **int** e **double.**
+
+A questão da comparação entre **float** e **double**, segundo o Inteligência Artificial (GitHub Copilot), vai ter esse comportamento pela questão que o primeiro é um número flutuante de 32 bits de única precisão, enquanto que o segundo é um valor de 64 bits com uma dupla precisão. Então 0.4 nos dois tipos acaba apresentando um diferença nesse calculo da precisão. O que faz essa comparação ser considerada falso. (Nessa o JavaScript também tem as suas loucuras).
