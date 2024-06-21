@@ -1246,4 +1246,17 @@ System.out.println(fmt3.format(nowISO));
 Parece uma boa ideia padronizar então sempre ter a formatação com o método sendo chamado do formatador, e não ficar misturando as possibilidades. Outra detalhe é que caso se tente usar um **Instant** com um formatador sem a informação de TZ ele vai gerar um erro. Isso vale inclusive para os formatadores pré definidos na classe. 
 
 Esse TZ que deve ser acrescentado, tem a classe `ZoneId` que além de fornecer alguns métodos que vão retornar ajudar a retornar a informação de zona, tem também um método `.getAvailableZoneIds()` que retorna uma série de valores que podem ser utilizados como referência, como IANAs por exemplo.
+
+### Aula 113: Convertendo Instant em Local
+    
+Para fazer a conversão de um objeto **Instant** em um **Local** vamos ter algumas opções, sendo uma delas utilizando um método estático da classe *target* e a outra forma, é transformar o objeto **Instant** em um do tipo **ZonedDateTime** e então em um **LocalDate** com os métodos de instância.
+
+```java
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+
+LocalDate today = LocalDate.ofInstant(nowISO, ZoneId.of("America/Sao_Paulo"));
+LocalDate today2 = nowISO.atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate();
+```
+
+Os objetos de data vão ter vários métodos, seria interessante ir lendo a assinatura deles conforme for abrindo no Intellisense. Eles vão ter métodos clássicos para isolar a informação de dia, de mês entre outros dados.
     
