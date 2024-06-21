@@ -861,7 +861,7 @@ Apenas para fins de esclarecimento, um elemento declarado como `public` poderá 
 
 Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
 
-## Seção 10 - Memória, Arrays e Listas
+## Seção 10: Memória, Arrays e Listas
 
 ### Aula 87: Tipos referência vs Tipos valor
     
@@ -1135,3 +1135,74 @@ Acontece que alguns desses transformadores apresentam uma ação de finalizaçã
 Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
 
 Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.
+
+## Seção 11: Dates
+
+### Aula 111: Objetos do tipo de datas
+    
+O Java vai ter os mesmo conceitos para datas e horas, sendo o formato local, que é sem informação de um TZ associado, e padrão ISO, e por falar em padrão ISO isso independe da linguagem então ela vai ter o formato `yyyy-MM-ddThh:mm:ss.xxxZ`. 
+
+Diferentemente do JavaScript que utiliza basicamente a classe `Date` para tudo, o Java vai apresentar classes especificas para cada tipo de situação. Uma informação de data local vai utilizar a classe `LocalDate`, enquanto que uma informação de data-hora local vai utilizar a classe `LocalDateTime`. Já a informação no formato ISO vai utilizar a classe `Instant`. Cabe ressaltar que um **LocalDateTime** pode existir sem a informação de horário, enquanto que um **LocalDate** vai descartar qualquer informação de horário.
+
+A operação mais básica com essas classes é a obtenção de valor do momento da execução, e para isso basta utilizar o método `now()` das classes. Abaixo seguem exemplos com cada classe:
+
+```java
+LocalDate today = LocalDate.now();
+LocalDateTime now = LocalDateTime.now();
+Instant nowISO = Instant.now();
+
+// 2024-06-19
+// 2024-06-19T11:55:30.302942
+// 2024-06-19T14:55:30.302942Z
+```
+
+Outra operação muito comum é quando nós temos uma string que representa um momento e nós precisamos converter isso em um objeto com os valores definidos pela string. Esse tipo de instancia pré-definida se dá utilizando o método `parse()`.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+Instant nowISOFromTZ = Instant.parse("2024-06-19T11:55:30.302942-03:00");
+
+// 2024-06-19
+// 2024-06-19T11:55:30.302942
+// 2024-06-19T14:55:30.302942Z
+// 2024-06-19T14:55:30.302942Z
+```
+
+Agora, no caso de essa string não estar no formato ISO, o que a gente precisa fazer é avisar o `parser()` qual é o formato que deve ser considerado na string. Para isso, existe uma outra classe utilizada para indicar o tipo do formato utilizado por uma string que é a classe `DateTimeFormatter`. A documentação da classe está nesse [link](https://docs.oracle.com/en%2Fjava%2Fjavase%2F22%2Fdocs%2Fapi%2F%2F/java.base/java/time/format/DateTimeFormatter.html) 
+
+```java
+String stringDate = "19/06/2024";
+DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+LocaDate date = LocalDate.parse(stringDate, format);
+
+// 2024-06-19
+```
+
+```java
+String stringDate = "19/06/2024 12:30";
+DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+LocalDateTime date = LocalDateTime.parse(stringDate, format);
+
+// 2024-06-19T12:30
+```
+
+Como última opção, é a criação de um objeto de data quando nós temos os valores de ano, mês, hora ou minuto de forma individual. Para isso as classes apresentam um método `.of()`. Por ser uma condição com várias combinações possíveis, esse método vai ter várias sobrecargas, então é bom dar uma olhada nas opções quando for utilizar.
+
+```java
+int year = 2024;
+int month = 06;
+int day = 19;
+int hour = 12;
+int minute = 00;
+
+LocalDate date = LocalDate.of(year, month, day);
+LocalDateTime datetime = LocalDateTime.of(year, month, day, hour, minute);
+
+// 2024-06-19
+// 2024-06-19T12:00
+```
+    

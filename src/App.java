@@ -1,45 +1,47 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class App {
   public static void main(String[] args) throws Exception {
-    List<String> names = new ArrayList<>();
+    // Current date and time
+    LocalDate today = LocalDate.now();
+    LocalDateTime now = LocalDateTime.now();
+    Instant nowISO = Instant.now();
 
-    // ADD
-    names.add("Alice");
-    names.add("Bob");
-    names.add("David");
-    names.add(2, "Charlie"); // Insert at index 2 and shift the rest
+    System.out.println("Today: " + today);
+    System.out.println("Now: " + now);
+    System.out.println("Now ISO: " + nowISO);
 
-    // REMOVE
-    names.remove("David");
-    names.remove(0); // Remove the first element and shift the rest
+    // Parse date and time from ISO format
+    today = LocalDate.parse("2024-06-19");
+    now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+    nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+    Instant nowISOFromTZ = Instant.parse("2024-06-19T11:55:30.302942-03:00");
 
-    // REMOVEIF
-    names.removeIf(name -> name.startsWith("A")); // Remove all names starting with 'A'
+    System.out.println("Today: " + today);
+    System.out.println("Now: " + now);
+    System.out.println("Now ISO: " + nowISO);
+    System.out.println("Now ISO from TZ: " + nowISOFromTZ);
 
-    names.size(); // length of the list
-    names.indexOf("Bob"); // Get the index of 'Bob' or -1 if not found
+    // Parse date and time from custom format
+    String stringDate = "19/06/2024";
+    DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    LocalDate date = LocalDate.parse(stringDate, format);
 
-    // STREAM
-    // Unmodifiable list
-    List<String> namesStartingWithA = names.stream()
-        .filter(name -> name.startsWith("A"))
-        .toList();
+    stringDate = "19/06/2024 12:30";
+    format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    LocalDateTime dateTime = LocalDateTime.parse(stringDate, format);
 
-    namesStartingWithA.add("Eve"); // UnsupportedOperationException
+    // Individual values
+    int year = 2024;
+    int month = 06;
+    int day = 19;
+    int hour = 12;
+    int minute = 00;
 
-    // Modifiable list
-    List<String> namesStartingWithB = names.stream()
-        .filter(name -> name.startsWith("B"))
-        .collect(Collectors.toList());
-
-    namesStartingWithB.add("Eve"); // OK
-
-    String firstNameWithA = names.stream()
-      .filter(name -> name.startsWith("A"))
-      .findFirst()
-      .orElse(null);
+    date = LocalDate.of(year, month, day);
+    dateTime = LocalDateTime.of(year, month, day, hour, minute);
   }
 }
