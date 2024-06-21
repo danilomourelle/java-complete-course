@@ -785,3 +785,71 @@ public class Product {
 
 Repare que temos duas funções construtoras sendo que na segunda, ela dispensa o valor de quantidade. Ou seja, ao se fazer a instanciação de um objeto do tipo **Product**, você vai poder fazer tanto passando a quantidade, quanto sem passar. Neste último caso, vale ressaltar que o valor para o atributo *quantity* não vai ser inicializado na instanciação, mas o Java, sempre inicializa uma variável **int** com o valor 0, então você teria um produto com uma quantidade 0.
 
+### Aula 79 - Encapsulamento
+
+A ideia é proteger qualquer dado do objeto para que ele permaneça consistente. Por exemplo, um objeto criado com uma informação que alguém pode simplesmente alterar e depois isso vai gerar uma quebra do programa. 
+
+Para isso, uma convenção é que todos os atributos sejam declarados como privados e que qualquer manipulação seja feita utilizando métodos conhecidos como *getters* e *setters*. 
+
+Os *getters* normalmente são funções que vão ter como nome a concatenação da expressão “get” mais no nome do atributo, por exemplo `getName`, vai ter como retorno o mesmo tipo do atributo e vair retornar o valor do atributo. Ele pode apresentar alguma lógica, a fim de verificar se é adequado retornar o valor na ocasião.
+
+Os *setters* são funções para alterar o valor do atributo. A nomenclatura também segue um padrão onde se tem a concatenação da expressão “set” mais o nome do atributo, por exemplo `setName`. Obviamente ela vai apresentar pelo menos 1 argumento, que seria o novo valor, e pode ter uma lógica, por exemplo, impedir valores negativos em um atributo de tamanho.
+
+Vamos ao exemplo da classe **Product**
+
+```java
+package entities;
+
+public class Product {
+  private String name;
+  private double price;
+  private int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public void setPrice(double price) {
+    this.price = price;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(int quantity) {
+    this.quantity = quantity < 0 ? 0 : quantity;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Veja nesse exemplo, como para o atributo `quantity` não foi criado um *setter* já que ele já tem os outros métodos que vão realizar o incremento e o decremento.
+
+Mas assim, se é para ter um *getter* e um *setter* que apenas retorne o valor e também possa alterar sem nenhum tipo de validação, então não faz sentido marcar o atributo como privado. As IDEs já disponibilizam uma ferramenta que automaticamente gera esses *getters* e *setters* simples para todos os atributos, para na minha opinião, usar isso dessa forma é um erro. Vá criando conforme você identifique a necessidade e condições de acesso ao atributo.
+
