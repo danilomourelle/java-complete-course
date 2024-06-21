@@ -853,3 +853,10 @@ Veja nesse exemplo, como para o atributo `quantity` não foi criado um *setter* 
 
 Mas assim, se é para ter um *getter* e um *setter* que apenas retorne o valor e também possa alterar sem nenhum tipo de validação, então não faz sentido marcar o atributo como privado. As IDEs já disponibilizam uma ferramenta que automaticamente gera esses *getters* e *setters* simples para todos os atributos, para na minha opinião, usar isso dessa forma é um erro. Vá criando conforme você identifique a necessidade e condições de acesso ao atributo.
 
+### Aula 81 - Modificadores de acesso
+
+A gente já viu que os elementos de uma classe, pode estar `public` e `private`, mas também existem outras opções que vão ter os seus efeitos.
+
+Apenas para fins de esclarecimento, um elemento declarado como `public` poderá ser acessado por todas as classes, a não ser que essa classe faça parte de um outro módulo que não exporte o pacote da qual ela faz parte.
+
+Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
