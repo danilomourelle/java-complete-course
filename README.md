@@ -1260,3 +1260,34 @@ LocalDate today2 = nowISO.atZone(ZoneId.of("America/Sao_Paulo")).toLocalDate();
 
 Os objetos de data vão ter vários métodos, seria interessante ir lendo a assinatura deles conforme for abrindo no Intellisense. Eles vão ter métodos clássicos para isolar a informação de dia, de mês entre outros dados.
     
+### Aula 114: Calculo com datas
+    
+Após a criação de uma data, esse objeto é imutável, portanto quando necessário, uma nova instancia precisa ser criada com o novo valor. Os objetos de data vão apresentar um série de métodos que podem retornar um novo objeto calculado com a diferença desejada. Os principais métodos das classes **LocalDate** e **LocalDateTime** vão somar ou subtrair uma quantidade de tempo e por isso eles vão ter um prefixo comum como `.minusDays()` e `.minusWeeks()` para subtrair e `.plusDays()` e `.plusWeeks()` para somar.
+
+Já os objetos da classe **Instant**, eles vão apresentar um método um pouco diferente. Ele apresenta menos métodos, mas em compensação tem um mais genérico que é o `.minus()` que vai aceitar um número, e uma unidade de medida. O mesmo acontece para o método `.plus()`.
+
+Para essa unidade de medida o Java disponibiliza a classe `ChronoUnit` que vai conter valores estáticos que vão servir para preencher o campo da forma correta.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDate yesterday = today.minusDays(1);
+
+LocalDateTime now = LocalDateTime.parse("2024-06-19T11:55:30.302942");
+LocalDateTime minus24Hours = now.minusHours(24);
+
+Instant nowISO = Instant.parse("2024-06-19T14:55:30.302942Z");
+Instant tomorrow = nowISO.plus(1, ChronoUnit.DAYS);
+```
+
+Para calcular a distância entre duas data, o Java vai ter a classe `Duration` e ela vai ter um método estético `.between()` que pode ser utilizado para se obter o objeto de duração entre duas datas. Esse objeto vai ter os seu métodos para que o seu valor possa ser obtido em um formato mais adequado. Por exemplo, é possível utilizar o método `.toDays()` que vai retornar o valore dessa duração em dias.
+
+```java
+LocalDate today = LocalDate.parse("2024-06-19");
+LocalDate yesterday = today.minusDays(1);
+
+Duration duration = Duration.between(today, yesterday);
+System.out.println(duration.toDays());
+```
+
+Porém, esse método aceita apenas **LocalDateTime**, ou seja, se a gente tiver objetos do tipo **LocalDate**, a gente precisa primeiro transformá-los para acrescentar a informação de horário, e para isso a gente pode utilizar o método `.atTime()` onde a gente pode especifica uma hora e minuto, ou podemos usar o método `.atStartOfDay()` que vai considerar o 00:00.
+    
