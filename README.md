@@ -709,7 +709,7 @@ Outra situação é que se usa uma classe com elementos estáticos é quando voc
 
 Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.
 
-### Seção 9: Construtores, this, sobrecarga e encapsulamento
+## Seção 9: Construtores, this, sobrecarga e encapsulamento
 
 ### Aula 76 - Construtores
 
@@ -860,3 +860,278 @@ A gente já viu que os elementos de uma classe, pode estar `public` e `private`,
 Apenas para fins de esclarecimento, um elemento declarado como `public` poderá ser acessado por todas as classes, a não ser que essa classe faça parte de um outro módulo que não exporte o pacote da qual ela faz parte.
 
 Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
+
+## Seção 10 - Memória, Arrays e Listas
+
+### Aula 87: Tipos referência vs Tipos valor
+    
+Valores primitivos, como **int**, **double**, **char**, **boolean** vão ter o valor da variável armazenado diretamente o setor `stack` da memória. Isso significa que caso você assinale uma variável primitiva com o valor de uma outra variável, quando ele copiar esse conteúdo da stack, ele vai copiar o valor, e portanto você terá dois valores iguais porém independentes.
+
+Agora para valores complexos, de objeto. O que acontece é que como eles precisam de mais memória, os valores em si são armazenados em uma outra sessão, chamada `heap`. Com isso a variável que fica na stack vai armazenar o endereço dos dados na heap. Isso faz com que ao assinalar uma variável de objeto para outra variável, ao copiar o conteúdo da stack, ele copia o endereço da heap, e aí você passa a ter duas variáveis apontando para um mesmo lugar.
+
+Algo me diz que o JavaScript deve fazer alguma coisa desse tipo, e por isso que comparar dois objetos com os mesmo valores vai dar `false` e copiar um objeto faz com que alterações na cópia também reflitam no original.
+
+Agora, tem um outro detalhe importante, se você declara uma variável ou um método sem inicializar o valor, ele vai dar erro caso você tente utilizá-la. Os valores padrão do Java só são aplicados aos atributos da classe, e não a todas as variáveis. Então, uma classe que tenha um atributo não inicializado no seu construtor, esse sim vai apresentar um valor padrão de acordo com o tipo.
+    
+### Aula 88: Desalocação e Garbage Collector
+    
+Quando um programa inicia, o que acontece é que são criados dois tipos de memória, uma chamada de **Stack** e outra de **Heap**. O que acontece é que uma função, ao ser executada, vai ter o seu contexto, e esse contexto é como se fosse um bloco dentro da **Stack** e lá serão salvas as variáveis primitivas dessa função.
+
+Já no caso dessas variáveis ser um objeto, os dados do objeto, por serem mais complexos, são salvos na **Heap** e o endereço onde foi salvo é que vai parar na variável da **Stack**. Já falamos disso na aula 87.
+
+Aí como funciona a reciclagem de memória? Durante a execução da função, o bloco dentro da **Stack** está lá, então suas variáveis primitivas com seus valores e as de referência armazenando o endereço a **Heap**. O que acontece é que ao finalizar a execução, esse bloco da **Stack** é totalmente apagado, então todos os valores primitivos somem, e os ponteiros também, abrindo espaço para novas alocações.
+
+Mas e os dados que estavam na **Heap**? Bom, esses acabam ficando lá, sem ninguém estar apontando para eles, e é aí que entra o conceito de *Garbage Collector*. O *GC* vai ficar observando a **Heap** e sempre que identificar dados sem ninguém apontando para ele, esses dados serão deletados e a memória ficará disponível para reutilização.
+    
+### Aulas 89-95: Arrays
+    
+Um array obrigatoriamente deve ter todos os elementos do mesmo tipo, e um outro detalhe é que ele deve ter um tamanho pré determinado na sua criação e esse tamanho não pode ser alterado.
+
+Para criar um array você precisa indicar o tipo dos dados, seguido do símbolo `[]`, então o nome. No caso de você não ter os elementos do array ainda, então essa declaração precisa indicar pelo menos a quantidade de elementos que ele vai ter, e para isso você vai usar a palavra chave `new` depois o tipo utilizado na primeira parte e entre parênteses a quantidade desse array.
+
+Veja um exemplo de um array de `double`:
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    Locale.setDefault(Locale.US);
+    Scanner scanner = new Scanner(System.in);
+
+    int quantity = scanner.nextInt();
+    double[] height = new double[quantity];
+
+    for (int i = 0; i < quantity; i++) {
+      height[i] = scanner.nextDouble();
+    }
+
+    scanner.close();
+  }
+}
+```
+
+Agora, caso você tenha os valores desse array, é possível fazer a criação dele logo de cara, por exemplo `double[] height = {1.75, 1.80, 1.65, 1.90};` 
+
+Apenas ressaltando que isso vale tanto para valores primitivos quanto para tipo de objetos, então uma declaração do tipo `Product[] products = new Product[length]`. É, eu sei, é estranho, porque parece que vc quer instanciar a classe com o valor de length no construtor, mas basta reparar que nos arrays são usados chaves e não parênteses. Aliás, falando em length, vale dizer que os arrays de Java apresentam essa propriedade então o exemplo acima poderia ser:
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    Locale.setDefault(Locale.US);
+    Scanner scanner = new Scanner(System.in);
+
+    int quantity = scanner.nextInt();
+    double[] height = new double[quantity];
+
+    for (int i = 0; i < height.length ; i++) {
+      height[i] = scanner.nextDouble();
+    }
+
+    scanner.close();
+  }
+}
+```
+    
+### Aula 96: Boxing, Unboxing e Wrapper Classes
+    
+**Boxing** e **Unboxing** são formas de você transportar um valor que pode ser considerado em primitivo para um de referência. Por exemplo, fazer o **Boxing** de uma variável do tipo **int** seria fazer com que ela deixasse de existir na **Stack** e passasse a existir na **Heap**. Isso poderia ser feito da seguinte forma:
+
+```java
+  public class App {
+  public static void main(String[] args) throws Exception {
+    int x = 10;
+
+    Object obj = x;
+  }
+}
+```
+
+Dessa forma a variável `obj` passou a ser um objeto armazenado com referência na **heap**. Para o processo de **Unboxing**, basta fazer o inverso:
+
+```java
+  public class App {
+  public static void main(String[] args) throws Exception {
+    int x = 10;
+
+    Object obj = x;
+    
+    int y = (int) obj;
+  }
+}
+```
+
+Mas repare que nesse caso, o compilador exige que você faça o casting, porque afinal, é preciso ter a certeza que esse objeto vai ter um valor compatível com o tipo primitivo que vai fazer o **Unboxing**.
+
+É aí que entra o conceito das **Wrapper Classes**. O Java vai ter uma classe compatível para cada tipo primitivo, sendo elas bem identificadas - *Byte, Short, Integer, Long, Float, Double, Boolean, Character*. Essas classes podem fazer essa transição de **Boxing ↔ Unboxing** sem a necessidade do casting.
+
+Outra vantagem dessas Wrapper Classes, é que por acabar gerando um obejto, isso significa que o valor padrão desses tipos vai ser sempre `null`. Isso faz com que seja uma boa prática que os atributos de uma classe sempre sejam declarados com essas classes e não com o tipo primitivo, pois assim, em uma instanciação, os valores iniciais do objeto vão ser `null`. 
+
+Isso é bom porque imagina que você tem um campo que armazena notas de uma prova. Antes de a prova ser aplicada, não dá pra ter valor, e caso esse campo seja declarado como primitivo, o que vai acontecer é que o valor será 0, o que não é real. Na verdade não há a nota, e portanto deveria ser nulo. Declarar esse campo com `Double` vai fazer com que esse campo possa ser e inicie com o valor nulo. Por isso é uma boa pratica que atributos de classes sejam declarados com a **Wrapper Class**.
+    
+### Aula 97: for each
+    
+Esse é um tipo de loop em um array, mas em comparação com o JavaScript, é muito mais parecido com o `for...of`.
+
+Para usar é basicamente colocar a expressão `for` abrindo o parêntese, depois o tipo do elemento do array (pra que né??), um nome para referenciar o elemento da vez, o símbolo `:` e o array que deve ser iterado. Abaixo vai ter o exemplo.
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    String[] names = { "Maria", "Bob", "Alex" };
+
+    for (String currentName : names) {
+      System.out.println(currentName);
+    }
+  }
+}
+```
+    
+### Aula 98-99: Listas
+    
+A ideia de lista é dar um pouco mais de maleabilidade para um array. Como comentado, você não poder alterar o tamanho do array, vai deixa tudo muito frustrante, ainda mais para quem veio do JavaScript e pode fazer isso. 
+
+No Java, o `List` acaba sendo uma interface que é utilizada por classes como o `ArrayList` e o `LinkedList`. A ideia é que na memória, essa estrutura não precisa estar enfileirada, e para que isso seja possível, a estratégia montada é que um elemento tenha a informação da posição do próximo elemento. Isso cria a possibilidade de um tamanho dinâmico, enquanto que diminui um pouco da performance em casos de iteração.
+
+Para se criar uma lista, você pode usar a interface para indicar o tipo da variável, mas não para assinalar o valor, uma vez que a interface não gera instância. Nesse caso você necessariamente precisa de uma classe que implemente a interface. Imagino eu que seja possível tipar a variável também com a classe, pelo menos funciona no VSCode.
+
+```java
+public static void main(String[] args) throws Exception {
+    List<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Bob");
+    names.add("Charlie");
+    names.add("Dave");
+    names.add("Eve");
+
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
+```
+
+Bom, o exemplo acima traz a declaração de uma `ArrayList` assim como a forma de se adicionar elementos nessa lista. O método `add` quando apenas com um argumento, ele adiciona esse argumento no final da lista, mas ele tem a opção com dois parâmetros, onde o primeiro recebe um **int** com a posição da inserção e o segundo recebe o elemento a ser inserido - `names.add(2, "Beatriz")`.
+
+Já para remover um elemento existe o método `remove` e este também pode ser utilizado de duas formas. A primeira é recebendo um inteiro com argumento que vai representar o index do elemento que deve ser removido `names.remove(2)` - quando usado nessa forma, o elemento removido é retornado pela operação. A segunda forma é passar o valor do elemento, por exemplo `names.remove("Charlie")`. Nessa forma ele vai passar pelos elementos, e caso encontre um que seja igual, ele irá remover (apenas o primeiro que ele encontrar). O retorno desse segundo tipo é um **boolean** uma vez que em teoria  a gente tem o valor de elemento que é o que foi passado como argumento.
+
+Existe uma forma de fazer uma remoção de elementos através de uma verificação, e neste caso todos os elementos são verificados e todos aqueles que caírem na verificação serão removidos, esse é o método `removeIf`. É como se fosse um filtro do JavaScript, mas nesse caso, ele não vai retornar um novo array, ele vai é remover da lista original. Essa função verificadora é chamada de predicado e ela deve retornar um booleano, sendo que todo elemento que retornar **true** é removido, e os que retornarem **false** permanece - `names.removeIf(name -> name.startsWith("B")` - quase uma *arrow function* né.
+
+```java
+  public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Bob");
+    names.add("Charlie");
+    names.add("Dave");
+    names.add("Eve");
+    names.add(2, "Beatriz");
+
+    System.out.println("AFTER ADDING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+
+    names.remove(5);
+    names.remove("Dave");
+
+    System.out.println("\nAFTER REMOVING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+
+    names.removeIf(name -> name.startsWith("B"));
+
+    System.out.println("\nAFTER FILTERING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
+  
+  /*
+    AFTER ADDING
+    Alice
+    Bob
+    Beatriz
+    Charlie
+    Dave
+    Eve
+    
+    AFTER REMOVING
+    Alice
+    Bob
+    Beatriz
+    Charlie
+    
+    AFTER FILTERING
+    Alice
+    Charlie
+    */
+```
+
+Ao contrário do array que tem a propriedade `length`, esse objeto vai ter o método `size()` para indicar a quantidade de elementos na lista. Outro método que as listas apresentam é o `indexOf(elemento)` e este funciona basicamente como o JavaScipt, se tiver retorna o índice do elemento, se não tiver retorna -1.
+
+Agora começa umas coisas estranhas. Imagina que você quer, a partir de uma lista, selecionar determinados elementos, mas mantendo a lista original. Você pode fazer uma cópia desse valor original e utilizar o **removeIf** mas isso pode ficar ineficiente conforme a lista fique muito grande uma vez que você vai copiar ele todo só para descartar uma parte dos dados, por isso, existe uma forma que é transformar a lista em um *stream*, aplicar esse predicado no *stream* e transformar esse resultado de volta em uma lista. WTF????
+
+Calma que piora, mas vamos com a primeira parte. Para transformar uma lista em *stream* obviamente você vai chamar o método `stream()` e aí esse tipo vai dar acesso ao método `filter()` que vai aceitar o predicado como argumento. Nesse caso um retorno **true** mantém o elemento enquanto que o **false** descarta.
+
+Agora precisamos retornar esse resultado para o tipo lista, e para fazer isso há duas formas, a primeira é simplesmente chamar o `.toList()`, mas nesse caso a lista se torna imutável, igual um array. Outra opção é chamar `.collect(Collectors.toList())`, essa forma também transforma em lista, mas em uma lista mutável, que ainda vai ter os métodos comentados no início da aula.
+
+```java
+public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Alex");
+    names.add("Bob");
+    names.add("Brain");
+
+    // Unmodifiable list
+    List<String> namesStartingWithA = names.stream()
+      .filter(name -> name.startsWith("A"))
+      .toList();
+
+    // Modifiable list
+    List<String> namesStartingWithB = names.stream()
+      .filter(name -> name.startsWith("B"))
+      .collect(Collectors.toList());
+  }
+```
+
+Essa estratégia de transformar a lista em um *stream* na verdade abre possibilidades para se aplicar vários métodos de *stream*. Um outro método interessante é o `.findFirst()`. Mas diferente do método `find()` do JavaScript, ele não aceita a função de comparação, então o que você precisa fazer é uma combinação com a **filter**. 
+
+Só que um detalhe é que o retorno desse método é de um tipo opcional, uma vez que o *stream* pode ter ficado vazio e portanto não tem ninguém para ser encontrado, e nesse caso, você pode utilizar o método `.orElse()` que vai receber um valor que deve ser retornado nesse casos.
+
+```java
+public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Alex");
+    names.add("Bob");
+    names.add("Brain");
+
+    // Returns Alice
+    String firstNameWithA = names.stream()
+      .filter(name -> name.startsWith("A"))
+      .findFirst()
+      .orElse(null);
+
+    // Returns null
+    String firstNameWithD = names.stream()
+      .filter(name -> name.startsWith("D"))
+      .findFirst()
+      .orElse(null);
+  }
+```
+    
+#### Streams
+    
+Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
+
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em u **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+
+Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
+
+Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
+
+Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.

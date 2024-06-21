@@ -1,10 +1,9 @@
 package entities;
 
 public class Product {
-  String model;
   private String name;
-  public double price;
-  protected int quantity;
+  private Double price;
+  private Integer quantity;
 
   public Product(String name, double price, int quantity) {
     this.name = name;
