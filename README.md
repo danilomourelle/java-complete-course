@@ -985,3 +985,153 @@ public class App {
 }
 ```
     
+### Aula 98-99: Listas
+    
+A ideia de lista é dar um pouco mais de maleabilidade para um array. Como comentado, você não poder alterar o tamanho do array, vai deixa tudo muito frustrante, ainda mais para quem veio do JavaScript e pode fazer isso. 
+
+No Java, o `List` acaba sendo uma interface que é utilizada por classes como o `ArrayList` e o `LinkedList`. A ideia é que na memória, essa estrutura não precisa estar enfileirada, e para que isso seja possível, a estratégia montada é que um elemento tenha a informação da posição do próximo elemento. Isso cria a possibilidade de um tamanho dinâmico, enquanto que diminui um pouco da performance em casos de iteração.
+
+Para se criar uma lista, você pode usar a interface para indicar o tipo da variável, mas não para assinalar o valor, uma vez que a interface não gera instância. Nesse caso você necessariamente precisa de uma classe que implemente a interface. Imagino eu que seja possível tipar a variável também com a classe, pelo menos funciona no VSCode.
+
+```java
+public static void main(String[] args) throws Exception {
+    List<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Bob");
+    names.add("Charlie");
+    names.add("Dave");
+    names.add("Eve");
+
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
+```
+
+Bom, o exemplo acima traz a declaração de uma `ArrayList` assim como a forma de se adicionar elementos nessa lista. O método `add` quando apenas com um argumento, ele adiciona esse argumento no final da lista, mas ele tem a opção com dois parâmetros, onde o primeiro recebe um **int** com a posição da inserção e o segundo recebe o elemento a ser inserido - `names.add(2, "Beatriz")`.
+
+Já para remover um elemento existe o método `remove` e este também pode ser utilizado de duas formas. A primeira é recebendo um inteiro com argumento que vai representar o index do elemento que deve ser removido `names.remove(2)` - quando usado nessa forma, o elemento removido é retornado pela operação. A segunda forma é passar o valor do elemento, por exemplo `names.remove("Charlie")`. Nessa forma ele vai passar pelos elementos, e caso encontre um que seja igual, ele irá remover (apenas o primeiro que ele encontrar). O retorno desse segundo tipo é um **boolean** uma vez que em teoria  a gente tem o valor de elemento que é o que foi passado como argumento.
+
+Existe uma forma de fazer uma remoção de elementos através de uma verificação, e neste caso todos os elementos são verificados e todos aqueles que caírem na verificação serão removidos, esse é o método `removeIf`. É como se fosse um filtro do JavaScript, mas nesse caso, ele não vai retornar um novo array, ele vai é remover da lista original. Essa função verificadora é chamada de predicado e ela deve retornar um booleano, sendo que todo elemento que retornar **true** é removido, e os que retornarem **false** permanece - `names.removeIf(name -> name.startsWith("B")` - quase uma *arrow function* né.
+
+```java
+  public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Bob");
+    names.add("Charlie");
+    names.add("Dave");
+    names.add("Eve");
+    names.add(2, "Beatriz");
+
+    System.out.println("AFTER ADDING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+
+    names.remove(5);
+    names.remove("Dave");
+
+    System.out.println("\nAFTER REMOVING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+
+    names.removeIf(name -> name.startsWith("B"));
+
+    System.out.println("\nAFTER FILTERING");
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
+  
+  /*
+    AFTER ADDING
+    Alice
+    Bob
+    Beatriz
+    Charlie
+    Dave
+    Eve
+    
+    AFTER REMOVING
+    Alice
+    Bob
+    Beatriz
+    Charlie
+    
+    AFTER FILTERING
+    Alice
+    Charlie
+    */
+```
+
+Ao contrário do array que tem a propriedade `length`, esse objeto vai ter o método `size()` para indicar a quantidade de elementos na lista. Outro método que as listas apresentam é o `indexOf(elemento)` e este funciona basicamente como o JavaScipt, se tiver retorna o índice do elemento, se não tiver retorna -1.
+
+Agora começa umas coisas estranhas. Imagina que você quer, a partir de uma lista, selecionar determinados elementos, mas mantendo a lista original. Você pode fazer uma cópia desse valor original e utilizar o **removeIf** mas isso pode ficar ineficiente conforme a lista fique muito grande uma vez que você vai copiar ele todo só para descartar uma parte dos dados, por isso, existe uma forma que é transformar a lista em um *stream*, aplicar esse predicado no *stream* e transformar esse resultado de volta em uma lista. WTF????
+
+Calma que piora, mas vamos com a primeira parte. Para transformar uma lista em *stream* obviamente você vai chamar o método `stream()` e aí esse tipo vai dar acesso ao método `filter()` que vai aceitar o predicado como argumento. Nesse caso um retorno **true** mantém o elemento enquanto que o **false** descarta.
+
+Agora precisamos retornar esse resultado para o tipo lista, e para fazer isso há duas formas, a primeira é simplesmente chamar o `.toList()`, mas nesse caso a lista se torna imutável, igual um array. Outra opção é chamar `.collect(Collectors.toList())`, essa forma também transforma em lista, mas em uma lista mutável, que ainda vai ter os métodos comentados no início da aula.
+
+```java
+public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Alex");
+    names.add("Bob");
+    names.add("Brain");
+
+    // Unmodifiable list
+    List<String> namesStartingWithA = names.stream()
+      .filter(name -> name.startsWith("A"))
+      .toList();
+
+    // Modifiable list
+    List<String> namesStartingWithB = names.stream()
+      .filter(name -> name.startsWith("B"))
+      .collect(Collectors.toList());
+  }
+```
+
+Essa estratégia de transformar a lista em um *stream* na verdade abre possibilidades para se aplicar vários métodos de *stream*. Um outro método interessante é o `.findFirst()`. Mas diferente do método `find()` do JavaScript, ele não aceita a função de comparação, então o que você precisa fazer é uma combinação com a **filter**. 
+
+Só que um detalhe é que o retorno desse método é de um tipo opcional, uma vez que o *stream* pode ter ficado vazio e portanto não tem ninguém para ser encontrado, e nesse caso, você pode utilizar o método `.orElse()` que vai receber um valor que deve ser retornado nesse casos.
+
+```java
+public static void main(String[] args) throws Exception {
+    ArrayList<String> names = new ArrayList<>();
+
+    names.add("Alice");
+    names.add("Alex");
+    names.add("Bob");
+    names.add("Brain");
+
+    // Returns Alice
+    String firstNameWithA = names.stream()
+      .filter(name -> name.startsWith("A"))
+      .findFirst()
+      .orElse(null);
+
+    // Returns null
+    String firstNameWithD = names.stream()
+      .filter(name -> name.startsWith("D"))
+      .findFirst()
+      .orElse(null);
+  }
+```
+    
+#### Streams
+    
+Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
+
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em u **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+
+Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
+
+Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
+
+Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.
