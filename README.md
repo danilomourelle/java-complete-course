@@ -967,3 +967,21 @@ Outra vantagem dessas Wrapper Classes, é que por acabar gerando um obejto, isso
 
 Isso é bom porque imagina que você tem um campo que armazena notas de uma prova. Antes de a prova ser aplicada, não dá pra ter valor, e caso esse campo seja declarado como primitivo, o que vai acontecer é que o valor será 0, o que não é real. Na verdade não há a nota, e portanto deveria ser nulo. Declarar esse campo com `Double` vai fazer com que esse campo possa ser e inicie com o valor nulo. Por isso é uma boa pratica que atributos de classes sejam declarados com a **Wrapper Class**.
     
+### Aula 97: for each
+    
+Esse é um tipo de loop em um array, mas em comparação com o JavaScript, é muito mais parecido com o `for...of`.
+
+Para usar é basicamente colocar a expressão `for` abrindo o parêntese, depois o tipo do elemento do array (pra que né??), um nome para referenciar o elemento da vez, o símbolo `:` e o array que deve ser iterado. Abaixo vai ter o exemplo.
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    String[] names = { "Maria", "Bob", "Alex" };
+
+    for (String currentName : names) {
+      System.out.println(currentName);
+    }
+  }
+}
+```
+    
