@@ -17,6 +17,7 @@ public class App {
 		int quantity = scanner.nextInt();
 
 		Product product = new Product(name, price, quantity);
+		// Product product = new Product(name, price); --> Overloaded constructor
 
 		System.out.println();
 		System.out.println("Product data: " + product);

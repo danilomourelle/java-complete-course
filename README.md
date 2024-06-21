@@ -743,3 +743,45 @@ public class Product {
 }
 ```
 
+### Aula 78 - Sobrecarga
+
+Também conhecido como overload. É um conceito em que você cria mas de uma assinatura de função utilizando o mesmo nome, mas com parâmetros diferentes. Um exemplo disso é quando a gente vai chamar uma função quando abre o parêntese o VSCode mostra mais de uma opção de argumentos.
+
+Isso em Java acontece mais pelo fato de que ela não apresenta os parâmetros opcionais ou com valores padrão. Então o que você precisa fazer é declarar a mesma função considerando todas formas viáveis, e escolher a forma certa quando for utilizar. 
+
+O estranho é que isso vale inclusive para o construtos da classe, mas isso é, novamente, pelo fato de ele não ter assinaturas com parâmetros com valor padrão. Então um exemplo para a nossa classe de **Produtos** seria algo mais ou menos assim
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+  public Product(String name, double price) {
+    this.name = name;
+	this.price = price;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Repare que temos duas funções construtoras sendo que na segunda, ela dispensa o valor de quantidade. Ou seja, ao se fazer a instanciação de um objeto do tipo **Product**, você vai poder fazer tanto passando a quantidade, quanto sem passar. Neste último caso, vale ressaltar que o valor para o atributo *quantity* não vai ser inicializado na instanciação, mas o Java, sempre inicializa uma variável **int** com o valor 0, então você teria um produto com uma quantidade 0.
+
