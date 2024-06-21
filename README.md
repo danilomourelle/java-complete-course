@@ -444,3 +444,7 @@ public class App {
     }
 }
 ```
+
+## Seção 6: Estruturas de repetição
+
+Também como o JavaScript, o Java possui as mesmas estruturas básicas de repetição, tanto o `while`, `do/while`, e o `for`. Todos funcionam da mesma maneira que no JS.

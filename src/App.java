@@ -1,47 +1,24 @@
+import java.util.Random;
+
 public class App {
 	public static void main(String[] args) throws Exception {
-		// if/else
-		int x = 10;
-		if (x < 10) {
-			System.out.println("Menor que 10");
-		} else if (x == 10) {
-			System.out.println("Igual a 10");
-		} else {
-			System.out.println("Maior que 10");
+		// while -> it may not run if condition is already fulfilled
+		int number1 = new Random().nextInt(10);
+		while (number1 < 5) {
+			System.out.println("Oh, no!! Number to low. Trying again.");
+			number1 = new Random().nextInt(10);
+			System.out.println(number1);
 		}
 
-		// switch/case
-		int number = 4;
-		String weekDay;
-		switch (number) {
-			case 1:
-				weekDay = "Sunday";
-				break;
-			case 2:
-				weekDay = "Monday";
-				break;
-			case 3:
-				weekDay = "Tuesday";
-				break;
-			case 4:
-				weekDay = "Wednesday";
-				break;
-			case 5:
-				weekDay = "Thursday";
-				break;
-			case 6:
-				weekDay = "Friday";
-				break;
-			case 7:
-				weekDay = "Saturday";
-				break;
-			default:
-				weekDay = "Invalid day";
-				break;
-		}
+		// do/while -> it will run at least once
+		int number;
+		do {
+			number = new Random().nextInt(10);
+		} while (number < 5);
 
-		// operador ternário
-		int hours = 0;
-		String greetings = hours < 12 ? "Good Morning" : "Good Afternoon";
+		// for
+		for (int index = 0; index < 10; index++) {
+			System.out.println(index);
+		}
 	}
 }
