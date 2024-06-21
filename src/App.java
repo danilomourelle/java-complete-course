@@ -17,15 +17,10 @@ public class App {
 		int quantity = scanner.nextInt();
 
 		Product product = new Product(name, price, quantity);
-		// Product product = new Product(name, price); --> Overloaded constructor
-
-		System.out.println();
-		System.out.println("Product data: " + product);
-		
-		System.out.println();
-		System.out.print("Enter the number of products to be added in stock: ");
-		product.add(scanner.nextInt());
-		System.out.println("Updated data: " + product);
+		product.price = 50.0; // --> OK
+		// product.name = "Computer"; --> error
+		// product.quantity = 10; --> error
+		// product.model = "Toshiba"; --> error
 
 		scanner.close();
 	}
