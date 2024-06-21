@@ -460,3 +460,251 @@ Depois dessa indicação do retorno, ela fica um pouco mais normal. Você coloca
 Com essa assinatura feita, basta abrir as chaves e implementar a lógica da mesma forma que outras linguagens. Para retornar um valor, também como no JavaScript, basta colocar a palavra chave `return` juntamente do valor a ser retornado. Se a função não tiver um **return**, então precisa indicar que a função tem um retorno do tipo `void`.
 
 Por serem métodos, não há nada que determine uma ordem de declaração e depois de utilização. Então um método lá embaixo no arquivo pode estar sendo usado lá na parte de cima, sem problemas. Mas vale ressaltar que caso a classe tenha algum método marcado como estático, este só poderá utilizar outros métodos desde que eles também sejam do tipo estático. Por outro lado, métodos de instância estão livres para utilizar métodos estáticos.
+
+## Seção 8: Introdução a Programação Orientada a Objetos
+
+### Aula 64-67: Utilizando Orientação a Objeto
+
+Vamos fazer um programa que vai receber as 3 medidas de dois triângulos, calcular a área de cada um e imprimir qual dos dois triângulos é maior. A fórmula para se calcular a área de um triângulo utilizando as medidas dos lados é `sqrt(p * (p - A) * (p - B) * (p - C))` onde `p = (A + B + C) / 2` e A, B e C são as medidas do triângulo.
+
+Se a gente fosse fazer isso tudo dentro do método *main* da classe principal, seria algo desse tipo:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		double xA, xB, xC, yA, yB, yC;
+		
+		System.out.println("Enter the measures of triangle X: ");
+		xA = scanner.nextDouble();
+		xB = scanner.nextDouble();
+		xC = scanner.nextDouble();
+		
+		System.out.println("Enter the measures of triangle Y: ");
+		yA = scanner.nextDouble();
+		yB = scanner.nextDouble();
+		yC = scanner.nextDouble();
+		
+		double p = (xA + xB + xC) / 2.0;
+		double areaX = Math.sqrt(p * (p - xA) * (p - xB) * (p - xC));
+		
+		p = (yA + yB + yC) / 2.0;
+		double areaY = Math.sqrt(p * (p - yA) * (p - yB) * (p - yC));
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+Mas a gente pode começar a migrar isso para orientação e objeto. Com isso a gente já consegue imaginar que o principal sujeito do programa é o triângulo. Então a gente pode representar o triângulo em uma classe (nesses casos é chamada de entidade).
+
+```java
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+}
+```
+
+Aqui, tem uma coisa interessante que o curso não comentou, mas arquivos de classes irmãs podem se ver sem problemas de importação. Então caso essa nova classe **Triangle** seja irmã da classe **App**, basta sair usando sem maiores problemas. Agora, com a separação de conceitos, a ideia é que até os arquivos sejam separados em pastas com o mesmo contexto. Essas pastas acabam tendo um conceito de *package* no Java.
+
+Um *package* tem algumas regrinhas. Primeiro que todas as classes dentro desse package precisam ter em seu início uma expressão para indicar que faz parte dele, então se nós consideramos a nossa classe **Triangle** como um elemento no *package entities*, o nosso arquivo vai estar localizado em `src/entities` e ele vai ter a seguinte alteração:
+
+```java
+package entities;
+
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+}
+```
+
+Já a nossa **main** vai poder utilizar essa classe depois de importar o `entities.Triangle`. Então uma alteração apenas considerando que agora as medidas dos lados vão fazer parte de um objeto seria mais ou menos assim:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Triangle;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		Triangle x, y;
+		x = new Triangle();
+		y = new Triangle();
+
+		System.out.println("Enter the measures of triangle X: ");
+		x.a = scanner.nextDouble();
+		x.b = scanner.nextDouble();
+		x.c = scanner.nextDouble();
+
+		System.out.println("Enter the measures of triangle Y: ");
+		y.a = scanner.nextDouble();
+		y.b = scanner.nextDouble();
+		y.c = scanner.nextDouble();
+		
+		double p = (x.a + x.b + x.c) / 2.0;
+		double areaX = Math.sqrt(p * (p - x.a) * (p - x.b) * (p - x.c));
+		
+		p = (y.a + y.b + y.c) / 2.0;
+		double areaY = Math.sqrt(p * (p - y.a) * (p - y.b) * (p - y.c));
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+Beleza, os dados já ficaram relacionados, mas ainda tem muita coisa para melhorar, como o calculo da área. Se a fórmula calcula a área do triângulo, então faz sentido que isso seja um método da classe.
+
+```java
+package entities;
+
+public class Triangle {
+
+  public double a;
+  public double b;
+  public double c;
+
+  public double calculateArea() {
+    double p = (a + b + c) / 2.0;
+    double area = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+
+    return area;
+  }
+}
+```
+
+Engraçado, aparentemente não tem o `this` em Java. Não sei se isso é bom, porque ôô tópico difícil né, ou ruim, porque eu finalmente entendi essa bagaça. Vamos esperar as próximas aulas para ver o que rola.
+
+A nossa **main** agora pode ficar assim:
+
+```java
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Triangle;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
+
+		Triangle x, y;
+		x = new Triangle();
+		y = new Triangle();
+
+		System.out.println("Enter the measures of triangle X: ");
+		x.a = scanner.nextDouble();
+		x.b = scanner.nextDouble();
+		x.c = scanner.nextDouble();
+
+		System.out.println("Enter the measures of triangle Y: ");
+		y.a = scanner.nextDouble();
+		y.b = scanner.nextDouble();
+		y.c = scanner.nextDouble();
+		
+		double areaX = x.calculateArea();
+		double areaY = y.calculateArea();
+
+		if (areaX > areaY) {
+			System.out.println("Larger area: X");
+		} else {
+			System.out.println("Larger area: Y");
+		}
+
+		scanner.close();
+	}
+}
+```
+
+A aula 67 traz a demonstração do `this` em Java. Aparentemente você pode acessar diretamente qualquer atributo da classe dentro dos métodos. O uso do `this` vai acabar ficando restrito apenas em casos de conflitos de nome entre um atributo e um parâmetro de um método. Então nesses casos, você usa para explicitamente reforçar quem é quem.
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Bom, poderia apenas proibir o conflito de nome, forçar que o parâmetro se chamasse por exemplo `quantityToAdd`, `quantityToRemove`. Vamos continuar a ver as próximas aulas.
+
+### Aula 68: Imprimindo um objeto
+
+Uma coisa interessante do Java é que toda classe existente é criada herdando os métodos da classe nativa `Object`. Essa classe apresenta um método `.toString()` que faz a conversão do objeto em uma string. Essa conversão acontece automaticamente quando o sistema identifica que o objeto está sendo impresso, isso significa que para imprimir no console basta utilizar o `System.out.print(objeto)`, e ele automaticamente faz a chamada do **.toString** por baixo do panos.
+
+Acontece que isso pode gerar um comportamento estranho, já que a função original pode não ser aquilo que se imagina, então é comum que classes tenham um método de mesmo nome para sobrescrever o comportamento original.
+
+Aí foi apresentado alguns macetes de conversão de números, sem que seja dentro da própria função de impressão. Então no exemplo da classe de Produtos, poderíamos ter uma função assim:
+
+```java
+public String toString() {
+	return name
+		+ ", $ "
+		+ String.format("%.2f", price)
+		+ ", "
+		+ quantity
+		+ " units, Total: $ "
+		+ String.format("%.2f", totalValueInStock());
+}
+```
+
+Repare que o objeto nativo **String** apresenta um método que vai receber a formatação e o valor numérico a ser formatado. Inclusive esse método pode ser utilizado como uma forma de se fazer uma espécie de *template string* do JavaScript. Na verdade, ela faz igual no **.printf**, mas ao invés de imprimir, ela retorna a string formatada.
+
+```java
+@Override
+public String toString() {
+    return String.format("%s, $ %.2f, %d units, Total: $ %.2f", name, price, quantity, totalValueInStock());
+}
+```
+
+Coisas ensinadas pela IA: A anotação `@Override` mostra para o compilador que está é uma função que irá sobrescrever um método de uma super classe. Ela não é obrigatória, mas é legal usar porque com ela, o compilador checa a cadeia para ver se a função realmente existe e se tem a mesma assinatura. Se essa verificação falhar, ele interrompe a compilação. 
+
+Por outro lado, sem a anotação, ele simplesmente vai compilar e você pode acabar tendo um método novo em caso de erro de digitação, ou criar um comportamento errante caso a assinatura não seja a mesma. Portanto use isso.
+
+### Aula 71 - Membros estáticos
+
+A ideia é que você pode colocar alguns elementos de uma classe, sejam atributos, sejam métodos como sendo do tipo estáticos. Isso vai indicar que o elemento não depende de uma instância da classe, eles são independentes dos valores do objeto em si, fazendo com que esse elementos sejam chamados sempre a partir da classe e não do objeto, por exemplo `Math.sqrt()`.
+
+Esse tipo de uso vai ser muito comum quando se cria uma coleção de funções em um mesmo contexto, e você agrupa todas elas em uma classe que vai representar esse contexto. Os métodos devem sempre utilizar dados recebidos por parâmetros. Novamente um exemplo é a classe `Math`. Vale ressaltar que em classes com métodos estáticos e não estáticos, você não pode chamar um método não estático em um estático, uma vez que isso abre a possibilidade dele depender de dados do objeto, o que vai na contra mão do conceito de estático.
+
+Outra situação é que se usa uma classe com elementos estáticos é quando você tem um conjunto de dados constantes, que não devem ser alterados, e também apresentam um contexto em comum. Então você declara uma classe como todos esses atributos como estáticos. Um exemplo disso é o `Locale.US` onde **US** é um atributo estático da classe **Locale**.
+
+Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.

@@ -1,24 +1,34 @@
-import java.util.Random;
+import java.util.Locale;
+import java.util.Scanner;
+
+import entities.Product;
 
 public class App {
 	public static void main(String[] args) throws Exception {
-		String hello = buildHelloWorld();
-		int times = buildRandomNumber();
+		Locale.setDefault(Locale.US);
+		Scanner scanner = new Scanner(System.in);
 
-		printTextNthTimes(hello, times);
-	}
+		System.out.println("Enter product data:");
+		System.out.print("Name: ");
+		String name = scanner.nextLine();
+		System.out.print("Price: ");
+		double price = scanner.nextDouble();
+		System.out.print("Quantity in stock: ");
+		int quantity = scanner.nextInt();
 
-	public static String buildHelloWorld() {
-		return "Hello World!!";
-	}
+		Product product = new Product();
+		product.name = name;
+		product.price = price;
+		product.quantity = quantity;
 
-	public static int buildRandomNumber() {
-		return new Random().nextInt(10);
-	}
+		System.out.println();
+		System.out.println("Product data: " + product);
+		
+		System.out.println();
+		System.out.print("Enter the number of products to be added in stock: ");
+		product.add(scanner.nextInt());
+		System.out.println("Updated data: " + product);
 
-	public static void printTextNthTimes(String text, int times) {
-		for (int index = 0; index < times; index++) {
-			System.out.println(text);
-		}
+		scanner.close();
 	}
 }
