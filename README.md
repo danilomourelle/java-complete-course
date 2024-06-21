@@ -708,3 +708,155 @@ Esse tipo de uso vai ser muito comum quando se cria uma coleção de funções e
 Outra situação é que se usa uma classe com elementos estáticos é quando você tem um conjunto de dados constantes, que não devem ser alterados, e também apresentam um contexto em comum. Então você declara uma classe como todos esses atributos como estáticos. Um exemplo disso é o `Locale.US` onde **US** é um atributo estático da classe **Locale**.
 
 Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.
+
+### Seção 9: Construtores, this, sobrecarga e encapsulamento
+
+### Aula 76 - Construtores
+
+Para se ter um construtor nas classes do Java, é preciso criar uma função pública, que vai ter o mesmo nome da classe. Ela não tem indicação do retorno e ela deve receber como parâmetro qualquer dado que seja necessário durante a instanciação do objeto. Então um exemplo para a nossa classe Produto seria algo como:
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+### Aula 78 - Sobrecarga
+
+Também conhecido como overload. É um conceito em que você cria mas de uma assinatura de função utilizando o mesmo nome, mas com parâmetros diferentes. Um exemplo disso é quando a gente vai chamar uma função quando abre o parêntese o VSCode mostra mais de uma opção de argumentos.
+
+Isso em Java acontece mais pelo fato de que ela não apresenta os parâmetros opcionais ou com valores padrão. Então o que você precisa fazer é declarar a mesma função considerando todas formas viáveis, e escolher a forma certa quando for utilizar. 
+
+O estranho é que isso vale inclusive para o construtos da classe, mas isso é, novamente, pelo fato de ele não ter assinaturas com parâmetros com valor padrão. Então um exemplo para a nossa classe de **Produtos** seria algo mais ou menos assim
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+  public Product(String name, double price) {
+    this.name = name;
+	this.price = price;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Repare que temos duas funções construtoras sendo que na segunda, ela dispensa o valor de quantidade. Ou seja, ao se fazer a instanciação de um objeto do tipo **Product**, você vai poder fazer tanto passando a quantidade, quanto sem passar. Neste último caso, vale ressaltar que o valor para o atributo *quantity* não vai ser inicializado na instanciação, mas o Java, sempre inicializa uma variável **int** com o valor 0, então você teria um produto com uma quantidade 0.
+
+### Aula 79 - Encapsulamento
+
+A ideia é proteger qualquer dado do objeto para que ele permaneça consistente. Por exemplo, um objeto criado com uma informação que alguém pode simplesmente alterar e depois isso vai gerar uma quebra do programa. 
+
+Para isso, uma convenção é que todos os atributos sejam declarados como privados e que qualquer manipulação seja feita utilizando métodos conhecidos como *getters* e *setters*. 
+
+Os *getters* normalmente são funções que vão ter como nome a concatenação da expressão “get” mais no nome do atributo, por exemplo `getName`, vai ter como retorno o mesmo tipo do atributo e vair retornar o valor do atributo. Ele pode apresentar alguma lógica, a fim de verificar se é adequado retornar o valor na ocasião.
+
+Os *setters* são funções para alterar o valor do atributo. A nomenclatura também segue um padrão onde se tem a concatenação da expressão “set” mais o nome do atributo, por exemplo `setName`. Obviamente ela vai apresentar pelo menos 1 argumento, que seria o novo valor, e pode ter uma lógica, por exemplo, impedir valores negativos em um atributo de tamanho.
+
+Vamos ao exemplo da classe **Product**
+
+```java
+package entities;
+
+public class Product {
+  private String name;
+  private double price;
+  private int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public void setPrice(double price) {
+    this.price = price;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(int quantity) {
+    this.quantity = quantity < 0 ? 0 : quantity;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+
+Veja nesse exemplo, como para o atributo `quantity` não foi criado um *setter* já que ele já tem os outros métodos que vão realizar o incremento e o decremento.
+
+Mas assim, se é para ter um *getter* e um *setter* que apenas retorne o valor e também possa alterar sem nenhum tipo de validação, então não faz sentido marcar o atributo como privado. As IDEs já disponibilizam uma ferramenta que automaticamente gera esses *getters* e *setters* simples para todos os atributos, para na minha opinião, usar isso dessa forma é um erro. Vá criando conforme você identifique a necessidade e condições de acesso ao atributo.
+
+### Aula 81 - Modificadores de acesso
+
+A gente já viu que os elementos de uma classe, pode estar `public` e `private`, mas também existem outras opções que vão ter os seus efeitos.
+
+Apenas para fins de esclarecimento, um elemento declarado como `public` poderá ser acessado por todas as classes, a não ser que essa classe faça parte de um outro módulo que não exporte o pacote da qual ela faz parte.
+
+Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
