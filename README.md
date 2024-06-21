@@ -708,3 +708,38 @@ Esse tipo de uso vai ser muito comum quando se cria uma coleção de funções e
 Outra situação é que se usa uma classe com elementos estáticos é quando você tem um conjunto de dados constantes, que não devem ser alterados, e também apresentam um contexto em comum. Então você declara uma classe como todos esses atributos como estáticos. Um exemplo disso é o `Locale.US` onde **US** é um atributo estático da classe **Locale**.
 
 Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.
+
+### Seção 9: Construtores, this, sobrecarga e encapsulamento
+
+### Aula 76 - Construtores
+
+Para se ter um construtor nas classes do Java, é preciso criar uma função pública, que vai ter o mesmo nome da classe. Ela não tem indicação do retorno e ela deve receber como parâmetro qualquer dado que seja necessário durante a instanciação do objeto. Então um exemplo para a nossa classe Produto seria algo como:
+
+```java
+package entities;
+
+public class Product {
+  public String name;
+  public double price;
+  public int quantity;
+
+  public Product(String name, double price, int quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+  }
+
+  public double totalValueInStock() {
+    return price * quantity;
+  }
+
+  public void addItens(int quantity) {
+    this.quantity += quantity;
+  }
+
+  public void removeItens(int quantity) {
+    this.quantity -= quantity;
+  }
+}
+```
+

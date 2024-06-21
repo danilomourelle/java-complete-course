@@ -16,10 +16,7 @@ public class App {
 		System.out.print("Quantity in stock: ");
 		int quantity = scanner.nextInt();
 
-		Product product = new Product();
-		product.name = name;
-		product.price = price;
-		product.quantity = quantity;
+		Product product = new Product(name, price, quantity);
 
 		System.out.println();
 		System.out.println("Product data: " + product);
