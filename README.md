@@ -873,3 +873,13 @@ Algo me diz que o JavaScript deve fazer alguma coisa desse tipo, e por isso que 
 
 Agora, tem um outro detalhe importante, se você declara uma variável ou um método sem inicializar o valor, ele vai dar erro caso você tente utilizá-la. Os valores padrão do Java só são aplicados aos atributos da classe, e não a todas as variáveis. Então, uma classe que tenha um atributo não inicializado no seu construtor, esse sim vai apresentar um valor padrão de acordo com o tipo.
     
+### Aula 88: Desalocação e Garbage Collector
+    
+Quando um programa inicia, o que acontece é que são criados dois tipos de memória, uma chamada de **Stack** e outra de **Heap**. O que acontece é que uma função, ao ser executada, vai ter o seu contexto, e esse contexto é como se fosse um bloco dentro da **Stack** e lá serão salvas as variáveis primitivas dessa função.
+
+Já no caso dessas variáveis ser um objeto, os dados do objeto, por serem mais complexos, são salvos na **Heap** e o endereço onde foi salvo é que vai parar na variável da **Stack**. Já falamos disso na aula 87.
+
+Aí como funciona a reciclagem de memória? Durante a execução da função, o bloco dentro da **Stack** está lá, então suas variáveis primitivas com seus valores e as de referência armazenando o endereço a **Heap**. O que acontece é que ao finalizar a execução, esse bloco da **Stack** é totalmente apagado, então todos os valores primitivos somem, e os ponteiros também, abrindo espaço para novas alocações.
+
+Mas e os dados que estavam na **Heap**? Bom, esses acabam ficando lá, sem ninguém estar apontando para eles, e é aí que entra o conceito de *Garbage Collector*. O *GC* vai ficar observando a **Heap** e sempre que identificar dados sem ninguém apontando para ele, esses dados serão deletados e a memória ficará disponível para reutilização.
+    
