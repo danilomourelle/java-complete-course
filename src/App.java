@@ -2,23 +2,23 @@ import java.util.Random;
 
 public class App {
 	public static void main(String[] args) throws Exception {
-		// while -> it may not run if condition is already fulfilled
-		int number1 = new Random().nextInt(10);
-		while (number1 < 5) {
-			System.out.println("Oh, no!! Number to low. Trying again.");
-			number1 = new Random().nextInt(10);
-			System.out.println(number1);
-		}
+		String hello = buildHelloWorld();
+		int times = buildRandomNumber();
 
-		// do/while -> it will run at least once
-		int number;
-		do {
-			number = new Random().nextInt(10);
-		} while (number < 5);
+		printTextNthTimes(hello, times);
+	}
 
-		// for
-		for (int index = 0; index < 10; index++) {
-			System.out.println(index);
+	public static String buildHelloWorld() {
+		return "Hello World!!";
+	}
+
+	public static int buildRandomNumber() {
+		return new Random().nextInt(10);
+	}
+
+	public static void printTextNthTimes(String text, int times) {
+		for (int index = 0; index < times; index++) {
+			System.out.println(text);
 		}
 	}
 }
