@@ -2,8 +2,8 @@ package entities;
 
 public class Product {
   private String name;
-  private double price;
-  private int quantity;
+  private Double price;
+  private Integer quantity;
 
   public Product(String name, double price, int quantity) {
     this.name = name;

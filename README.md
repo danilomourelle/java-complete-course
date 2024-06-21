@@ -931,3 +931,39 @@ public class App {
 }
 ```
     
+### Aula 96: Boxing, Unboxing e Wrapper Classes
+    
+**Boxing** e **Unboxing** são formas de você transportar um valor que pode ser considerado em primitivo para um de referência. Por exemplo, fazer o **Boxing** de uma variável do tipo **int** seria fazer com que ela deixasse de existir na **Stack** e passasse a existir na **Heap**. Isso poderia ser feito da seguinte forma:
+
+```java
+  public class App {
+  public static void main(String[] args) throws Exception {
+    int x = 10;
+
+    Object obj = x;
+  }
+}
+```
+
+Dessa forma a variável `obj` passou a ser um objeto armazenado com referência na **heap**. Para o processo de **Unboxing**, basta fazer o inverso:
+
+```java
+  public class App {
+  public static void main(String[] args) throws Exception {
+    int x = 10;
+
+    Object obj = x;
+    
+    int y = (int) obj;
+  }
+}
+```
+
+Mas repare que nesse caso, o compilador exige que você faça o casting, porque afinal, é preciso ter a certeza que esse objeto vai ter um valor compatível com o tipo primitivo que vai fazer o **Unboxing**.
+
+É aí que entra o conceito das **Wrapper Classes**. O Java vai ter uma classe compatível para cada tipo primitivo, sendo elas bem identificadas - *Byte, Short, Integer, Long, Float, Double, Boolean, Character*. Essas classes podem fazer essa transição de **Boxing ↔ Unboxing** sem a necessidade do casting.
+
+Outra vantagem dessas Wrapper Classes, é que por acabar gerando um obejto, isso significa que o valor padrão desses tipos vai ser sempre `null`. Isso faz com que seja uma boa prática que os atributos de uma classe sempre sejam declarados com essas classes e não com o tipo primitivo, pois assim, em uma instanciação, os valores iniciais do objeto vão ser `null`. 
+
+Isso é bom porque imagina que você tem um campo que armazena notas de uma prova. Antes de a prova ser aplicada, não dá pra ter valor, e caso esse campo seja declarado como primitivo, o que vai acontecer é que o valor será 0, o que não é real. Na verdade não há a nota, e portanto deveria ser nulo. Declarar esse campo com `Double` vai fazer com que esse campo possa ser e inicie com o valor nulo. Por isso é uma boa pratica que atributos de classes sejam declarados com a **Wrapper Class**.
+    
