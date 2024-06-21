@@ -883,3 +883,51 @@ Aí como funciona a reciclagem de memória? Durante a execução da função, o 
 
 Mas e os dados que estavam na **Heap**? Bom, esses acabam ficando lá, sem ninguém estar apontando para eles, e é aí que entra o conceito de *Garbage Collector*. O *GC* vai ficar observando a **Heap** e sempre que identificar dados sem ninguém apontando para ele, esses dados serão deletados e a memória ficará disponível para reutilização.
     
+### Aulas 89-95: Arrays
+    
+Um array obrigatoriamente deve ter todos os elementos do mesmo tipo, e um outro detalhe é que ele deve ter um tamanho pré determinado na sua criação e esse tamanho não pode ser alterado.
+
+Para criar um array você precisa indicar o tipo dos dados, seguido do símbolo `[]`, então o nome. No caso de você não ter os elementos do array ainda, então essa declaração precisa indicar pelo menos a quantidade de elementos que ele vai ter, e para isso você vai usar a palavra chave `new` depois o tipo utilizado na primeira parte e entre parênteses a quantidade desse array.
+
+Veja um exemplo de um array de `double`:
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    Locale.setDefault(Locale.US);
+    Scanner scanner = new Scanner(System.in);
+
+    int quantity = scanner.nextInt();
+    double[] height = new double[quantity];
+
+    for (int i = 0; i < quantity; i++) {
+      height[i] = scanner.nextDouble();
+    }
+
+    scanner.close();
+  }
+}
+```
+
+Agora, caso você tenha os valores desse array, é possível fazer a criação dele logo de cara, por exemplo `double[] height = {1.75, 1.80, 1.65, 1.90};` 
+
+Apenas ressaltando que isso vale tanto para valores primitivos quanto para tipo de objetos, então uma declaração do tipo `Product[] products = new Product[length]`. É, eu sei, é estranho, porque parece que vc quer instanciar a classe com o valor de length no construtor, mas basta reparar que nos arrays são usados chaves e não parênteses. Aliás, falando em length, vale dizer que os arrays de Java apresentam essa propriedade então o exemplo acima poderia ser:
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    Locale.setDefault(Locale.US);
+    Scanner scanner = new Scanner(System.in);
+
+    int quantity = scanner.nextInt();
+    double[] height = new double[quantity];
+
+    for (int i = 0; i < height.length ; i++) {
+      height[i] = scanner.nextDouble();
+    }
+
+    scanner.close();
+  }
+}
+```
+    
