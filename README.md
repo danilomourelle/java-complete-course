@@ -709,7 +709,7 @@ Outra situação é que se usa uma classe com elementos estáticos é quando voc
 
 Para criar um método estático basta indicar na sua declaração utilizando a palavra chave `static`, e nos casos de um atributo que representa uma constante, é com `static final`. No caso de uma Classe que possua apenas elementos estáticos, é possível indicar que ela vai ser uma classe estática, o que impede que seja feita uma instância a partir dela.
 
-### Seção 9: Construtores, this, sobrecarga e encapsulamento
+## Seção 9: Construtores, this, sobrecarga e encapsulamento
 
 ### Aula 76 - Construtores
 
@@ -860,3 +860,16 @@ A gente já viu que os elementos de uma classe, pode estar `public` e `private`,
 Apenas para fins de esclarecimento, um elemento declarado como `public` poderá ser acessado por todas as classes, a não ser que essa classe faça parte de um outro módulo que não exporte o pacote da qual ela faz parte.
 
 Já os elementos `private` são elementos que só podem ser acessados dentro da própria classe. Ou seja, nem pelo objeto ela fica acessível se não tiver o *getter* e o *setter.* Mas existem também os elementos `protected` que serão elementos que vão poder ser acessados por outras classes que façam parte de um mesmo pacote, ou por subclasses que estendam essa. Por fim, podemos não colocar nenhum modificador de acesso, e o efeito disso é deixar os elementos visíveis apenas dentro de classes que fazem parte do mesmo pacote;
+
+## Seção 10 - Memória, Arrays e Listas
+
+### Aula 87: Tipos referência vs Tipos valor
+    
+Valores primitivos, como **int**, **double**, **char**, **boolean** vão ter o valor da variável armazenado diretamente o setor `stack` da memória. Isso significa que caso você assinale uma variável primitiva com o valor de uma outra variável, quando ele copiar esse conteúdo da stack, ele vai copiar o valor, e portanto você terá dois valores iguais porém independentes.
+
+Agora para valores complexos, de objeto. O que acontece é que como eles precisam de mais memória, os valores em si são armazenados em uma outra sessão, chamada `heap`. Com isso a variável que fica na stack vai armazenar o endereço dos dados na heap. Isso faz com que ao assinalar uma variável de objeto para outra variável, ao copiar o conteúdo da stack, ele copia o endereço da heap, e aí você passa a ter duas variáveis apontando para um mesmo lugar.
+
+Algo me diz que o JavaScript deve fazer alguma coisa desse tipo, e por isso que comparar dois objetos com os mesmo valores vai dar `false` e copiar um objeto faz com que alterações na cópia também reflitam no original.
+
+Agora, tem um outro detalhe importante, se você declara uma variável ou um método sem inicializar o valor, ele vai dar erro caso você tente utilizá-la. Os valores padrão do Java só são aplicados aos atributos da classe, e não a todas as variáveis. Então, uma classe que tenha um atributo não inicializado no seu construtor, esse sim vai apresentar um valor padrão de acordo com o tipo.
+    
