@@ -1291,3 +1291,102 @@ System.out.println(duration.toDays());
 
 Porém, esse método aceita apenas **LocalDateTime**, ou seja, se a gente tiver objetos do tipo **LocalDate**, a gente precisa primeiro transformá-los para acrescentar a informação de horário, e para isso a gente pode utilizar o método `.atTime()` onde a gente pode especifica uma hora e minuto, ou podemos usar o método `.atStartOfDay()` que vai considerar o 00:00.
     
+## Seção 13: Enumeração, composição
+
+### Aula 147
+    
+Um `enum` é um tipo especial onde você aglomera valores que vão ter um contexto muito próximo, como uma lista de status. Esse enum vai tanto facilitar indicando os valores através do intellisense quanto limitando as possibilidades apenas para os valores conhecidos pelo sistema. Um exemplo de como declarar um enum:
+
+```java
+package entities.enums;
+
+public enum OrderStatus {
+  PENDING_PAYMENT,
+  PROCESSING,
+  SHIPPED,
+  DELIVERED;
+}
+```
+
+Agora esse enum vira um tipo que pode ser utilizado para identificar um atributo em alguma classe, por exemplo numa classe `Order`:
+
+```java
+package entities;
+
+import entities.enums.OrderStatus;
+
+public class Order {
+  private Integer id;
+  private String moment;
+  private OrderStatus status; // Utilização do enum como um tipo
+
+  public Order(Integer id, String moment, OrderStatus status) {
+    this.id = id;
+    this.moment = moment;
+    this.status = status;
+  }
+}
+```
+
+E a ideia de utilização do `enum` em si é que você pode definir o valor a partir do enum, como se fosse um atributo estático de uma classe.
+
+```java
+import entities.Order;
+import entities.enums.OrderStatus;
+
+public class App {
+  public static void main(String[] args) throws Exception {
+    Order order = new Order(1080, "2021-06-20T19:53:07Z", OrderStatus.PENDING_PAYMENT);
+  }
+}
+```
+
+Repare que para definir o valor de status, eu primeiro chamo o meu `enum` que vai ter os possíveis valores, e então a própria IDE já me mostra a lista limitada com os valores aplicáveis.
+
+Mas vale ressaltar que um enum não é exatamente uma lista de strings, repare que os valores não estão entre aspas. Mas se você mandar imprimir algum objeto onde um dos atributos seja um enum, ele vai considerar o nome do valor como se fosse uma string e imprimir. Agora para os casos inversos, onde a gente precisa selecionar o enum a partir de uma string, aí a gente pode utilizar o método `.valueOf()` passando como string alguns dos valores existentes dentro do enum.
+
+```java
+public class App {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+
+    System.out.println("Estado do pedido:");
+    String status = sc.next();
+
+    Order order = new Order(1080, "2021-06-20T19:53:07Z", OrderStatus.valueOf(status));
+    System.out.println(order);
+
+    sc.close();
+  }
+}
+```
+
+Apenas lembrando que caso o valor recebido não exista no enum, um erro será lançado.  
+
+Uma informação obtida com a IA é que na verdade o enum é um tipo especial de classe, onde cada um dos valores que declaramos dentro dele seria uma instância pré-definida. Ou seja, é uma classe com instâncias fixas e conhecidas.
+
+Se é uma classe, eu quis entender se ela pode ter métodos, e aparentemente pode sim, e essas instâncias pré-definidas vão ter acesso a elas também.
+
+```java
+public enum Color {
+    RED, GREEN, BLUE;
+
+    public void printColor() {
+        switch (this) {
+            case RED:
+                System.out.println("Color is Red");
+                break;
+            case GREEN:
+                System.out.println("Color is Green");
+                break;
+            case BLUE:
+                System.out.println("Color is Blue");
+                break;
+        }
+    }
+}
+
+Color.RED.printColor();  // prints "Color is Red"
+```
+
+Ai, eu tentei entender a diferença entre um `enum` e uma classe estática, o ponto é que a classe estática não pode ter instâncias associadas, enquanto que o enum vai ter essas instâncias fixas. Outra coisa que eu não entendi muito bem, é que parece que uma classe estática tem que estar dentro de uma outra classe.
