@@ -1430,3 +1430,89 @@ enum DayOfWeek {
     }
 }
 ```
+
+## Seção 14: Herança e Polimorfismo
+
+### Aula 157 - Herança
+
+A ideia de herança é exatamente a mesma do JavaScript, você tem uma classe base, e uma outra que vai utilizar todos os dados dessa base, e estender com mais outras informações. Essa classe base é chamada de `super` enquanto que a outra é chamada de `sub`.
+
+Vejamos o exemplo:
+
+```java
+// Account.java
+package entities;
+
+public class Account {
+  private Integer number;
+  private String holder;
+  private Double balance;
+
+  public Account() {
+  }
+
+  public Account(Integer number, String holder, Double balance) {
+    this.number = number;
+    this.holder = holder;
+    this.balance = balance;
+  }
+
+  public Integer getNumber() {
+    return number;
+  }
+
+  public void setNumber(Integer number) {
+    this.number = number;
+  }
+
+  public String getHolder() {
+    return holder;
+  }
+
+  public void setHolder(String holder) {
+    this.holder = holder;
+  }
+
+  public Double getBalance() {
+    return balance;
+  }
+
+  public void deposit(Double amount) {
+    balance += amount;
+  }
+
+  public void withdraw(Double amount) {
+    balance -= amount + 5.0;
+  }
+}
+```
+
+```java
+// BusinessAccount.java
+package entities;
+
+public class BusinessAccount extends Account{
+  private Double loanLimit;
+
+  public BusinessAccount() {
+    super();
+  }
+
+  public BusinessAccount(Integer number, String holder, Double balance, Double loanLimit) {
+    super(number, holder, balance);
+    this.loanLimit = loanLimit;
+  }
+
+  public Double getLoanLimit() {
+    return loanLimit;
+  }
+
+  public void setLoanLimit(Double loanLimit) {
+    this.loanLimit = loanLimit;
+  }
+}
+```
+
+A sub classe `BusinessAccount` vai ter todas as informações da super classe `Account` e mais aquelas que forem exclusivas dela. Porém, vale lembrar dos modificadores de acesso, por exemplo, caso um campo seja marcado como privado numa super classe ele ainda não pode ser alterado na sub classe. Se isso for necessário, o campo deve ser alterado para protegido.
+
+A ideia de sempre ter um construtor vazio ajuda nas questões de herança no sentido de que quando você for herdar, você pode ter um construtor vazio na sub classe invocando o super vazio. Assim se em algum momento houver uma lógica para a construtor vazio na super classe, essa possibilidade fica válida para a sub classe.
