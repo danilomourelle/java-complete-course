@@ -1430,3 +1430,236 @@ enum DayOfWeek {
     }
 }
 ```
+
+## Seção 14: Herança e Polimorfismo
+
+### Aula 157 - Herança
+
+A ideia de herança é exatamente a mesma do JavaScript, você tem uma classe base, e uma outra que vai utilizar todos os dados dessa base, e estender com mais outras informações. Essa classe base é chamada de `super` enquanto que a outra é chamada de `sub`.
+
+Vejamos o exemplo:
+
+```java
+// Account.java
+package entities;
+
+public class Account {
+  private Integer number;
+  private String holder;
+  private Double balance;
+
+  public Account() {
+  }
+
+  public Account(Integer number, String holder, Double balance) {
+    this.number = number;
+    this.holder = holder;
+    this.balance = balance;
+  }
+
+  public Integer getNumber() {
+    return number;
+  }
+
+  public void setNumber(Integer number) {
+    this.number = number;
+  }
+
+  public String getHolder() {
+    return holder;
+  }
+
+  public void setHolder(String holder) {
+    this.holder = holder;
+  }
+
+  public Double getBalance() {
+    return balance;
+  }
+
+  public void deposit(Double amount) {
+    balance += amount;
+  }
+
+  public void withdraw(Double amount) {
+    balance -= amount + 5.0;
+  }
+}
+```
+
+```java
+// BusinessAccount.java
+package entities;
+
+public class BusinessAccount extends Account{
+  private Double loanLimit;
+
+  public BusinessAccount() {
+    super();
+  }
+
+  public BusinessAccount(Integer number, String holder, Double balance, Double loanLimit) {
+    super(number, holder, balance);
+    this.loanLimit = loanLimit;
+  }
+
+  public Double getLoanLimit() {
+    return loanLimit;
+  }
+
+  public void setLoanLimit(Double loanLimit) {
+    this.loanLimit = loanLimit;
+  }
+}
+```
+
+A sub classe `BusinessAccount` vai ter todas as informações da super classe `Account` e mais aquelas que forem exclusivas dela. Porém, vale lembrar dos modificadores de acesso, por exemplo, caso um campo seja marcado como privado numa super classe ele ainda não pode ser alterado na sub classe. Se isso for necessário, o campo deve ser alterado para protegido.
+
+A ideia de sempre ter um construtor vazio ajuda nas questões de herança no sentido de que quando você for herdar, você pode ter um construtor vazio na sub classe invocando o super vazio. Assim se em algum momento houver uma lógica para a construtor vazio na super classe, essa possibilidade fica válida para a sub classe.
+
+### Aula 158 - Upcasting e Downcasting
+
+Esses conceitos basicamente indicam você classificar a instância de uma classe com o tipo de outra classe dessa cadeia de herança. Então, seguindo no exemplo que temos da aula passada, um *upcasting* seria atribuir uma instancia da sub classe `BusinessAccount` a uma variável tipada como uma super classe `Account`.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount= new BusinessAccount(8010, "Bob Brown", 100.0, 500.0);
+
+		Account acc1 = businessAccount; // OK
+	}
+}
+```
+
+Nós conseguimos atribuir uma instância de `BusinessAccount` como valor para uma variável do tipo `Account`, e isso acontece pelo fato de que a herança faz com que todas as informações necessárias para o tipo `Account` estejam presentes no tipo `BusinessAccount` o que possibilita essa “substituição”. Mas vale o detalhe, que como a variável é tipada como `Account`, por mais que o valor seja do tipo `BusinessAccount`, não será possível utilizar as informações exclusivas da sub classe.
+
+Já o *downcasting* é o inverso, você tentar utilizar uma instância de uma super classe como valor para uma variável com o tipo de uma sub classe. Essa conversão não é uma conversão natural, afinal, você está usando um valor que tem menos informações que o tipo de variável requisita. Isso torna necessário um casting manual.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount = new BusinessAccount(1002, "Maria", 1000.0, 500.0);
+		Account account = businessAccount; // UPCASTING
+
+		BusinessAccount businessAccount2 = (BusinessAccount) account; // DOWNCASTING
+	}
+}
+```
+
+Repare que para o `businessAccount2` a gente está tentando atribuir o valor de `account` que nada mais é que o valor de `businessAccount`. Porém, o fato de ela ter passado por esse *upcasting*, na hora de fazer o *downcasting*, se torna necessário a ação manual. E vale destacar que essa ação de casting manual simplesmente faz o compilador ignorar qualquer verificação de tipo, ou seja, caso ela seja feita se forma errada, vai acontecer um erro apenas no momento de execução.
+
+Uma forma de resolver isso é a verificação prévia como o `instanceof`.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount = new BusinessAccount(1002, "Maria", 1000.0, 500.0);
+		Account account = businessAccount; // UPCASTING
+
+		if (account instanceof BusinessAccount) {
+			BusinessAccount businessAccount2 = (BusinessAccount) account; // DOWNCASTING
+			businessAccount2.loan(100.0);
+		}
+	}
+}
+```
+
+### Aula 159 - Sobreposição, super e Override
+
+A sobreposição é quando você recria um método de uma super classe em uma sub classe. Dessa forma, ao utilizar uma instancia da super classe, o objeto vai ter a função original, mas uma instância da sub classe vai ter esse método com a implementação exclusiva.
+
+Quando você estiver uma situação de sobreposição de um método, uma boa prática é adicionar a anotação `@Override`. Como já comentado, ela avisa o compilador que a função está sendo reescrita em uma sub classe, e o compilador consegue verificar se ela realmente existe e se tem a mesma assinatura na cadeia de herança, dificultando assim que erros de digitação passem despercebidos e que a função tenha alterações muito significativas entre os membros da cadeia.
+
+```java
+package entities;
+
+public class SavingsAccount extends Account {
+  private Double interestRate;
+
+  public SavingsAccount() {
+  }
+
+  public SavingsAccount(Integer number, String holder, Double balance, Double interestRate) {
+    super(number, holder, balance);
+    this.interestRate = interestRate;
+  }
+
+  public Double getInterestRate() {
+    return interestRate;
+  }
+
+  public void setInterestRate(Double interestRate) {
+    this.interestRate = interestRate;
+  }
+
+  public void updateBalance() {
+    balance += balance * interestRate;
+  }
+
+  @Override
+  public void withdraw(Double amount) {
+    balance -= amount;
+  }
+}
+
+```
+
+### Aula 160 - Classes e métodos "final"
+
+Quando uma classe é marcada como `final` (palavra chave adicionada logo após ao modificador de acesso), torna a classe em uma do tipo final, e isso significa que ela não poderá ser utilizada como uma super classe em uma cadeira de herança.
+
+Já se essa indicação for aplicado em um método, o efeito vai ser que esse método não poderá mais sofrer uma sobreposição em uma sub classe. Por lógica, fica evidente que não faz sentido ter uma classe final com métodos final, já que ela por si só já não permite sub classes que poderiam sobrepor algum de seus métodos.
+
+### Aula 161 - Polimorfismo
+
+É o recurso que permite que variáveis de um mesmo tipo mais genérico possam apontar para objetos de tipos específicos diferentes, tendo assim comportamentos diferentes conforme cada tipo específico.
+
+Resumindo, é a possibilidade de você tipar variáveis com uma super classe mas inicializar com uma instância de outras sub classes (*upcasting*) e mesmo que no tipo, essas variáveis sejam as mesmas, elas podem ter ações diferentes em determinados métodos devido as sobreposições que cada sub classe aplica.
+
+### Aula 164 - Classes abstratas
+
+Classes abstratas são classes que não podem ser instanciadas. É uma forma de garantir herança total. Somente subclasses não abstratas podem ser instanciadas, mas nunca a superclasse abstrata.
+
+Essa definição ficou bem confusa, mas a ideia é que até agora a gente sempre utilizou uma classe útil como super classe, e estendeu uma outra mais detalhada como sub classe que utilizava 100% das informações da super, e por isso nós sempre criamos instâncias das duas. 
+
+Porém, existem situações em que você precisa de duas classes com uma mesma base, mas com informações exclusivas de cada, então você não consegue fazer com que uma estenda outra, mas para aproveitar a parte em comum, é possível criar uma classe (super) que vai conter apenas as informações em comum, e depois estender em outras duas sub classes.
+
+Isso resolve a questão da sub classe ter uma herança de todas as informações da super classe e no caso de essa super classe não fazer um sentido por si só, basta marcar ela como abstrata, fazendo com que seja impossível criar um objeto a partir dela. No caso, fica possível instanciar apenas as sub classes, se estas também não estiverem marcadas como abstratas. 
+
+As motivações dessa ideia é justamente a reutilização de informações, sem a necessidade de ficar repetindo em classes semelhantes, fora a questão do polimorfismo. Para dar um exemplo, vamos pegar a ideia do `Activity` no projeto do SuperApp, ela mesmo não era um tipo abstrato, pois dela eram originadas os tipos `WorkActivity` e `SideActivity`.
+
+### Aula 165 - Métodos abstratos
+
+São métodos que não possuem uma implementação, isso se dá quando você vai ter uma super classe que vai ser estendida por várias sub classes e já se tem um desenho de que esse método precisa existir em todas as sub classes, mas com cada uma delas tendo uma implementação específica. 
+
+Vale lembrar que caso um método seja marcado como abstrato, a classe necessariamente também precisa ser marcada como abstrata, para impedir que se crie uma instância de uma classe que tem um método sem implementação.
+
+Um motivo para se criar um método abstrato, mesmo tendo que se criar as implementações individualmente em cada sub classe, é o polimorfismo, porque dessa forma você garante que todas as subclasses herdaram o método, vão implementar, e com isso, você consegue tipar uma instância de uma sub classe como se fosse uma super classe, e ainda assim vai ter acesso ao método.
+
+A classe abaixo é um exemplo de situação onde cabe um método abstrato.
+
+```java
+public abstract class Shape {
+  private Color color;
+
+  public Color getColor() {
+    return color;
+  }
+
+  public abstract Double area();
+}
+```
+
+Veja que a classe precisa também ser marcada como abstrata e o método `area` tem toda uma assinatura, mas não tem um corpo de implementação. Mas o compilador identifica esse método nas subclasses e obriga que um método seja criado (inclusive com a anotação de `Override`).
