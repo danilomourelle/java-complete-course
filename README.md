@@ -1628,3 +1628,14 @@ Já se essa indicação for aplicado em um método, o efeito vai ser que esse m�
 
 Resumindo, é a possibilidade de você tipar variáveis com uma super classe mas inicializar com uma instância de outras sub classes (*upcasting*) e mesmo que no tipo, essas variáveis sejam as mesmas, elas podem ter ações diferentes em determinados métodos devido as sobreposições que cada sub classe aplica.
 
+### Aula 164 - Classes abstratas
+
+Classes abstratas são classes que não podem ser instanciadas. É uma forma de garantir herança total. Somente subclasses não abstratas podem ser instanciadas, mas nunca a superclasse abstrata.
+
+Essa definição ficou bem confusa, mas a ideia é que até agora a gente sempre utilizou uma classe útil como super classe, e estendeu uma outra mais detalhada como sub classe que utilizava 100% das informações da super, e por isso nós sempre criamos instâncias das duas. 
+
+Porém, existem situações em que você precisa de duas classes com uma mesma base, mas com informações exclusivas de cada, então você não consegue fazer com que uma estenda outra, mas para aproveitar a parte em comum, é possível criar uma classe (super) que vai conter apenas as informações em comum, e depois estender em outras duas sub classes.
+
+Isso resolve a questão da sub classe ter uma herança de todas as informações da super classe e no caso de essa super classe não fazer um sentido por si só, basta marcar ela como abstrata, fazendo com que seja impossível criar um objeto a partir dela. No caso, fica possível instanciar apenas as sub classes, se estas também não estiverem marcadas como abstratas. 
+
+As motivações dessa ideia é justamente a reutilização de informações, sem a necessidade de ficar repetindo em classes semelhantes, fora a questão do polimorfismo. Para dar um exemplo, vamos pegar a ideia do `Activity` no projeto do SuperApp, ela mesmo não era um tipo abstrato, pois dela eram originadas os tipos `WorkActivity` e `SideActivity`.
