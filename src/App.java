@@ -1,11 +1,15 @@
+import entities.Account;
 import entities.BusinessAccount;
 
 public class App {
 	public static void main(String[] args) throws Exception {
-		BusinessAccount account = new BusinessAccount(8010, "Bob Brown", 100.0, 500.0);
-		
-		System.out.println(account.getLoanLimit());
-		System.out.println(account.getBalance());
-		System.out.println(account.getNumber());
+
+		BusinessAccount businessAccount = new BusinessAccount(1002, "Maria", 1000.0, 500.0);
+		Account account = businessAccount; // UPCASTING
+
+		if (account instanceof BusinessAccount) {
+			BusinessAccount businessAccount2 = (BusinessAccount) account; // DOWNCASTING
+			businessAccount2.loan(100.0);
+		}
 	}
 }

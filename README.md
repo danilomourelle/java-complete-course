@@ -1516,3 +1516,62 @@ public class BusinessAccount extends Account{
 A sub classe `BusinessAccount` vai ter todas as informações da super classe `Account` e mais aquelas que forem exclusivas dela. Porém, vale lembrar dos modificadores de acesso, por exemplo, caso um campo seja marcado como privado numa super classe ele ainda não pode ser alterado na sub classe. Se isso for necessário, o campo deve ser alterado para protegido.
 
 A ideia de sempre ter um construtor vazio ajuda nas questões de herança no sentido de que quando você for herdar, você pode ter um construtor vazio na sub classe invocando o super vazio. Assim se em algum momento houver uma lógica para a construtor vazio na super classe, essa possibilidade fica válida para a sub classe.
+
+### Aula 158 - Upcasting e Downcasting
+
+Esses conceitos basicamente indicam você classificar a instância de uma classe com o tipo de outra classe dessa cadeia de herança. Então, seguindo no exemplo que temos da aula passada, um *upcasting* seria atribuir uma instancia da sub classe `BusinessAccount` a uma variável tipada como uma super classe `Account`.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount= new BusinessAccount(8010, "Bob Brown", 100.0, 500.0);
+
+		Account acc1 = businessAccount; // OK
+	}
+}
+```
+
+Nós conseguimos atribuir uma instância de `BusinessAccount` como valor para uma variável do tipo `Account`, e isso acontece pelo fato de que a herança faz com que todas as informações necessárias para o tipo `Account` estejam presentes no tipo `BusinessAccount` o que possibilita essa “substituição”. Mas vale o detalhe, que como a variável é tipada como `Account`, por mais que o valor seja do tipo `BusinessAccount`, não será possível utilizar as informações exclusivas da sub classe.
+
+Já o *downcasting* é o inverso, você tentar utilizar uma instância de uma super classe como valor para uma variável com o tipo de uma sub classe. Essa conversão não é uma conversão natural, afinal, você está usando um valor que tem menos informações que o tipo de variável requisita. Isso torna necessário um casting manual.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount = new BusinessAccount(1002, "Maria", 1000.0, 500.0);
+		Account account = businessAccount; // UPCASTING
+
+		BusinessAccount businessAccount2 = (BusinessAccount) account; // DOWNCASTING
+	}
+}
+```
+
+Repare que para o `businessAccount2` a gente está tentando atribuir o valor de `account` que nada mais é que o valor de `businessAccount`. Porém, o fato de ela ter passado por esse *upcasting*, na hora de fazer o *downcasting*, se torna necessário a ação manual. E vale destacar que essa ação de casting manual simplesmente faz o compilador ignorar qualquer verificação de tipo, ou seja, caso ela seja feita se forma errada, vai acontecer um erro apenas no momento de execução.
+
+Uma forma de resolver isso é a verificação prévia como o `instanceof`.
+
+```java
+import entities.Account;
+import entities.BusinessAccount;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+
+		BusinessAccount businessAccount = new BusinessAccount(1002, "Maria", 1000.0, 500.0);
+		Account account = businessAccount; // UPCASTING
+
+		if (account instanceof BusinessAccount) {
+			BusinessAccount businessAccount2 = (BusinessAccount) account; // DOWNCASTING
+			businessAccount2.loan(100.0);
+		}
+	}
+}
+```
