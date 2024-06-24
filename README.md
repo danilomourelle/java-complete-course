@@ -1575,3 +1575,44 @@ public class App {
 	}
 }
 ```
+
+### Aula 159 - Sobreposição, super e Override
+
+A sobreposição é quando você recria um método de uma super classe em uma sub classe. Dessa forma, ao utilizar uma instancia da super classe, o objeto vai ter a função original, mas uma instância da sub classe vai ter esse método com a implementação exclusiva.
+
+Quando você estiver uma situação de sobreposição de um método, uma boa prática é adicionar a anotação `@Override`. Como já comentado, ela avisa o compilador que a função está sendo reescrita em uma sub classe, e o compilador consegue verificar se ela realmente existe e se tem a mesma assinatura na cadeia de herança, dificultando assim que erros de digitação passem despercebidos e que a função tenha alterações muito significativas entre os membros da cadeia.
+
+```java
+package entities;
+
+public class SavingsAccount extends Account {
+  private Double interestRate;
+
+  public SavingsAccount() {
+  }
+
+  public SavingsAccount(Integer number, String holder, Double balance, Double interestRate) {
+    super(number, holder, balance);
+    this.interestRate = interestRate;
+  }
+
+  public Double getInterestRate() {
+    return interestRate;
+  }
+
+  public void setInterestRate(Double interestRate) {
+    this.interestRate = interestRate;
+  }
+
+  public void updateBalance() {
+    balance += balance * interestRate;
+  }
+
+  @Override
+  public void withdraw(Double amount) {
+    balance -= amount;
+  }
+}
+
+```
+
