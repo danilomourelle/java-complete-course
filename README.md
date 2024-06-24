@@ -1621,3 +1621,10 @@ public class SavingsAccount extends Account {
 Quando uma classe é marcada como `final` (palavra chave adicionada logo após ao modificador de acesso), torna a classe em uma do tipo final, e isso significa que ela não poderá ser utilizada como uma super classe em uma cadeira de herança.
 
 Já se essa indicação for aplicado em um método, o efeito vai ser que esse método não poderá mais sofrer uma sobreposição em uma sub classe. Por lógica, fica evidente que não faz sentido ter uma classe final com métodos final, já que ela por si só já não permite sub classes que poderiam sobrepor algum de seus métodos.
+
+### Aula 161 - Polimorfismo
+
+É o recurso que permite que variáveis de um mesmo tipo mais genérico possam apontar para objetos de tipos específicos diferentes, tendo assim comportamentos diferentes conforme cada tipo específico.
+
+Resumindo, é a possibilidade de você tipar variáveis com uma super classe mas inicializar com uma instância de outras sub classes (*upcasting*) e mesmo que no tipo, essas variáveis sejam as mesmas, elas podem ter ações diferentes em determinados métodos devido as sobreposições que cada sub classe aplica.
+
