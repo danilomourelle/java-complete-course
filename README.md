@@ -1293,7 +1293,7 @@ Porém, esse método aceita apenas **LocalDateTime**, ou seja, se a gente tiver 
     
 ## Seção 13: Enumeração, composição
 
-### Aula 147
+### Aula 147: Enums
     
 Um `enum` é um tipo especial onde você aglomera valores que vão ter um contexto muito próximo, como uma lista de status. Esse enum vai tanto facilitar indicando os valores através do intellisense quanto limitando as possibilidades apenas para os valores conhecidos pelo sistema. Um exemplo de como declarar um enum:
 
@@ -1389,4 +1389,44 @@ public enum Color {
 Color.RED.printColor();  // prints "Color is Red"
 ```
 
-Ai, eu tentei entender a diferença entre um `enum` e uma classe estática, o ponto é que a classe estática não pode ter instâncias associadas, enquanto que o enum vai ter essas instâncias fixas. Outra coisa que eu não entendi muito bem, é que parece que uma classe estática tem que estar dentro de uma outra classe.
+Ai, eu tentei entender a diferença entre um `enum` e uma classe ~~estática~~ abstrata, o ponto é que a classe ~~estática~~ abstrata não pode ter instâncias associadas, enquanto que o enum vai ter essas instâncias fixas. ~~Outra coisa que eu não entendi muito bem, é que parece que uma classe estática tem que estar dentro de uma outra classe.~~ Deu pra ver que eu me confundi com conceito de estática e abstrata. 
+
+Outra coisa é que enum podem ter métodos, campos e construtores. Os construtores serão sempre privados, impedindo a criação de uma instância de um enum, mantendo o ponto de instâncias fixas, mas eles sempre serão chamados por cada uma das instâncias indicadas dentro de enum.
+
+Esse construtor serve para inicializar possíveis campos que o enum venha a ter, e os valores utilizados pelo construtor devem ser indicados dentro de parênteses ao lado de cada indicação de instância. Abaixo tem um exemplo de um enum de dias da semana, com os sete possíveis valores, um construtor inicializando valores de nome e número do dia na semana, e apresentando métodos que podem ser chamados por cada uma das instâncias.
+
+```java
+enum DayOfWeek {
+    MONDAY("Monday", 1),
+    TUESDAY("Tuesday", 2),
+    WEDNESDAY("Wednesday", 3),
+    THURSDAY("Thursday", 4),
+    FRIDAY("Friday", 5),
+    SATURDAY("Saturday", 6),
+    SUNDAY("Sunday", 7);
+
+    private final String dayName;
+    private final int dayNumber;
+
+    // Constructor is implicit private
+    DayOfWeek(String dayName, int dayNumber) {
+        this.dayName = dayName;
+        this.dayNumber = dayNumber;
+    }
+
+    // Getter for dayName
+    public String getDayName() {
+        return dayName;
+    }
+
+    // Getter for dayNumber
+    public int getDayNumber() {
+        return dayNumber;
+    }
+
+    // Method to check if it's a weekday
+    public boolean isWeekday() {
+        return this.dayNumber >= 1 && this.dayNumber <= 5;
+    }
+}
+```
