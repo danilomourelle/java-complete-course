@@ -1616,3 +1616,8 @@ public class SavingsAccount extends Account {
 
 ```
 
+### Aula 160 - Classes e métodos "final"
+
+Quando uma classe é marcada como `final` (palavra chave adicionada logo após ao modificador de acesso), torna a classe em uma do tipo final, e isso significa que ela não poderá ser utilizada como uma super classe em uma cadeira de herança.
+
+Já se essa indicação for aplicado em um método, o efeito vai ser que esse método não poderá mais sofrer uma sobreposição em uma sub classe. Por lógica, fica evidente que não faz sentido ter uma classe final com métodos final, já que ela por si só já não permite sub classes que poderiam sobrepor algum de seus métodos.
