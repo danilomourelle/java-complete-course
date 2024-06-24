@@ -1639,3 +1639,27 @@ Porém, existem situações em que você precisa de duas classes com uma mesma b
 Isso resolve a questão da sub classe ter uma herança de todas as informações da super classe e no caso de essa super classe não fazer um sentido por si só, basta marcar ela como abstrata, fazendo com que seja impossível criar um objeto a partir dela. No caso, fica possível instanciar apenas as sub classes, se estas também não estiverem marcadas como abstratas. 
 
 As motivações dessa ideia é justamente a reutilização de informações, sem a necessidade de ficar repetindo em classes semelhantes, fora a questão do polimorfismo. Para dar um exemplo, vamos pegar a ideia do `Activity` no projeto do SuperApp, ela mesmo não era um tipo abstrato, pois dela eram originadas os tipos `WorkActivity` e `SideActivity`.
+
+### Aula 165 - Métodos abstratos
+
+São métodos que não possuem uma implementação, isso se dá quando você vai ter uma super classe que vai ser estendida por várias sub classes e já se tem um desenho de que esse método precisa existir em todas as sub classes, mas com cada uma delas tendo uma implementação específica. 
+
+Vale lembrar que caso um método seja marcado como abstrato, a classe necessariamente também precisa ser marcada como abstrata, para impedir que se crie uma instância de uma classe que tem um método sem implementação.
+
+Um motivo para se criar um método abstrato, mesmo tendo que se criar as implementações individualmente em cada sub classe, é o polimorfismo, porque dessa forma você garante que todas as subclasses herdaram o método, vão implementar, e com isso, você consegue tipar uma instância de uma sub classe como se fosse uma super classe, e ainda assim vai ter acesso ao método.
+
+A classe abaixo é um exemplo de situação onde cabe um método abstrato.
+
+```java
+public abstract class Shape {
+  private Color color;
+
+  public Color getColor() {
+    return color;
+  }
+
+  public abstract Double area();
+}
+```
+
+Veja que a classe precisa também ser marcada como abstrata e o método `area` tem toda uma assinatura, mas não tem um corpo de implementação. Mas o compilador identifica esse método nas subclasses e obriga que um método seja criado (inclusive com a anotação de `Override`).
