@@ -1886,3 +1886,31 @@ public class App {
 	}
 }
 ```
+
+### Aula 217 - Bloco try com recursos
+
+Essa estrutura é uma modificação do bloco `try` para trabalhar de forma mais prática com esses *streams* sem a necessidade de se fazer a abertura e fechamento manual com toda essas tratativas de exceções que podem acontecer em todos os passos.
+
+```java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\in.txt";
+
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				System.out.println(line);
+				line = bufferedReader.readLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} 
+	}
+}
+```
+
+Dessa forma, o *stream* é aberto e fechado automaticamente pelo programa, sendo que a variável fica disponível para ser utilizada dentro do bloco.
