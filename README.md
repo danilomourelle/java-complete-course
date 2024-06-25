@@ -1914,3 +1914,31 @@ public class App {
 ```
 
 Dessa forma, o *stream* é aberto e fechado automaticamente pelo programa, sendo que a variável fica disponível para ser utilizada dentro do bloco.
+
+### Aula 218 - FileWriter e BufferWriter
+
+É basicamente a mesma ideia do *Reader*, mas para escrever alguma coisa no arquivo, sendo que  também deve ser utilizado na estrutura de bloco **try** com recursos. A única diferença é que ao passar o caminho na criação do objeto com a classe `FileWriter`, caso seja passado apenas o caminho do arquivo, este será completamente sobrescrito caso já exista. Se a intenção for acrescentar um conteúdo caso o arquivo já exista, deve-se passar o valor **true** como segundo argumento ao se criar a instância
+
+```java
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\out.txt";
+
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path, true))) {
+			String[] content = new String[] { "Good morning", "Good afternoon", "Good night" };
+
+			for (String line : content) {
+				bufferedWriter.write(line);
+				bufferedWriter.newLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} 
+	}
+}
+```
+

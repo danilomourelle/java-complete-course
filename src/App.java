@@ -1,16 +1,17 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class App {
 	public static void main(String[] args) {
-		String path = "C:\\temp\\in.txt";
+		String path = "C:\\temp\\out.txt";
 
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
-			String line = bufferedReader.readLine();
-			while (line != null) {
-				System.out.println(line);
-				line = bufferedReader.readLine();
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path, true))) {
+			String[] content = new String[] { "Good morning", "Good afternoon", "Good night" };
+
+			for (String line : content) {
+				bufferedWriter.write(line);
+				bufferedWriter.newLine();
 			}
 		} catch (IOException e) {
 			System.out.println("Error: " + e.getMessage());
