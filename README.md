@@ -1663,3 +1663,141 @@ public abstract class Shape {
 ```
 
 Veja que a classe precisa também ser marcada como abstrata e o método `area` tem toda uma assinatura, mas não tem um corpo de implementação. Mas o compilador identifica esse método nas subclasses e obriga que um método seja criado (inclusive com a anotação de `Override`).
+
+## Seção 15: Tratamento de Error
+
+### Aula 170 - Introdução a Tratamento de Erros
+
+É uma condição de erro ou comportamento inesperado encontrado por um programa em execução. No Java é um objeto herdado da classe `Exception` - compilador obriga o tratamento - ou da classe `RuntimeException` - compilador **NÃO** obriga o tratamento.
+
+Quando lançada, uma exceção é propagada na pilha de chamadas de métodos em execução, até que seja capturada (tratada) ou o programa seja encerrado.
+
+Entre as classes de erros, a maior super classe é a `Throwable`. Dela teremos outras duas classes, a `Error` que vai representar erros não tratáveis, como o *OutOfMemoryError* e *VirtualMachineError* que são erros que quando acontecem, não dão nem a possibilidade de uma tratativa, já que fazem parte do core de execução do programa. Já os erros passíveis de tratamento, vão partir da classe `Exception`.
+
+### Aula 171 - try/catch
+
+Os blocos `try/catch` funcionam de forma muito similar ao JavaScript, mas com uma particularidade devido a forte tipagem da linguagem. Nos blocos `catch`, é necessário tipar o erro que deverá ser capturado, e isso funciona como uma espécie de filtro para o bloco, ou seja, se caso o seu programa no bloco `try` puder lançar mais de um tipo de exceção, você precisará de um bloco `catch` para cada tipo. O erro será tratado apenas no seu bloco, e caso ele não tenha um bloco, terá o mesmo comportamento de um erro não tratado
+
+```java
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Scanner scanner = new Scanner(System.in);
+
+		try {
+			String[] names = scanner.nextLine().split(" ");
+			int position = scanner.nextInt();
+			System.out.println(names[position]); 
+		} catch (ArrayIndexOutOfBoundsException error) {
+			System.out.println("Invalid position!");
+		} catch (InputMismatchException error) {
+			System.out.println("Position is not a number!");
+		}
+
+		System.out.println("End of program");
+		
+		scanner.close();
+	}
+}
+```
+
+### Aula 173 - Bloco finally
+
+Também igual ao JavaScript, o tratamento de erro conta com um terceiro bloco, `finally`. Esse bloco vai ser executado independentemente se o bloco passar sem problemas pelo **try** ou se cair em algum dos blocos **catch**. Esse bloco vai ter uma ótima utilização quando for usado o `Scanner` já que ele precisa ser fechado, e devido ao tratamento de erro não é possível garantir que todo o bloco do **try** vai ser executado.
+
+```java
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Scanner scanner = new Scanner(System.in);
+
+		try {
+			String[] names = scanner.nextLine().split(" ");
+			int position = scanner.nextInt();
+			System.out.println(names[position]); 
+		} catch (ArrayIndexOutOfBoundsException error) {
+			System.out.println("Invalid position!");
+		} catch (InputMismatchException error) {
+			System.out.println("Position is not a number!");
+		} finally {
+			scanner.close();
+		}
+
+		System.out.println("End of program");
+	}
+}
+```
+
+### Aula 174-176 - Exceções personalizadas
+
+O Java já conta com uma séria de exceções que podem ser utilizadas durante o desenvolvimento, mas também da a possibilidade de se criar novas classes que vão representar uma exceção, da mesma forma que fazemos no JavaScript. 
+
+Porém, neste caso, nós podemos estender a classe `Exception` e neste caso, o compilador irá reclamar da falta de tratamento ou de propagação. Isso significa que se em algum método você utilizar esse erro, dentro dele precisa ter o bloco **catch** ou a assinatura dele precisa conter a propagação. Porém se caso você esteja fazendo métodos enxutos, pode ser que tenha que propagar a exceção por mais de um nível.
+
+Para evitar isso, você pode estender da classe `RuntimeException` e com isso não fica obrigado a assinalar a propagação, mas isso também significa que o compilador não vai identifica a falta de tratamento em nenhum ponto. Aí para evitar esse tipo de situação, nós podemos utilizar o herança ao nosso favor, e num ponto mais alto do programa, adicionar um bloco **catch** para o tipo `RuntimeException`, e então qualquer erro que possa ter passado desapercebido vai cair nesse bloco.
+
+```java
+package model.exceptions;
+
+public class DomainException extends RuntimeException {
+  public DomainException(String message) {
+    super(message);
+  }
+}
+```
+
+```java
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Scanner;
+
+import model.entities.Reservation;
+import model.exceptions.DomainException;
+
+public class App {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+			System.out.print("Enter room number: ");
+			int roomNumber = scanner.nextInt();
+
+			System.out.print("Enter check-in date: ");
+			LocalDate checkIn = LocalDate.parse(scanner.next(), formatter);
+
+			System.out.print("Enter check-out date: ");
+			LocalDate checkOut = LocalDate.parse(scanner.next(), formatter);
+
+			Reservation reservation = new Reservation(roomNumber, checkIn, checkOut);
+			System.out.println("Reservation: " + reservation);
+
+			System.out.println();
+			System.out.println("Enter data to update the reservation:");
+			System.out.print("Enter check-in date: ");
+			checkIn = LocalDate.parse(scanner.next(), formatter);
+
+			System.out.print("Enter check-out date: ");
+			checkOut = LocalDate.parse(scanner.next(), formatter);
+
+			reservation.updateDates(checkIn, checkOut);
+			System.out.println("Reservation: " + reservation);
+
+		} catch (DateTimeParseException e) {
+			System.out.println("Invalid date format");
+		} catch (DomainException e) {
+			System.out.println("Error in reservation: " + e.getMessage());
+		} catch (RuntimeException e) {
+			System.out.println("Unexpected error");
+		} finally {
+			scanner.close();
+		}
+	}
+}
+```
