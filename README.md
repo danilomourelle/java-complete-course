@@ -1673,3 +1673,32 @@ Veja que a classe precisa também ser marcada como abstrata e o método `area` t
 Quando lançada, uma exceção é propagada na pilha de chamadas de métodos em execução, até que seja capturada (tratada) ou o programa seja encerrado.
 
 Entre as classes de erros, a maior super classe é a `Throwable`. Dela teremos outras duas classes, a `Error` que vai representar erros não tratáveis, como o *OutOfMemoryError* e *VirtualMachineError* que são erros que quando acontecem, não dão nem a possibilidade de uma tratativa, já que fazem parte do core de execução do programa. Já os erros passíveis de tratamento, vão partir da classe `Exception`.
+
+### Aula 171 - try/catch
+
+Os blocos `try/catch` funcionam de forma muito similar ao JavaScript, mas com uma particularidade devido a forte tipagem da linguagem. Nos blocos `catch`, é necessário tipar o erro que deverá ser capturado, e isso funciona como uma espécie de filtro para o bloco, ou seja, se caso o seu programa no bloco `try` puder lançar mais de um tipo de exceção, você precisará de um bloco `catch` para cada tipo. O erro será tratado apenas no seu bloco, e caso ele não tenha um bloco, terá o mesmo comportamento de um erro não tratado
+
+```java
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Scanner scanner = new Scanner(System.in);
+
+		try {
+			String[] names = scanner.nextLine().split(" ");
+			int position = scanner.nextInt();
+			System.out.println(names[position]); 
+		} catch (ArrayIndexOutOfBoundsException error) {
+			System.out.println("Invalid position!");
+		} catch (InputMismatchException error) {
+			System.out.println("Position is not a number!");
+		}
+
+		System.out.println("End of program");
+		
+		scanner.close();
+	}
+}
+```
