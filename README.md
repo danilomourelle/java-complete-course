@@ -1702,3 +1702,33 @@ public class App {
 	}
 }
 ```
+
+### Aula 173 - Bloco finally
+
+Também igual ao JavaScript, o tratamento de erro conta com um terceiro bloco, `finally`. Esse bloco vai ser executado independentemente se o bloco passar sem problemas pelo **try** ou se cair em algum dos blocos **catch**. Esse bloco vai ter uma ótima utilização quando for usado o `Scanner` já que ele precisa ser fechado, e devido ao tratamento de erro não é possível garantir que todo o bloco do **try** vai ser executado.
+
+```java
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) throws Exception {
+		Scanner scanner = new Scanner(System.in);
+
+		try {
+			String[] names = scanner.nextLine().split(" ");
+			int position = scanner.nextInt();
+			System.out.println(names[position]); 
+		} catch (ArrayIndexOutOfBoundsException error) {
+			System.out.println("Invalid position!");
+		} catch (InputMismatchException error) {
+			System.out.println("Position is not a number!");
+		} finally {
+			scanner.close();
+		}
+
+		System.out.println("End of program");
+	}
+}
+```
+

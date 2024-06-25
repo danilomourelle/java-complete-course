@@ -13,10 +13,10 @@ public class App {
 			System.out.println("Invalid position!");
 		} catch (InputMismatchException error) {
 			System.out.println("Position is not a number!");
+		} finally {
+			scanner.close();
 		}
 
 		System.out.println("End of program");
-		
-		scanner.close();
 	}
 }
