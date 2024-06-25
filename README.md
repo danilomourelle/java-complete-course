@@ -1732,3 +1732,72 @@ public class App {
 }
 ```
 
+### Aula 174-176 - Exceções personalizadas
+
+O Java já conta com uma séria de exceções que podem ser utilizadas durante o desenvolvimento, mas também da a possibilidade de se criar novas classes que vão representar uma exceção, da mesma forma que fazemos no JavaScript. 
+
+Porém, neste caso, nós podemos estender a classe `Exception` e neste caso, o compilador irá reclamar da falta de tratamento ou de propagação. Isso significa que se em algum método você utilizar esse erro, dentro dele precisa ter o bloco **catch** ou a assinatura dele precisa conter a propagação. Porém se caso você esteja fazendo métodos enxutos, pode ser que tenha que propagar a exceção por mais de um nível.
+
+Para evitar isso, você pode estender da classe `RuntimeException` e com isso não fica obrigado a assinalar a propagação, mas isso também significa que o compilador não vai identifica a falta de tratamento em nenhum ponto. Aí para evitar esse tipo de situação, nós podemos utilizar o herança ao nosso favor, e num ponto mais alto do programa, adicionar um bloco **catch** para o tipo `RuntimeException`, e então qualquer erro que possa ter passado desapercebido vai cair nesse bloco.
+
+```java
+package model.exceptions;
+
+public class DomainException extends RuntimeException {
+  public DomainException(String message) {
+    super(message);
+  }
+}
+```
+
+```java
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Scanner;
+
+import model.entities.Reservation;
+import model.exceptions.DomainException;
+
+public class App {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+			System.out.print("Enter room number: ");
+			int roomNumber = scanner.nextInt();
+
+			System.out.print("Enter check-in date: ");
+			LocalDate checkIn = LocalDate.parse(scanner.next(), formatter);
+
+			System.out.print("Enter check-out date: ");
+			LocalDate checkOut = LocalDate.parse(scanner.next(), formatter);
+
+			Reservation reservation = new Reservation(roomNumber, checkIn, checkOut);
+			System.out.println("Reservation: " + reservation);
+
+			System.out.println();
+			System.out.println("Enter data to update the reservation:");
+			System.out.print("Enter check-in date: ");
+			checkIn = LocalDate.parse(scanner.next(), formatter);
+
+			System.out.print("Enter check-out date: ");
+			checkOut = LocalDate.parse(scanner.next(), formatter);
+
+			reservation.updateDates(checkIn, checkOut);
+			System.out.println("Reservation: " + reservation);
+
+		} catch (DateTimeParseException e) {
+			System.out.println("Invalid date format");
+		} catch (DomainException e) {
+			System.out.println("Error in reservation: " + e.getMessage());
+		} catch (RuntimeException e) {
+			System.out.println("Unexpected error");
+		} finally {
+			scanner.close();
+		}
+	}
+}
+```
