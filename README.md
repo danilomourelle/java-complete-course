@@ -1663,3 +1663,13 @@ public abstract class Shape {
 ```
 
 Veja que a classe precisa também ser marcada como abstrata e o método `area` tem toda uma assinatura, mas não tem um corpo de implementação. Mas o compilador identifica esse método nas subclasses e obriga que um método seja criado (inclusive com a anotação de `Override`).
+
+## Seção 15: Tratamento de Error
+
+### Aula 170 - Introdução a Tratamento de Erros
+
+É uma condição de erro ou comportamento inesperado encontrado por um programa em execução. No Java é um objeto herdado da classe `Exception` - compilador obriga o tratamento - ou da classe `RuntimeException` - compilador **NÃO** obriga o tratamento.
+
+Quando lançada, uma exceção é propagada na pilha de chamadas de métodos em execução, até que seja capturada (tratada) ou o programa seja encerrado.
+
+Entre as classes de erros, a maior super classe é a `Throwable`. Dela teremos outras duas classes, a `Error` que vai representar erros não tratáveis, como o *OutOfMemoryError* e *VirtualMachineError* que são erros que quando acontecem, não dão nem a possibilidade de uma tratativa, já que fazem parte do core de execução do programa. Já os erros passíveis de tratamento, vão partir da classe `Exception`.
