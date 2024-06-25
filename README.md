@@ -1801,3 +1801,42 @@ public class App {
 	}
 }
 ```
+
+## Sessão 17: Trabalhando com arquivos
+
+### Aula 215: Leitura básica de arquivo
+
+Para fazer a leitura de um arquivo, basta utilizar a classe `File`. Ela precisa do caminho do arquivo no seu construtor e retorna como instância um objeto que vai estar associado ao arquivo em questão e disponibiliza uma série de métodos que podem ser feitos com esse arquivo. 
+
+Mas para trabalhar com o conteúdo do arquivo, aí precisamos criar uma instância da classe `Scanner` passando o objeto **file** no construtor. Com isso a gente pode manipular as informações que existem dentro do arquivo. 
+
+Erros na manipulação do arquivo lançam a exceção `IOExceptio` que é estendida de *Exception* e portanto precisa obrigatoriamente ser tratada ou propagada. Mas como é interessante que a variável do tipo *Scanner* seja feita fora do bloco **try** para que possa se ter acesso e que se feche ele em um bloco **finally**, essa criação é feita com um valor inicial **null** e a instância é da classe é feita dentro do bloco.
+
+```java
+import java.io.File;
+import java.io.IOException;
+
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) {
+		File file = new File("C:\\temp\\ini.txt");
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(file);
+
+			while (scanner.hasNextLine()) {
+				System.out.println(scanner.nextLine());
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+	}
+}
+```
+
