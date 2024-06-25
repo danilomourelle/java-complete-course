@@ -1840,3 +1840,49 @@ public class App {
 }
 ```
 
+### Aula 216 - FileReader e BufferReader
+
+Na aula passada foi visto como localizar um arquivo, e como acessar o conteúdo com as classes `File` e `Scanner` respectivamente. Mas há uma outra forma de se fazer isso que é com as classes `FileReader` e `BufferedReader`. Essas classes elas já localizam e acessam o arquivo, e criam um *stream* que melhora em muito a leitura contínua de um arquivo se este for muito grande.
+
+Acontece que essas classes melhoram o desempenho de acesso, mas apresentam uma manipulação de exceções mais complicada. Abaixo o exemplo de uma leitura do mesmo arquivo mas fazendo o acesso linha a linha.
+
+```java
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\in.txt";
+		FileReader fileReader = null;
+		BufferedReader bufferedReader = null;
+
+		try {
+			fileReader = new FileReader(path);
+			bufferedReader = new BufferedReader(fileReader);
+			
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				System.out.println(line);
+				line = bufferedReader.readLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			try {
+				if (fileReader != null) {
+					fileReader.close();
+				}
+				if (bufferedReader != null) {
+					bufferedReader.close();
+				}
+			} catch (IOException e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		}
+	}
+}
+```
