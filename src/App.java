@@ -1,24 +1,37 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Locale;
 
 public class App {
 	public static void main(String[] args) {
-		String path = "C:\\temp\\out.txt";
+		String path = "C:\\temp\\in.csv";
 
-		File dirPath = new File(path);
+		File inFile = new File(path);
+		String parentPath = inFile.getParent();
+		new File(parentPath + "\\out").mkdir();
+		File outFile = new File(parentPath + "\\out\\summary.csv");
 
-		File[] folders = dirPath.listFiles(File::isDirectory);
-		System.out.println("Folders:");
-		for (File folder : folders) {
-			System.out.println(folder);
+		try (
+			BufferedReader br = new BufferedReader(new FileReader(inFile));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile)) 
+			) {
+			String line = br.readLine();
+			while (line != null) {
+				String[] fields = line.split(",");
+				String name = fields[0];
+				double price = Double.parseDouble(fields[1]);
+				int quantity = Integer.parseInt(fields[2]);
+
+				bw.write(name + "," + String.format(Locale.US, "%.2f", price * quantity));
+				bw.newLine();
+
+				line = br.readLine();
+			}
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
 		}
-
-		File[] files = dirPath.listFiles(File::isFile);
-		System.out.println("Files:");
-		for (File file : files) {
-			System.out.println(file);
-		}
-
-		boolean success = new File(dirPath + "\\subdir").mkdir();
-		System.out.println("Directory created successfully: " + success);
 	}
 }

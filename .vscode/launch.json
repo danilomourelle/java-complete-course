@@ -8,6 +8,13 @@
       "type": "java",
       "name": "App",
       "request": "launch",
+      "mainClass": "App",
+      "projectName": "Complete_Java_2bd5c03b"
+    },
+    {
+      "type": "java",
+      "name": "App",
+      "request": "launch",
       "mainClass": "application.App",
       "projectName": "Complete_Java_65bf9d33"
     },
