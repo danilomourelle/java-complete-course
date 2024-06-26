@@ -1974,3 +1974,10 @@ public class App {
 	}
 }
 ```
+
+## Sessão 18 - Interfaces
+
+### Aula 225 - Interface
+
+É exatamente a mesma coisa das interfaces de Typescript (ou vice-versa). Você cria um contrato de um tipo que vai indicar as assinaturas de métodos que uma classe que venha a implementar essa interface precisa ter como forma de garantir que quaisquer outra classe que venha a utilizar desse método, não precise ficar restrita a uma dependência de classe, mas sim a uma dependência de interface, melhorando e muito a questão de expansão do sistema.
+
