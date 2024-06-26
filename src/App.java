@@ -1,49 +1,37 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Scanner;
-
-import model.entities.Reservation;
-import model.exceptions.DomainException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Locale;
 
 public class App {
 	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
-		
-		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String path = "C:\\temp\\in.csv";
 
-			System.out.print("Enter room number: ");
-			int roomNumber = scanner.nextInt();
+		File inFile = new File(path);
+		String parentPath = inFile.getParent();
+		new File(parentPath + "\\out").mkdir();
+		File outFile = new File(parentPath + "\\out\\summary.csv");
 
-			System.out.print("Enter check-in date: ");
-			LocalDate checkIn = LocalDate.parse(scanner.next(), formatter);
+		try (
+			BufferedReader br = new BufferedReader(new FileReader(inFile));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile)) 
+			) {
+			String line = br.readLine();
+			while (line != null) {
+				String[] fields = line.split(",");
+				String name = fields[0];
+				double price = Double.parseDouble(fields[1]);
+				int quantity = Integer.parseInt(fields[2]);
 
-			System.out.print("Enter check-out date: ");
-			LocalDate checkOut = LocalDate.parse(scanner.next(), formatter);
+				bw.write(name + "," + String.format(Locale.US, "%.2f", price * quantity));
+				bw.newLine();
 
-			Reservation reservation = new Reservation(roomNumber, checkIn, checkOut);
-			System.out.println("Reservation: " + reservation);
-
-			System.out.println();
-			System.out.println("Enter data to update the reservation:");
-			System.out.print("Enter check-in date: ");
-			checkIn = LocalDate.parse(scanner.next(), formatter);
-
-			System.out.print("Enter check-out date: ");
-			checkOut = LocalDate.parse(scanner.next(), formatter);
-
-			reservation.updateDates(checkIn, checkOut);
-			System.out.println("Reservation: " + reservation);
-
-		} catch (DateTimeParseException e) {
-			System.out.println("Invalid date format");
-		} catch (DomainException e) {
-			System.out.println("Error in reservation: " + e.getMessage());
-		} catch (RuntimeException e) {
-			System.out.println("Unexpected error");
-		} finally {
-			scanner.close();
+				line = br.readLine();
+			}
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
 		}
 	}
 }

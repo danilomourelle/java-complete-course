@@ -1801,3 +1801,176 @@ public class App {
 	}
 }
 ```
+
+## Sessão 17: Trabalhando com arquivos
+
+### Aula 215: Leitura básica de arquivo
+
+Para fazer a leitura de um arquivo, basta utilizar a classe `File`. Ela precisa do caminho do arquivo no seu construtor e retorna como instância um objeto que vai estar associado ao arquivo em questão e disponibiliza uma série de métodos que podem ser feitos com esse arquivo. 
+
+Mas para trabalhar com o conteúdo do arquivo, aí precisamos criar uma instância da classe `Scanner` passando o objeto **file** no construtor. Com isso a gente pode manipular as informações que existem dentro do arquivo. 
+
+Erros na manipulação do arquivo lançam a exceção `IOExceptio` que é estendida de *Exception* e portanto precisa obrigatoriamente ser tratada ou propagada. Mas como é interessante que a variável do tipo *Scanner* seja feita fora do bloco **try** para que possa se ter acesso e que se feche ele em um bloco **finally**, essa criação é feita com um valor inicial **null** e a instância é da classe é feita dentro do bloco.
+
+```java
+import java.io.File;
+import java.io.IOException;
+
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) {
+		File file = new File("C:\\temp\\ini.txt");
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(file);
+
+			while (scanner.hasNextLine()) {
+				System.out.println(scanner.nextLine());
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+	}
+}
+```
+
+### Aula 216 - FileReader e BufferReader
+
+Na aula passada foi visto como localizar um arquivo, e como acessar o conteúdo com as classes `File` e `Scanner` respectivamente. Mas há uma outra forma de se fazer isso que é com as classes `FileReader` e `BufferedReader`. Essas classes elas já localizam e acessam o arquivo, e criam um *stream* que melhora em muito a leitura contínua de um arquivo se este for muito grande.
+
+Acontece que essas classes melhoram o desempenho de acesso, mas apresentam uma manipulação de exceções mais complicada. Abaixo o exemplo de uma leitura do mesmo arquivo mas fazendo o acesso linha a linha.
+
+```java
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import java.util.Scanner;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\in.txt";
+		FileReader fileReader = null;
+		BufferedReader bufferedReader = null;
+
+		try {
+			fileReader = new FileReader(path);
+			bufferedReader = new BufferedReader(fileReader);
+			
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				System.out.println(line);
+				line = bufferedReader.readLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			try {
+				if (fileReader != null) {
+					fileReader.close();
+				}
+				if (bufferedReader != null) {
+					bufferedReader.close();
+				}
+			} catch (IOException e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		}
+	}
+}
+```
+
+### Aula 217 - Bloco try com recursos
+
+Essa estrutura é uma modificação do bloco `try` para trabalhar de forma mais prática com esses *streams* sem a necessidade de se fazer a abertura e fechamento manual com toda essas tratativas de exceções que podem acontecer em todos os passos.
+
+```java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\in.txt";
+
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				System.out.println(line);
+				line = bufferedReader.readLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} 
+	}
+}
+```
+
+Dessa forma, o *stream* é aberto e fechado automaticamente pelo programa, sendo que a variável fica disponível para ser utilizada dentro do bloco.
+
+### Aula 218 - FileWriter e BufferWriter
+
+É basicamente a mesma ideia do *Reader*, mas para escrever alguma coisa no arquivo, sendo que  também deve ser utilizado na estrutura de bloco **try** com recursos. A única diferença é que ao passar o caminho na criação do objeto com a classe `FileWriter`, caso seja passado apenas o caminho do arquivo, este será completamente sobrescrito caso já exista. Se a intenção for acrescentar um conteúdo caso o arquivo já exista, deve-se passar o valor **true** como segundo argumento ao se criar a instância
+
+```java
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\out.txt";
+
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path, true))) {
+			String[] content = new String[] { "Good morning", "Good afternoon", "Good night" };
+
+			for (String line : content) {
+				bufferedWriter.write(line);
+				bufferedWriter.newLine();
+			}
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} 
+	}
+}
+```
+
+### Aula 219 - Manipulando pastas
+
+Vai ser utilizado a mesma classe `File`. Quando ela recebe um caminho, ela vai ter acesso a todo o conteúdo daquele caminho, seja um arquivo ou um diretório. E como já comentado, esse tipo de variável vai apresentar alguns métodos possíveis após o sucesso do acesso, sendo que um deles é o `.listFiles()` que apesar do nome pode ser utilizado para listar qualquer item. No caso das pastas, basta passar a função lambda indicando que é para ser listado as pastas. Essa função, vai ter uma notação diferente `File::isDirectory`. Caso se deseje listar os arquivos de uma pasta, é o mesmo método porém como a função lambda sendo `File::isFile`.
+
+Já para fazer a criação de uma pasta dentro de um diretório, na verdade o que precisa ser feito, é concatenar o caminho do diretório aberto com o nome dessa sub pasta, instanciar um novo objeto do tipo `File` e então chamar o método `.mkdir()`. Esse método retorna um valor booleano indicando o sucesso da operação.
+
+```java
+import java.io.File;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\out.txt";
+
+		File dirPath = new File(path);
+
+		File[] folders = dirPath.listFiles(File::isDirectory);
+		System.out.println("Folders:");
+		for (File folder : folders) {
+			System.out.println(folder);
+		}
+
+		File[] files = dirPath.listFiles(File::isFile);
+		System.out.println("Files:");
+		for (File file : files) {
+			System.out.println(file);
+		}
+
+		boolean success = new File(dirPath + "\\subdir").mkdir();
+		System.out.println("Directory created successfully: " + success);
+	}
+}
+```
