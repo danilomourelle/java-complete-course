@@ -1942,3 +1942,35 @@ public class App {
 }
 ```
 
+### Aula 219 - Manipulando pastas
+
+Vai ser utilizado a mesma classe `File`. Quando ela recebe um caminho, ela vai ter acesso a todo o conteúdo daquele caminho, seja um arquivo ou um diretório. E como já comentado, esse tipo de variável vai apresentar alguns métodos possíveis após o sucesso do acesso, sendo que um deles é o `.listFiles()` que apesar do nome pode ser utilizado para listar qualquer item. No caso das pastas, basta passar a função lambda indicando que é para ser listado as pastas. Essa função, vai ter uma notação diferente `File::isDirectory`. Caso se deseje listar os arquivos de uma pasta, é o mesmo método porém como a função lambda sendo `File::isFile`.
+
+Já para fazer a criação de uma pasta dentro de um diretório, na verdade o que precisa ser feito, é concatenar o caminho do diretório aberto com o nome dessa sub pasta, instanciar um novo objeto do tipo `File` e então chamar o método `.mkdir()`. Esse método retorna um valor booleano indicando o sucesso da operação.
+
+```java
+import java.io.File;
+
+public class App {
+	public static void main(String[] args) {
+		String path = "C:\\temp\\out.txt";
+
+		File dirPath = new File(path);
+
+		File[] folders = dirPath.listFiles(File::isDirectory);
+		System.out.println("Folders:");
+		for (File folder : folders) {
+			System.out.println(folder);
+		}
+
+		File[] files = dirPath.listFiles(File::isFile);
+		System.out.println("Files:");
+		for (File file : files) {
+			System.out.println(file);
+		}
+
+		boolean success = new File(dirPath + "\\subdir").mkdir();
+		System.out.println("Directory created successfully: " + success);
+	}
+}
+```
