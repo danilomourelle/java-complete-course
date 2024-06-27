@@ -1,41 +1,37 @@
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Scanner;
 
-import model.entities.CarRental;
-import model.entities.Vehicle;
-import model.services.BrazilianTaxService;
-import model.services.RentalService;
+import model.entities.Contract;
+import model.services.ContractPaymentService;
+import model.services.PayPalService;
 
 public class App {
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		System.out.println("Enter rental data");
-		System.out.print("Car model: ");
-		String carModel = sc.nextLine();
-		System.out.print("Pickup (dd/MM/yyyy HH:mm): ");
-		LocalDateTime start = LocalDateTime.parse(sc.nextLine(), formatter);
-		System.out.print("Return (dd/MM/yyyy HH:mm): ");
-		LocalDateTime finish = LocalDateTime.parse(sc.nextLine(), formatter);
+		System.out.println("Enter contract data");
+		System.out.print("Number: ");
+		int number = sc.nextInt();
+		System.out.print("Date (dd/MM/yyyy): ");
+		LocalDate date = LocalDate.parse(sc.next(), formatter);
+		System.out.print("Contract value: ");
+		double totalValue = sc.nextDouble();
+		System.out.print("Enter number of installments: ");
+		int installmentsQtd = sc.nextInt();
 
-		CarRental carRental = new CarRental(start, finish, new Vehicle(carModel));
+		Contract contract = new Contract(number, date, totalValue, installmentsQtd);
 
-		System.out.print("Enter price per hour: ");
-		double pricePerHour = sc.nextDouble();
-		System.out.print("Enter price per day: ");
-		double pricePerDay = sc.nextDouble();
+		System.out.println("Installments:");
 
-		RentalService rentalService = new RentalService(pricePerHour, pricePerDay, new BrazilianTaxService());
-		rentalService.processInvoice(carRental);
+		new ContractPaymentService(contract, new PayPalService()).processContract();
 
-		System.out.println("INVOICE:");
-		System.out.println("Basic payment: " + String.format("%.2f", carRental.getInvoice().getBasicPayment()));
-		System.out.println("Tax: " + String.format("%.2f", carRental.getInvoice().getTax()));
-		System.out.println("Total payment: " + String.format("%.2f", carRental.getInvoice().getTotalPayment()));
+		for (int index = 0; index < contract.getInstallmentsQtd(); index++) {
+			System.out.println(contract.getInstallments()[index]);
+		}
 
 		sc.close();
 	}
