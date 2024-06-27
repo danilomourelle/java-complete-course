@@ -1974,3 +1974,147 @@ public class App {
 	}
 }
 ```
+
+## Sessão 18 - Interfaces
+
+### Aula 225 - Interface
+
+É exatamente a mesma coisa das interfaces de Typescript (ou vice-versa). Você cria um contrato de um tipo que vai indicar as assinaturas de métodos que uma classe que venha a implementar essa interface precisa ter como forma de garantir que quaisquer outra classe que venha a utilizar desse método, não precise ficar restrita a uma dependência de classe, mas sim a uma dependência de interface, melhorando e muito a questão de expansão do sistema.
+
+### Aula 233 - Herança vs Interface
+
+Agora que vimos o conceito de herança, polimorfismo e interface, é difícil não se perguntar qual a diferença entre uma interface e uma classe abstrata com métodos abstratos. Os dois criam uma espécie de contrato que as subclasses devem respeitar, e os dois criam um tipo genérico que aceita receber as classes mais especificas que as utilizam como base. Então a única diferença fica na questão das propriedades.
+
+Uma interface não pode ter propriedade, coisa que uma classe abstrata pode ter, e que será herdada pela suas sub classes. Então basicamente é, se você precisa garantir apenas que as subclasses apresentem um método específico, uma interface já te atende, mas se você precisa que além dos métodos, as sub classes também apresentem propriedades comum entre ela, então a classe abstrata vai deixar seu código mais limpo.
+
+Uma estratégia comum, é que caso você percebe que precisa tanto de métodos quanto de atributos, mas que alguns desses métodos não esteja tão relacionado aos atributos, o que pode ser feito é criar uma interface com os métodos que independem dos atributos, e criar uma classe abstrata com esses atributos, implementando a interface. O fato de ser uma classe abstrata, não obriga que ela detenha a implementação do método, mas obriga que suas sub classes a tenham, sem terem a necessidade de fazer a implementação da interface explicitamente.
+
+Ah, um comentário, me parece muito que a ideia é tentar individualizar responsabilidade, garantir um formato, fazer uma abstração, esses conceitos todos vão deixando tudo muito complexo, e me faz perguntar se por acaso a usasse o paradigma funcional, a gente não teria muito dessas coisas. Pra que uma interface para garantir que uma classe tenha o método, se um método é uma função, e no paradigma funcional ela não precisa estar associada ao objeto?
+
+### Aula 234 - Problema Diamante
+
+O problema proposto é: a gente tem uma classe abstrata `Device` que vai ter uma propriedade **doc** e um método abstrato *processDoc*. Dela a gente estende a classe `Scanner` que vai ter o seu método *scan*, e a classe `Printer` que vai ter o seu método *print*. Agora imagina a gente  ter uma classe `MultiFunction` como que a gente faz, para ele ter o método *print* e o *scan*. 
+
+ Isso sugere que seria interessante ter uma extensão de duas classes, mas como nesse caso, onde ambas apresentam um mesmo método e cada uma com a sua implementação. De quem seria feita a herança? Esse é um dos motivos pelo qual a maioria das linguagens proíbe estender de mais de uma classe.
+
+A solução proposta é que fosse criado uma interface `Printer` e `Scanner`, as classes fossem renomeadas para `PrinterDevice` e `ScannerDevice` sendo que elas iriam estender `Device` e implementar de suas respectivas interfaces. Com isso os devices continuariam sendo obrigados a implementar o método *processDoc*, e também ficariam obrigados a ter os seus respectivos métodos. Já no dispositivo multi funções, o que é possível fazer, é estender do `Device` e implementar as duas interfaces.
+
+Aí aí, que coisa mais sem pé nem cabeça. Esse problema lembra um pouco a pergunta que eu fiz no StackOverflow, e eu ainda não fui atrás do conceito de mixin… mas voltado para aqui. Primeiro que você apenas garantiu a interface, mas não consegue o reuso do código, ou seja, vai ter que implementar a função *print* na `PrinterDevice` e na `MultiFunction`. Fora que esse é um caso que resolve um problema se a mistura fosse com propriedades. Não acho que vou ter uma resposta disso aqui não.
+
+### Aula 235 - Interface Comparable
+
+É um desses conceitos que fazem algumas pessoas não gostarem de Java, mas vamos lá. Você tem um classe estática chamada `Collections` que vai apresentar alguns métodos que podem ser feitos com listas e arrays. Um desses métodos é o `.sort(list)` que serve para ordenar os elementos.
+
+Porém para que esse método funcione, ele precisa saber como comparar os elementos dessa lista, por exemplo, se for uma string, ele compara pelo código da tabela ascii, se for número, pelo valor mesmo, mas em casos de objetos relativos ao programa, ele não vai saber qual é a intenção da comparação.
+
+Então, nesses casos, você deve fazer com que a classe que vai tipas a lista a ser ordenada implemente a interface `Comparable<T>`. Essa interface força a implementação de um método `compareTo` onde você define uma função que compara o objeto atual com um objeto recebido nos parâmetros, essa função deve voltar um inteiro que se igual 0 vai indicar que eles devem manter a posição, se menor que zero o objeto atual deve vir primeiro, e maior que zero se o objeto atual deve vir depois que o objeto recebido por parâmetro.
+
+Pra mim fica óbvio que essa forma de ordenar uma lista fica estranha. No `.sort(fn)` do JavaScript ele aceita um callback que vai fazer essa mesma comparação com retorno de um número, e isso significa que quando a quando o array é de objetos, você vai precisar passar uma função toda vez que quiser ordenar, mas dá uma maior flexibilidade nas opções que se pode utilizar. Já você implementando a interface e definindo o método na classe, me parece um pouco rígido, porque se depois você quiser ordenar de outra forma você fica meio preso.
+
+Mas eu fui pesquisar um pouco, e descobri que esse método tem uma sobrecarga que é `.sort(list, comparator)` onde nesses casos, você define como os elementos devem ser comparados, e com isso tira a obrigação de o próprio tipo precisar implementar a interface. Se for uma comparação simples de campo, esse *comparator* pode até ser feito através da classe `Comparator` para se utilizar a comparação com o operador de referência.
+
+```java
+// Employee.java
+package model.entities;
+
+public class Employee implements Comparable<Employee> {
+  private String name;
+  private Double salary;
+
+  public Employee() {
+  }
+
+  public Employee(String name, Double salary) {
+    this.name = name;
+    this.salary = salary;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Double getSalary() {
+    return salary;
+  }
+
+  @Override
+  public int compareTo(Employee other) {
+    return name.compareTo(other.getName());
+  }
+}
+```
+
+```java
+// Person.java
+package model.entities;
+
+public class Person {
+    private String name;
+    private Integer age;
+
+    public Person() {
+    }
+
+    public Person(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+}
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.Employee;
+import model.entities.Person;
+
+public class App {
+	public static void main(String[] args) {
+		List<Employee> employeesList = new ArrayList<>();
+		employeesList.add(new Employee("Maria", 4300.00));
+		employeesList.add(new Employee("Alex", 3100.00));
+		employeesList.add(new Employee("Bob", 3500.00));
+
+		List<Person> peopleList = new ArrayList<>();
+		peopleList.add(new Person("Maria", 35));
+		peopleList.add(new Person("Alex", 20));
+		peopleList.add(new Person("Bob", 25));
+
+		Collections.sort(employeesList);
+		for (Employee emp : employeesList) {
+			System.out.println(emp.getName() + ", " + emp.getSalary());
+		}
+
+		Collections.sort(peopleList, Comparator.comparing(Person::getName));
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
+
+		Collections.sort(peopleList, Comparator.comparing(Person::getAge));
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
+	}
+}
+```
+
+Veja como na ordenação da classe `Employee` a gente consegue chamar ela de uma forma bem mais rápida, mas ficamos presos em como os elementos serão ordenados, já na classe `Person`, a gente teve que indicar a função de comparação duas vezes, mas pelo menos ficamos livres para alterar a forma de comparação.
+
+### Aula 236 - Default methods
+
+Mais uma das coisas que seriam evitadas com o paradigma funcional. Mas basicamente a gente volta para o problema do diamante, onde a gente comentou que uma classe pode implementar mais de uma interface, mas a gente teria que desenvolver o método nos dois lugares, ou seja, não fazendo o reuso entre eles.
+
+Agora, a gente pode declarar um método em uma interface e marcar ela com a palavra chave `default`. Esses métodos vão aceitar ter um corpo na função, e eles não ficam obrigados de serem desenvolvidos nas classes que implementarem essa interface. Nesses casos, vai ser executado esse desenvolvimento padrão. Ah lembrando que esse métodos não vão ter acesso direto a nenhum atributo da classe, portanto, caso seja necessário, ele deve estar disponível em um *getter* e esse *getter* deve também aparecer como um método da interface.
+
+Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.

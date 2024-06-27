@@ -1,37 +1,26 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.Locale;
+import java.util.Scanner;
+
+import model.services.IInterestService;
+import model.services.UsaInterestService;
 
 public class App {
 	public static void main(String[] args) {
-		String path = "C:\\temp\\in.csv";
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
 
-		File inFile = new File(path);
-		String parentPath = inFile.getParent();
-		new File(parentPath + "\\out").mkdir();
-		File outFile = new File(parentPath + "\\out\\summary.csv");
+		System.out.print("Amount: ");
+		double amount = sc.nextDouble();
+		System.out.print("Months: ");
+		int months = sc.nextInt();
 
-		try (
-			BufferedReader br = new BufferedReader(new FileReader(inFile));
-			BufferedWriter bw = new BufferedWriter(new FileWriter(outFile)) 
-			) {
-			String line = br.readLine();
-			while (line != null) {
-				String[] fields = line.split(",");
-				String name = fields[0];
-				double price = Double.parseDouble(fields[1]);
-				int quantity = Integer.parseInt(fields[2]);
+		// IInterestService interestService = new BrazilianService(2.0);
+		IInterestService interestService = new UsaInterestService(1.0);
+		double payment = interestService.payment(amount, months);
 
-				bw.write(name + "," + String.format(Locale.US, "%.2f", price * quantity));
-				bw.newLine();
+		System.out.println("Payment after " + months + " months:");
+		System.out.println(String.format("%.2f", payment));
 
-				line = br.readLine();
-			}
-		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
-		}
+		sc.close();
 	}
 }
