@@ -2110,3 +2110,11 @@ public class App {
 ```
 
 Veja como na ordenação da classe `Employee` a gente consegue chamar ela de uma forma bem mais rápida, mas ficamos presos em como os elementos serão ordenados, já na classe `Person`, a gente teve que indicar a função de comparação duas vezes, mas pelo menos ficamos livres para alterar a forma de comparação.
+
+### Aula 236 - Default methods
+
+Mais uma das coisas que seriam evitadas com o paradigma funcional. Mas basicamente a gente volta para o problema do diamante, onde a gente comentou que uma classe pode implementar mais de uma interface, mas a gente teria que desenvolver o método nos dois lugares, ou seja, não fazendo o reuso entre eles.
+
+Agora, a gente pode declarar um método em uma interface e marcar ela com a palavra chave `default`. Esses métodos vão aceitar ter um corpo na função, e eles não ficam obrigados de serem desenvolvidos nas classes que implementarem essa interface. Nesses casos, vai ser executado esse desenvolvimento padrão. Ah lembrando que esse métodos não vão ter acesso direto a nenhum atributo da classe, portanto, caso seja necessário, ele deve estar disponível em um *getter* e esse *getter* deve também aparecer como um método da interface.
+
+Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.

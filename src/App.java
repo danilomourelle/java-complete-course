@@ -1,36 +1,26 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
 
-import model.entities.Employee;
-import model.entities.Person;
+import model.services.IInterestService;
+import model.services.UsaInterestService;
 
 public class App {
 	public static void main(String[] args) {
-		List<Employee> employeesList = new ArrayList<>();
-		employeesList.add(new Employee("Maria", 4300.00));
-		employeesList.add(new Employee("Alex", 3100.00));
-		employeesList.add(new Employee("Bob", 3500.00));
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
 
-		List<Person> peopleList = new ArrayList<>();
-		peopleList.add(new Person("Maria", 35));
-		peopleList.add(new Person("Alex", 20));
-		peopleList.add(new Person("Bob", 25));
+		System.out.print("Amount: ");
+		double amount = sc.nextDouble();
+		System.out.print("Months: ");
+		int months = sc.nextInt();
 
-		Collections.sort(employeesList);
-		for (Employee emp : employeesList) {
-			System.out.println(emp.getName() + ", " + emp.getSalary());
-		}
+		// IInterestService interestService = new BrazilianService(2.0);
+		IInterestService interestService = new UsaInterestService(1.0);
+		double payment = interestService.payment(amount, months);
 
-		Collections.sort(peopleList, Comparator.comparing(Person::getName));
-		for (Person p : peopleList) {
-			System.out.println(p.getName() + ", " + p.getAge());
-		}
+		System.out.println("Payment after " + months + " months:");
+		System.out.println(String.format("%.2f", payment));
 
-		Collections.sort(peopleList, Comparator.comparing(Person::getAge).reversed());
-		for (Person p : peopleList) {
-			System.out.println(p.getName() + ", " + p.getAge());
-		}
+		sc.close();
 	}
 }
