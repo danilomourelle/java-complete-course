@@ -1990,3 +1990,14 @@ Uma interface não pode ter propriedade, coisa que uma classe abstrata pode ter,
 Uma estratégia comum, é que caso você percebe que precisa tanto de métodos quanto de atributos, mas que alguns desses métodos não esteja tão relacionado aos atributos, o que pode ser feito é criar uma interface com os métodos que independem dos atributos, e criar uma classe abstrata com esses atributos, implementando a interface. O fato de ser uma classe abstrata, não obriga que ela detenha a implementação do método, mas obriga que suas sub classes a tenham, sem terem a necessidade de fazer a implementação da interface explicitamente.
 
 Ah, um comentário, me parece muito que a ideia é tentar individualizar responsabilidade, garantir um formato, fazer uma abstração, esses conceitos todos vão deixando tudo muito complexo, e me faz perguntar se por acaso a usasse o paradigma funcional, a gente não teria muito dessas coisas. Pra que uma interface para garantir que uma classe tenha o método, se um método é uma função, e no paradigma funcional ela não precisa estar associada ao objeto?
+
+### Aula 234 - Problema Diamante
+
+O problema proposto é: a gente tem uma classe abstrata `Device` que vai ter uma propriedade **doc** e um método abstrato *processDoc*. Dela a gente estende a classe `Scanner` que vai ter o seu método *scan*, e a classe `Printer` que vai ter o seu método *print*. Agora imagina a gente  ter uma classe `MultiFunction` como que a gente faz, para ele ter o método *print* e o *scan*. 
+
+ Isso sugere que seria interessante ter uma extensão de duas classes, mas como nesse caso, onde ambas apresentam um mesmo método e cada uma com a sua implementação. De quem seria feita a herança? Esse é um dos motivos pelo qual a maioria das linguagens proíbe estender de mais de uma classe.
+
+A solução proposta é que fosse criado uma interface `Printer` e `Scanner`, as classes fossem renomeadas para `PrinterDevice` e `ScannerDevice` sendo que elas iriam estender `Device` e implementar de suas respectivas interfaces. Com isso os devices continuariam sendo obrigados a implementar o método *processDoc*, e também ficariam obrigados a ter os seus respectivos métodos. Já no dispositivo multi funções, o que é possível fazer, é estender do `Device` e implementar as duas interfaces.
+
+Aí aí, que coisa mais sem pé nem cabeça. Esse problema lembra um pouco a pergunta que eu fiz no StackOverflow, e eu ainda não fui atrás do conceito de mixin… mas voltado para aqui. Primeiro que você apenas garantiu a interface, mas não consegue o reuso do código, ou seja, vai ter que implementar a função *print* na `PrinterDevice` e na `MultiFunction`. Fora que esse é um caso que resolve um problema se a mistura fosse com propriedades. Não acho que vou ter uma resposta disso aqui não.
+
