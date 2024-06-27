@@ -1,38 +1,22 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Scanner;
-
-import model.entities.Contract;
-import model.services.ContractPaymentService;
-import model.services.PayPalService;
+import model.entities.AbstractShape;
+import model.entities.Circle;
+import model.entities.Rectangle;
+import model.entities.Shape;
+import model.entities.Square;
+import model.enums.Color;
 
 public class App {
 	public static void main(String[] args) {
-		Locale.setDefault(Locale.US);
-		Scanner sc = new Scanner(System.in);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		AbstractShape s1 = new Circle(2.0, Color.BLACK);
+		AbstractShape s2 = new Rectangle(3.0, 4.0, Color.BLUE);
+		Shape s3 = new Square(2.0);
 
-		System.out.println("Enter contract data");
-		System.out.print("Number: ");
-		int number = sc.nextInt();
-		System.out.print("Date (dd/MM/yyyy): ");
-		LocalDate date = LocalDate.parse(sc.next(), formatter);
-		System.out.print("Contract value: ");
-		double totalValue = sc.nextDouble();
-		System.out.print("Enter number of installments: ");
-		int installmentsQtd = sc.nextInt();
+		System.out.println("Circle color: " + s1.getColor());
+		System.out.println("Circle area: " + s1.area());
 
-		Contract contract = new Contract(number, date, totalValue, installmentsQtd);
+		System.out.println("Rectangle color: " + s2.getColor());
+		System.out.println("Rectangle area: " + s2.area());
 
-		System.out.println("Installments:");
-
-		new ContractPaymentService(contract, new PayPalService()).processContract();
-
-		for (int index = 0; index < contract.getInstallmentsQtd(); index++) {
-			System.out.println(contract.getInstallments()[index]);
-		}
-
-		sc.close();
+		System.out.println("Square area: " + s3.area());
 	}
 }

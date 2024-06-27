@@ -1981,3 +1981,12 @@ public class App {
 
 É exatamente a mesma coisa das interfaces de Typescript (ou vice-versa). Você cria um contrato de um tipo que vai indicar as assinaturas de métodos que uma classe que venha a implementar essa interface precisa ter como forma de garantir que quaisquer outra classe que venha a utilizar desse método, não precise ficar restrita a uma dependência de classe, mas sim a uma dependência de interface, melhorando e muito a questão de expansão do sistema.
 
+### Aula 233 - Herança vs Interface
+
+Agora que vimos o conceito de herança, polimorfismo e interface, é difícil não se perguntar qual a diferença entre uma interface e uma classe abstrata com métodos abstratos. Os dois criam uma espécie de contrato que as subclasses devem respeitar, e os dois criam um tipo genérico que aceita receber as classes mais especificas que as utilizam como base. Então a única diferença fica na questão das propriedades.
+
+Uma interface não pode ter propriedade, coisa que uma classe abstrata pode ter, e que será herdada pela suas sub classes. Então basicamente é, se você precisa garantir apenas que as subclasses apresentem um método específico, uma interface já te atende, mas se você precisa que além dos métodos, as sub classes também apresentem propriedades comum entre ela, então a classe abstrata vai deixar seu código mais limpo.
+
+Uma estratégia comum, é que caso você percebe que precisa tanto de métodos quanto de atributos, mas que alguns desses métodos não esteja tão relacionado aos atributos, o que pode ser feito é criar uma interface com os métodos que independem dos atributos, e criar uma classe abstrata com esses atributos, implementando a interface. O fato de ser uma classe abstrata, não obriga que ela detenha a implementação do método, mas obriga que suas sub classes a tenham, sem terem a necessidade de fazer a implementação da interface explicitamente.
+
+Ah, um comentário, me parece muito que a ideia é tentar individualizar responsabilidade, garantir um formato, fazer uma abstração, esses conceitos todos vão deixando tudo muito complexo, e me faz perguntar se por acaso a usasse o paradigma funcional, a gente não teria muito dessas coisas. Pra que uma interface para garantir que uma classe tenha o método, se um método é uma função, e no paradigma funcional ela não precisa estar associada ao objeto?
