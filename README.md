@@ -2001,3 +2001,112 @@ A solução proposta é que fosse criado uma interface `Printer` e `Scanner`, as
 
 Aí aí, que coisa mais sem pé nem cabeça. Esse problema lembra um pouco a pergunta que eu fiz no StackOverflow, e eu ainda não fui atrás do conceito de mixin… mas voltado para aqui. Primeiro que você apenas garantiu a interface, mas não consegue o reuso do código, ou seja, vai ter que implementar a função *print* na `PrinterDevice` e na `MultiFunction`. Fora que esse é um caso que resolve um problema se a mistura fosse com propriedades. Não acho que vou ter uma resposta disso aqui não.
 
+### Aula 235 - Interface Comparable
+
+É um desses conceitos que fazem algumas pessoas não gostarem de Java, mas vamos lá. Você tem um classe estática chamada `Collections` que vai apresentar alguns métodos que podem ser feitos com listas e arrays. Um desses métodos é o `.sort(list)` que serve para ordenar os elementos.
+
+Porém para que esse método funcione, ele precisa saber como comparar os elementos dessa lista, por exemplo, se for uma string, ele compara pelo código da tabela ascii, se for número, pelo valor mesmo, mas em casos de objetos relativos ao programa, ele não vai saber qual é a intenção da comparação.
+
+Então, nesses casos, você deve fazer com que a classe que vai tipas a lista a ser ordenada implemente a interface `Comparable<T>`. Essa interface força a implementação de um método `compareTo` onde você define uma função que compara o objeto atual com um objeto recebido nos parâmetros, essa função deve voltar um inteiro que se igual 0 vai indicar que eles devem manter a posição, se menor que zero o objeto atual deve vir primeiro, e maior que zero se o objeto atual deve vir depois que o objeto recebido por parâmetro.
+
+Pra mim fica óbvio que essa forma de ordenar uma lista fica estranha. No `.sort(fn)` do JavaScript ele aceita um callback que vai fazer essa mesma comparação com retorno de um número, e isso significa que quando a quando o array é de objetos, você vai precisar passar uma função toda vez que quiser ordenar, mas dá uma maior flexibilidade nas opções que se pode utilizar. Já você implementando a interface e definindo o método na classe, me parece um pouco rígido, porque se depois você quiser ordenar de outra forma você fica meio preso.
+
+Mas eu fui pesquisar um pouco, e descobri que esse método tem uma sobrecarga que é `.sort(list, comparator)` onde nesses casos, você define como os elementos devem ser comparados, e com isso tira a obrigação de o próprio tipo precisar implementar a interface. Se for uma comparação simples de campo, esse *comparator* pode até ser feito através da classe `Comparator` para se utilizar a comparação com o operador de referência.
+
+```java
+// Employee.java
+package model.entities;
+
+public class Employee implements Comparable<Employee> {
+  private String name;
+  private Double salary;
+
+  public Employee() {
+  }
+
+  public Employee(String name, Double salary) {
+    this.name = name;
+    this.salary = salary;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Double getSalary() {
+    return salary;
+  }
+
+  @Override
+  public int compareTo(Employee other) {
+    return name.compareTo(other.getName());
+  }
+}
+```
+
+```java
+// Person.java
+package model.entities;
+
+public class Person {
+    private String name;
+    private Integer age;
+
+    public Person() {
+    }
+
+    public Person(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+}
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.Employee;
+import model.entities.Person;
+
+public class App {
+	public static void main(String[] args) {
+		List<Employee> employeesList = new ArrayList<>();
+		employeesList.add(new Employee("Maria", 4300.00));
+		employeesList.add(new Employee("Alex", 3100.00));
+		employeesList.add(new Employee("Bob", 3500.00));
+
+		List<Person> peopleList = new ArrayList<>();
+		peopleList.add(new Person("Maria", 35));
+		peopleList.add(new Person("Alex", 20));
+		peopleList.add(new Person("Bob", 25));
+
+		Collections.sort(employeesList);
+		for (Employee emp : employeesList) {
+			System.out.println(emp.getName() + ", " + emp.getSalary());
+		}
+
+		Collections.sort(peopleList, Comparator.comparing(Person::getName));
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
+
+		Collections.sort(peopleList, Comparator.comparing(Person::getAge));
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
+	}
+}
+```
+
+Veja como na ordenação da classe `Employee` a gente consegue chamar ela de uma forma bem mais rápida, mas ficamos presos em como os elementos serão ordenados, já na classe `Person`, a gente teve que indicar a função de comparação duas vezes, mas pelo menos ficamos livres para alterar a forma de comparação.

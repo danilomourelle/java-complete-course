@@ -1,22 +1,36 @@
-import model.entities.AbstractShape;
-import model.entities.Circle;
-import model.entities.Rectangle;
-import model.entities.Shape;
-import model.entities.Square;
-import model.enums.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.Employee;
+import model.entities.Person;
 
 public class App {
 	public static void main(String[] args) {
-		AbstractShape s1 = new Circle(2.0, Color.BLACK);
-		AbstractShape s2 = new Rectangle(3.0, 4.0, Color.BLUE);
-		Shape s3 = new Square(2.0);
+		List<Employee> employeesList = new ArrayList<>();
+		employeesList.add(new Employee("Maria", 4300.00));
+		employeesList.add(new Employee("Alex", 3100.00));
+		employeesList.add(new Employee("Bob", 3500.00));
 
-		System.out.println("Circle color: " + s1.getColor());
-		System.out.println("Circle area: " + s1.area());
+		List<Person> peopleList = new ArrayList<>();
+		peopleList.add(new Person("Maria", 35));
+		peopleList.add(new Person("Alex", 20));
+		peopleList.add(new Person("Bob", 25));
 
-		System.out.println("Rectangle color: " + s2.getColor());
-		System.out.println("Rectangle area: " + s2.area());
+		Collections.sort(employeesList);
+		for (Employee emp : employeesList) {
+			System.out.println(emp.getName() + ", " + emp.getSalary());
+		}
 
-		System.out.println("Square area: " + s3.area());
+		Collections.sort(peopleList, Comparator.comparing(Person::getName));
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
+
+		Collections.sort(peopleList, Comparator.comparing(Person::getAge).reversed());
+		for (Person p : peopleList) {
+			System.out.println(p.getName() + ", " + p.getAge());
+		}
 	}
 }
