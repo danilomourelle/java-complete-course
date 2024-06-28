@@ -2290,3 +2290,47 @@ public class App {
 Esse exemplo de cima recebe o nome de covariância, e tem como efeito colateral que o método que aplica esse curinga não vai conseguir adicionar elementos, apenas ler. Isso porque foi definido que a lista vai ser de elementos que estender um tipo, ou seja, eles tem pelo menos um tipo, mas podem ter mais coisas do seu próprio tipo que é definido na tipagem da lista onde esse método vai ser chamado.
 
 O método *totalArea* não faz ideia se a lista que chegou é uma lista de `Circle`, `Rectangle`, que aceitam apenas os seus respectivos tipos, ou se é uma lista de `Shape` que está sim, poderia aceitar os dois tipos. O único lugar que sabe qual lista está sendo usada, é o *main* que é quem chamou, e por isso dentro de *totalArea* fica proibido adicionar elementos à lista.
+
+Agora, a gente pode ter uma situação inversa, onde a gente quer adicionar elementos em uma lista genérica, que se chama de contra-variância. Nesse caso, eu preciso indicar para o método que ele vai receber um tipo, ou qualquer super classe desse tipo (todo mundo pra cima). Acontece que como um tipo pode receber como valor instâncias dele, e de sub classes que estendem (todo mundo pra baixo), você acaba meio que indicando que aceita toda a cadeia de herança.
+
+Bom, esse é um caso muito específico, porque se você vai aceitar que os elementos estejam em qualquer tipo da cadeira de herança, isso faz com que você não possa definir com segurança o tipo exato de um elemento específico, sendo assim, nesses casos fica impossibilitado de se fazer a leitura de elementos dessa lista, mas é possível fazer a adição, desde que o elemento tenha o seu tipo na cadeia hereditária. 
+
+**OBS**: O acesso até é permitido, mas você fica obrigado a marcar o elemento como sendo do tipo `Object` que é o tipo mais primitivo da linguagem, o que vai limitar e muito as possibilidade de ações a se fazer nesse valor.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class App {
+	public static void main(String[] args) {
+		List<String> strings = List.of("apple", "banana", "orange");
+		List<Integer> integers = List.of(1, 2, 3, 4, 5);
+		List<Double> doubles = List.of(1.1, 2.2, 3.3, 4.4, 5.5);	
+
+		List<Object> objects = new ArrayList<>();
+
+		copy(integers, objects);
+		printList(objects);
+
+		copy(doubles, objects);
+		printList(objects);
+
+		// copy(strings, objects); - error: String is not part of Number inheritance hierarchy
+	}	
+
+	public static void copy(List<? extends Number> source, List<? super Number> destination) {
+		for (Number obj : source) {
+			destination.add(obj);
+		}
+
+		Object number = destination.get(0); // Object is the only class that can be used to store any type of object
+	}
+
+	public static void printList(List<?> list) {
+		for (Object obj : list) {
+			System.out.println(obj);
+		}
+	}
+}
+```
+
