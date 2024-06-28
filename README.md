@@ -2158,3 +2158,60 @@ public class PrintService<T> {
 }
 ```
 
+### Aula 240 - Genéricos delimitados
+
+A ideia é que os genéricos causam uma flexibilização, mas precisa em uma linguagem orientada (obrigatória) a objetos, fortemente tipada, as vezes essa flexibilização pode sair do controle, então você precisa definir um mínimo de segurança na tipagem para acabar tentando utilizar um método que não existe no tipo recebido.
+
+Então o que existe é uma forma de você delimitar o tipo, falando que você aceita qualquer tipo `T` desde que ele respeite alguma condição, por exemplo, implemente alguma interface que vai ter um método necessário. Nesse caso, a gente precisa colocar que aceitamos `<T extends Interface>` que na verdade pode estender uma interface ou qualquer outra coisa, como uma classe.
+
+```java
+package model.services;
+
+import java.util.List;
+
+public class CalculationService {
+  public static <T extends Comparable<T>> T max(List<T> list) {
+    if (list.isEmpty()) {
+      throw new IllegalStateException("List can't be empty");
+    }
+
+    T max = list.get(0);
+    for (T item : list) {
+      if (item.compareTo(max) > 0) {
+        max = item;
+      }
+    }
+
+    return max;
+  }
+}
+```
+
+Veja que primeiro, a nossa classe não é genérica, apenas o método é. Nesse caso temos o modificador de acesso, depois a marcação de um método estático, aí sim, temos a marcação de *Generics* falando que aceitamos qualquer tipo `T` desde que ele estenda a interface `Comparable<T>`. Então temos o tipo de retorno método que vai ser `T`, o nome e os parâmetros.
+
+Então para que eu possa utilizar esse método passando uma determinada classe como tipo, eu preciso garantir que essa classe vai implementar a interface.
+
+```java
+package model.entities;
+
+public class Product implements Comparable<Product> {
+  private String name;
+  private Double price;
+
+  public Product() {
+  }
+
+  public Product(String name, Double price) {
+    this.name = name;
+    this.price = price;
+  }
+
+  @Override
+  public int compareTo(Product other) {
+    return price.compareTo(other.getPrice());
+  }
+}
+```
+
+Veja que a classe `Product` precisa implementar a `Comparable<Product>` e por isso ser obrigada a implementar o método *compareTo* para só então poder ser utilizada como um tipo genérico para o método *max* da classe `CalculationService`.
+
