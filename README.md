@@ -2215,3 +2215,31 @@ public class Product implements Comparable<Product> {
 
 Veja que a classe `Product` precisa implementar a `Comparable<Product>` e por isso ser obrigada a implementar o método *compareTo* para só então poder ser utilizada como um tipo genérico para o método *max* da classe `CalculationService`.
 
+### Aula 241 - Tipos curinga
+
+A bizarrice da vez. A ideia é que assim, se você tem uma interface ou classe que aceita um tipo genérico, isso quer dizer que ela tem uma flexibilidade de aceitar diferentes tipos, mas que uma vez definido vão formar um tipo final rígido. Ou seja, a interface `List` pode aceitar qualquer tipo como *Generic*, mas uma vez definido o `List<Integer>` por exemplo, é preciso entender que o tipo é a combinação e é rígido.
+
+Em outras palavras, a gente já viu que um tipo `Object` pode receber um valor `Integer` como uma forma de *upcasting*, mas uma `List<Object>` não vai poder receber o valor de uma `List<Integer>`. Então é como se a gente precisasse definir um **Generic** para tipos genéricos - Eh laiá. E é para isso que existe o tipo curinga, pois nesse caso você consegue marcar uma variável de um tipo que recebe um genérico, fazendo com que depois essa variável possa receber como valor aquele tipo recebendo qualquer genérico.
+
+```java
+import java.util.List;
+
+public class App {
+	public static void main(String[] args) {
+		List<String> listStr = List.of("a", "b", "c", "d", "e");
+		List<Integer> listInt = List.of(1, 2, 3, 4, 5);
+
+		List<?> listJoker = listStr;
+		printList(listJoker);
+
+		listJoker = listInt;
+		printList(listJoker);
+	}
+
+	public static void printList(List<?> list) {
+		for (Object i : list) {
+			System.out.println(i);
+		}
+	}
+}
+```
