@@ -2118,3 +2118,43 @@ Mais uma das coisas que seriam evitadas com o paradigma funcional. Mas basicamen
 Agora, a gente pode declarar um método em uma interface e marcar ela com a palavra chave `default`. Esses métodos vão aceitar ter um corpo na função, e eles não ficam obrigados de serem desenvolvidos nas classes que implementarem essa interface. Nesses casos, vai ser executado esse desenvolvimento padrão. Ah lembrando que esse métodos não vão ter acesso direto a nenhum atributo da classe, portanto, caso seja necessário, ele deve estar disponível em um *getter* e esse *getter* deve também aparecer como um método da interface.
 
 Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.
+
+## Sessão 19 - Generics, Set, Map
+
+### Aula 239 - Introdução ao Generics
+
+É basicamente a mesma coisa que o `Generics` do TypeScript. Você vai criar uma classe com um tipo genérico `<T>` e esse tipo também vai ser utilizado nos métodos e atributos quando necessário, e com isso a quando você tiver a utilização da classe, você pode ter a flexibilidade de instanciar indicando qualquer tipo, mas a segurança de que uma vez estabelecido, esse tipo será respeitado em todas as operações.
+
+```java
+package model.services;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PrintService<T> {
+  private List<T> list = new ArrayList<>();
+
+  public void addValue(T value) {
+    list.add(value);
+  }
+
+  public T first() {
+    if (list.isEmpty()) {
+      throw new IllegalStateException("List is empty");
+    }
+    return list.get(0);
+  }
+
+  public void print() {
+    System.out.print("[");
+    if (!list.isEmpty()) {
+      System.out.print(list.get(0));
+    }
+    for (int i = 1; i < list.size(); i++) {
+      System.out.print(", " + list.get(i));
+    }
+    System.out.println("]");
+  }
+}
+```
+

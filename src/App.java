@@ -1,25 +1,28 @@
 import java.util.Locale;
 import java.util.Scanner;
 
-import model.services.IInterestService;
-import model.services.UsaInterestService;
+import model.services.PrintService;
 
 public class App {
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
 
-		System.out.print("Amount: ");
-		double amount = sc.nextDouble();
-		System.out.print("Months: ");
-		int months = sc.nextInt();
+		PrintService<Integer> ps = new PrintService<>();
 
-		// IInterestService interestService = new BrazilianService(2.0);
-		IInterestService interestService = new UsaInterestService(1.0);
-		double payment = interestService.payment(amount, months);
+		System.out.println("How many values? ");
+		int n = sc.nextInt();
 
-		System.out.println("Payment after " + months + " months:");
-		System.out.println(String.format("%.2f", payment));
+		// ps.addValue("Maria"); -> erro
+
+		for (int i = 0; i < n; i++) {
+			int value = sc.nextInt();
+			ps.addValue(value);
+		}
+
+		ps.print();
+		Integer x = ps.first();
+		System.out.println("First: " + x);
 
 		sc.close();
 	}
