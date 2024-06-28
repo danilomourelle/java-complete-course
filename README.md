@@ -2243,3 +2243,50 @@ public class App {
 	}
 }
 ```
+
+### Aula 242 - Curinga delimitados
+
+Aqui vira a junção da bizarrice. O exemplo vai concentrar nos tipos `List` porque é uma interface genérica bastante utilizada. Então um caso em que nós temos um método que vai receber uma lista, e iterar sobre os elementos. Quando a gente utiliza o `foreach` a gente precisa indicar qual vai ser o tipo do elemento, que nesses casos costuma ser o tipo passado como **Generic** para a interface `List`. 
+
+Mas se a gente tiver uma situação onde você quer que a lista possa ser flexível quanto ao tipo, seria só usar o curinga `?`, agora se quiser ser flexível, mas como um mínimo de segurança, por exemplo garantir que esse genérico vai respeitar uma super classe, então a gente pode colocar `? extends Classe`. Em outras palavras, é o aninhameno do **Generic**.
+
+Alguma coisa vai usar um tipo `<T>`, mas nem que usa sabe o que vai ser o **T**, então ela passa um `?` para ser o `T`, que se precisar ter um mínimo de garantia, vai ser `? extends`.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+import model.entities.Circle;
+import model.entities.Rectangle;
+import model.entities.Shape;
+
+public class App {
+	public static void main(String[] args) {
+		List<Shape> myShapes = new ArrayList<>();
+		myShapes.add(new Rectangle(3.0, 2.0));
+		myShapes.add(new Circle(2.0));
+		System.out.println("Total area: " + totalArea(myShapes));
+
+		List<Circle> myCircles = new ArrayList<>();
+		myCircles.add(new Circle(2.0));
+		myCircles.add(new Circle(3.0));
+		System.out.println("Total area: " + totalArea(myCircles));
+
+		List<Rectangle> myRectangles = new ArrayList<>();
+		myRectangles.add(new Rectangle(3.0, 2.0));
+		myRectangles.add(new Rectangle(2.0, 3.0));
+		System.out.println("Total area: " + totalArea(myRectangles));
+	}
+
+	public static double totalArea(List<? extends Shape> list) {
+		double total = 0;
+		for (Shape s : list) {
+			total += s.area();
+		}
+		return total;
+	}
+}
+```
+Esse exemplo de cima recebe o nome de covariância, e tem como efeito colateral que o método que aplica esse curinga não vai conseguir adicionar elementos, apenas ler. Isso porque foi definido que a lista vai ser de elementos que estender um tipo, ou seja, eles tem pelo menos um tipo, mas podem ter mais coisas do seu próprio tipo que é definido na tipagem da lista onde esse método vai ser chamado.
+
+O método *totalArea* não faz ideia se a lista que chegou é uma lista de `Circle`, `Rectangle`, que aceitam apenas os seus respectivos tipos, ou se é uma lista de `Shape` que está sim, poderia aceitar os dois tipos. O único lugar que sabe qual lista está sendo usada, é o *main* que é quem chamou, e por isso dentro de *totalArea* fica proibido adicionar elementos à lista.
