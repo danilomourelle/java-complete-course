@@ -1,34 +1,23 @@
-import java.util.ArrayList;
-import java.util.List;
+import model.entities.Client;
 
 public class App {
 	public static void main(String[] args) {
-		List<String> strings = List.of("apple", "banana", "orange");
-		List<Integer> integers = List.of(1, 2, 3, 4, 5);
-		List<Double> doubles = List.of(1.1, 2.2, 3.3, 4.4, 5.5);	
+		Client c1 = new Client("Maria", "maria@gmail.com");
+		Client c2 = new Client("Maria", "maria@gmail.com");
+		Client c3 = new Client("Alex", "alex.gmail.com");
 
-		List<Object> objects = new ArrayList<>();
+		String s1 = "Test";
+		String s2 = "Test";
 
-		copy(integers, objects);
-		printList(objects);
+		String s3 = new String("Test");
+		String s4 = new String("Test");
 
-		copy(doubles, objects);
-		printList(objects);
-
-		// copy(strings, objects); - error: String is not part of Number inheritance hierarchy
-	}	
-
-	public static void copy(List<? extends Number> source, List<? super Number> destination) {
-		for (Number obj : source) {
-			destination.add(obj);
-		}
-
-		Object number = destination.get(0); // Object is the only class that can be used to store any type of object
-	}
-
-	public static void printList(List<?> list) {
-		for (Object obj : list) {
-			System.out.println(obj);
-		}
+		System.out.println(c1.hashCode());
+		System.out.println(c2.hashCode());
+		System.out.println(c3.hashCode());
+		System.out.println(c1.equals(c2));
+		System.out.println(c1 == c2);
+		System.out.println(s1 == s2);
+		System.out.println(s3 == s4);
 	}
 }

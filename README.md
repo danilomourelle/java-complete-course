@@ -2334,3 +2334,83 @@ public class App {
 }
 ```
 
+### Aula 243 - HashCode e Equals
+
+Esses são dois métodos que são herdados do `Object`, portanto qualquer dado em Java vai ter acesso a esses métodos. Eles são utilizados para se fazer comparação de dados em estrutura de  objeto uma vez que esses dados são armazenados como referência pela variável. O comparador `==` verifica o valor da variável em si, o que em casos de objetos, esse valor acaba sendo a valor da referência e não dos dados, o que faz com que mesmo objetos com os mesmos dados, sejam vistos como diferentes quando utilizado esse comparador.
+
+Se precisarmos verificar igualdade de dados entre objetos, nós temos duas estratégias, sendo que a primeira é utilizar o método `.hashCode()`. Esse método passa os dados do objeto por um algoritmo gerando um número inteiro, então se dois objetos tiverem os mesmos dados, eles devem gerar o mesmo hashCode. Porém esse método apresenta a possibilidade de conflito, onde objetos com diferentes dados acabam gerando o mesmo hashCode. Então ele acaba sendo utilizado mais para a verificação da diferença do que da igualdade. Em uma busca contra vários elementos, é comum que primeiro se elimine os certamente diferentes com a comparação de hashCode, para então verificar a igualdade com o próximo método.
+
+A verificação de igualdade é feita através do método `.equals(other)` e esse vai ter uma garantia quanto ao seu resultado. Como contra partida, é um  método mais lento, por isso em situações de comparação contra vários elementos, deve ser evitado, ou utilizado como estratégia complementar.
+
+Por serem métodos herdados, eles podem ser sobrescritos, para por exemplo ignorar um dos atributos de uma classe. Outro detalhe é que apesar de strings serem consideradas instâncias de uma classe, quando declaradas de forma literal, podem ser comparadas normalmente com o `==`, mas um cuidado que se deve ter é ao comparar uma string, que são valores entre aspas duplas, com apenas um caractere, com um char, que é um valor entre aspas simples. Para o Java, isso são valores diferentes.
+
+```java
+package model.entities;
+
+public class Client {
+  private String name;
+  private String email;
+
+  public Client(String name, String email) {
+    this.name = name;
+    this.email = email;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Client other = (Client) obj;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (email == null) {
+      if (other.email != null)
+        return false;
+    } else if (!email.equals(other.email))
+      return false;
+    return true;
+  }
+}
+```
+
+```java
+import model.entities.Client;
+
+public class App {
+	public static void main(String[] args) {
+		Client c1 = new Client("Maria", "maria@gmail.com");
+		Client c2 = new Client("Maria", "maria@gmail.com");
+		Client c3 = new Client("Alex", "alex.gmail.com");
+
+		String s1 = "Test";
+		String s2 = "Test";
+
+		String s3 = new String("Test");
+		String s4 = new String("Test");
+
+		System.out.println(c1.hashCode());
+		System.out.println(c2.hashCode());
+		System.out.println(c3.hashCode());
+		System.out.println(c1.equals(c2));
+		System.out.println(c1 == c2);
+		System.out.println(s1 == s2);
+		System.out.println(s3 == s4);
+	}
+}
+```
