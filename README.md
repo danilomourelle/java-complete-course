@@ -2573,3 +2573,46 @@ public class App {
 ```
 
 Essas mesmas estratégias são utilizadas tanto para o `.contains()` quanto para a adição, uma vez que o set precisa verificar se o agrupamento já apresenta tal elemento, para descartá-lo em caso positivo.
+
+### Aula 249 - Map
+
+O `Map`é um conceito muito parecido com o `Set`, porém ao invés de ser um agrupamento em formato de lista de dados não repetitivos, o `Map` vai ser um agrupamento, também não repetitivo, mas em um formato chave/valor. Então, apenas para repassar, o `Map` vai ser uma interface de tipo genérico, mas o interessante é que vai ser na verdade de dois tipos genéricos, sendo um o tipo da chave, e outro o tipo do valor (e esses tipos podem ser qualquer coisa).
+
+Ele também vai apresentar 3 classes que implementam essa interface, sendo que elas se assemelham em nome e comportamento com o `Set`, portanto, teremos o `HashMap`, `TreeMap` e `LinkedHashMap`. Elas vão apresentar as mesmas características quanto à complexidade de operações, e questões de ordenação e comparação.
+
+De diferença o que temos é que, por se tratar de um agrupamento do tipo chave/valor, o que acontece ao se tentar inserir um elemento com uma chave que já existe no agrupamento, é que o valor será sobrescrito, já que não há como termos chaves repetidas. Lembrando que, caso as chaves sejam de um tipo de classe, essa comparação pode ser dar pelo *hashCode/equals* assim como pelo *compareTo* ou pelo valor da referência se esses métodos não estiverem presentes.
+
+```java
+import java.util.Map;
+import java.util.TreeMap;
+
+public class App {
+	public static void main(String[] args) {
+		Map<String, String> cookies = new TreeMap<>();
+
+		cookies.put("username", "john");
+		cookies.put("email", "john@email.com");
+		cookies.put("phone", "1234567890");
+
+		cookies.remove("email");
+		cookies.put("phone", "0987654321");
+
+		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
+		System.out.println("Phone: " + cookies.get("phone"));
+		System.out.println("Email: " + cookies.get("email"));
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
+
+		System.out.println();
+		System.out.println("COOKIES:");
+		for (String key : cookies.keySet()) {
+			System.out.println(key + ": " + cookies.get(key));
+		}
+		
+		System.out.println();
+		cookies.clear();
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
+	}
+}
+```

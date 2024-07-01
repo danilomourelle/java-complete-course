@@ -1,23 +1,32 @@
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
-import model.entities.Product;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class App {
 	public static void main(String[] args) {
-		Set<Product> hashSet = new HashSet<>();
-		
-		hashSet.add(new Product("TV", 900.0));
-		hashSet.add(new Product("Notebook", 1200.0));
-		hashSet.add(new Product("Tablet", 400.0));
+		Map<String, String> cookies = new TreeMap<>();
 
-		System.out.println(hashSet.contains(new Product("Notebook", 1200.0))); // returns false if hashCode and equals are not implemented
+		cookies.put("username", "john");
+		cookies.put("email", "john@email.com");
+		cookies.put("phone", "1234567890");
 
-		Set<Product> treeSet = new TreeSet<>(hashSet);
+		cookies.remove("email");
+		cookies.put("phone", "0987654321");
 
-		for (Product p : treeSet) {
-			System.out.println(p); // will crash if Product class does not implements Comparable
+		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
+		System.out.println("Phone: " + cookies.get("phone"));
+		System.out.println("Email: " + cookies.get("email"));
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
+
+		System.out.println();
+		System.out.println("COOKIES:");
+		for (String key : cookies.keySet()) {
+			System.out.println(key + ": " + cookies.get(key));
 		}
+		
+		System.out.println();
+		cookies.clear();
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
 	}
 }
