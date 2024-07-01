@@ -2118,3 +2118,501 @@ Mais uma das coisas que seriam evitadas com o paradigma funcional. Mas basicamen
 Agora, a gente pode declarar um método em uma interface e marcar ela com a palavra chave `default`. Esses métodos vão aceitar ter um corpo na função, e eles não ficam obrigados de serem desenvolvidos nas classes que implementarem essa interface. Nesses casos, vai ser executado esse desenvolvimento padrão. Ah lembrando que esse métodos não vão ter acesso direto a nenhum atributo da classe, portanto, caso seja necessário, ele deve estar disponível em um *getter* e esse *getter* deve também aparecer como um método da interface.
 
 Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.
+
+## Sessão 19 - Generics, Set, Map
+
+### Aula 239 - Introdução ao Generics
+
+É basicamente a mesma coisa que o `Generics` do TypeScript. Você vai criar uma classe com um tipo genérico `<T>` e esse tipo também vai ser utilizado nos métodos e atributos quando necessário, e com isso a quando você tiver a utilização da classe, você pode ter a flexibilidade de instanciar indicando qualquer tipo, mas a segurança de que uma vez estabelecido, esse tipo será respeitado em todas as operações.
+
+```java
+package model.services;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PrintService<T> {
+  private List<T> list = new ArrayList<>();
+
+  public void addValue(T value) {
+    list.add(value);
+  }
+
+  public T first() {
+    if (list.isEmpty()) {
+      throw new IllegalStateException("List is empty");
+    }
+    return list.get(0);
+  }
+
+  public void print() {
+    System.out.print("[");
+    if (!list.isEmpty()) {
+      System.out.print(list.get(0));
+    }
+    for (int i = 1; i < list.size(); i++) {
+      System.out.print(", " + list.get(i));
+    }
+    System.out.println("]");
+  }
+}
+```
+
+### Aula 240 - Genéricos delimitados
+
+A ideia é que os genéricos causam uma flexibilização, mas precisa em uma linguagem orientada (obrigatória) a objetos, fortemente tipada, as vezes essa flexibilização pode sair do controle, então você precisa definir um mínimo de segurança na tipagem para acabar tentando utilizar um método que não existe no tipo recebido.
+
+Então o que existe é uma forma de você delimitar o tipo, falando que você aceita qualquer tipo `T` desde que ele respeite alguma condição, por exemplo, implemente alguma interface que vai ter um método necessário. Nesse caso, a gente precisa colocar que aceitamos `<T extends Interface>` que na verdade pode estender uma interface ou qualquer outra coisa, como uma classe.
+
+```java
+package model.services;
+
+import java.util.List;
+
+public class CalculationService {
+  public static <T extends Comparable<T>> T max(List<T> list) {
+    if (list.isEmpty()) {
+      throw new IllegalStateException("List can't be empty");
+    }
+
+    T max = list.get(0);
+    for (T item : list) {
+      if (item.compareTo(max) > 0) {
+        max = item;
+      }
+    }
+
+    return max;
+  }
+}
+```
+
+Veja que primeiro, a nossa classe não é genérica, apenas o método é. Nesse caso temos o modificador de acesso, depois a marcação de um método estático, aí sim, temos a marcação de *Generics* falando que aceitamos qualquer tipo `T` desde que ele estenda a interface `Comparable<T>`. Então temos o tipo de retorno método que vai ser `T`, o nome e os parâmetros.
+
+Então para que eu possa utilizar esse método passando uma determinada classe como tipo, eu preciso garantir que essa classe vai implementar a interface.
+
+```java
+package model.entities;
+
+public class Product implements Comparable<Product> {
+  private String name;
+  private Double price;
+
+  public Product() {
+  }
+
+  public Product(String name, Double price) {
+    this.name = name;
+    this.price = price;
+  }
+
+  @Override
+  public int compareTo(Product other) {
+    return price.compareTo(other.getPrice());
+  }
+}
+```
+
+Veja que a classe `Product` precisa implementar a `Comparable<Product>` e por isso ser obrigada a implementar o método *compareTo* para só então poder ser utilizada como um tipo genérico para o método *max* da classe `CalculationService`.
+
+### Aula 241 - Tipos curinga
+
+A bizarrice da vez. A ideia é que assim, se você tem uma interface ou classe que aceita um tipo genérico, isso quer dizer que ela tem uma flexibilidade de aceitar diferentes tipos, mas que uma vez definido vão formar um tipo final rígido. Ou seja, a interface `List` pode aceitar qualquer tipo como *Generic*, mas uma vez definido o `List<Integer>` por exemplo, é preciso entender que o tipo é a combinação e é rígido.
+
+Em outras palavras, a gente já viu que um tipo `Object` pode receber um valor `Integer` como uma forma de *upcasting*, mas uma `List<Object>` não vai poder receber o valor de uma `List<Integer>`. Então é como se a gente precisasse definir um **Generic** para tipos genéricos - Eh laiá. E é para isso que existe o tipo curinga, pois nesse caso você consegue marcar uma variável de um tipo que recebe um genérico, fazendo com que depois essa variável possa receber como valor aquele tipo recebendo qualquer genérico.
+
+```java
+import java.util.List;
+
+public class App {
+	public static void main(String[] args) {
+		List<String> listStr = List.of("a", "b", "c", "d", "e");
+		List<Integer> listInt = List.of(1, 2, 3, 4, 5);
+
+		List<?> listJoker = listStr;
+		printList(listJoker);
+
+		listJoker = listInt;
+		printList(listJoker);
+	}
+
+	public static void printList(List<?> list) {
+		for (Object i : list) {
+			System.out.println(i);
+		}
+	}
+}
+```
+
+### Aula 242 - Curinga delimitados
+
+Aqui vira a junção da bizarrice. O exemplo vai concentrar nos tipos `List` porque é uma interface genérica bastante utilizada. Então um caso em que nós temos um método que vai receber uma lista, e iterar sobre os elementos. Quando a gente utiliza o `foreach` a gente precisa indicar qual vai ser o tipo do elemento, que nesses casos costuma ser o tipo passado como **Generic** para a interface `List`. 
+
+Mas se a gente tiver uma situação onde você quer que a lista possa ser flexível quanto ao tipo, seria só usar o curinga `?`, agora se quiser ser flexível, mas como um mínimo de segurança, por exemplo garantir que esse genérico vai respeitar uma super classe, então a gente pode colocar `? extends Classe`. Em outras palavras, é o aninhameno do **Generic**.
+
+Alguma coisa vai usar um tipo `<T>`, mas nem que usa sabe o que vai ser o **T**, então ela passa um `?` para ser o `T`, que se precisar ter um mínimo de garantia, vai ser `? extends`.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+import model.entities.Circle;
+import model.entities.Rectangle;
+import model.entities.Shape;
+
+public class App {
+	public static void main(String[] args) {
+		List<Shape> myShapes = new ArrayList<>();
+		myShapes.add(new Rectangle(3.0, 2.0));
+		myShapes.add(new Circle(2.0));
+		System.out.println("Total area: " + totalArea(myShapes));
+
+		List<Circle> myCircles = new ArrayList<>();
+		myCircles.add(new Circle(2.0));
+		myCircles.add(new Circle(3.0));
+		System.out.println("Total area: " + totalArea(myCircles));
+
+		List<Rectangle> myRectangles = new ArrayList<>();
+		myRectangles.add(new Rectangle(3.0, 2.0));
+		myRectangles.add(new Rectangle(2.0, 3.0));
+		System.out.println("Total area: " + totalArea(myRectangles));
+	}
+
+	public static double totalArea(List<? extends Shape> list) {
+		double total = 0;
+		for (Shape s : list) {
+			total += s.area();
+		}
+		return total;
+	}
+}
+```
+Esse exemplo de cima recebe o nome de covariância, e tem como efeito colateral que o método que aplica esse curinga não vai conseguir adicionar elementos, apenas ler. Isso porque foi definido que a lista vai ser de elementos que estender um tipo, ou seja, eles tem pelo menos um tipo, mas podem ter mais coisas do seu próprio tipo que é definido na tipagem da lista onde esse método vai ser chamado.
+
+O método *totalArea* não faz ideia se a lista que chegou é uma lista de `Circle`, `Rectangle`, que aceitam apenas os seus respectivos tipos, ou se é uma lista de `Shape` que está sim, poderia aceitar os dois tipos. O único lugar que sabe qual lista está sendo usada, é o *main* que é quem chamou, e por isso dentro de *totalArea* fica proibido adicionar elementos à lista.
+
+Agora, a gente pode ter uma situação inversa, onde a gente quer adicionar elementos em uma lista genérica, que se chama de contra-variância. Nesse caso, eu preciso indicar para o método que ele vai receber um tipo, ou qualquer super classe desse tipo (todo mundo pra cima). Acontece que como um tipo pode receber como valor instâncias dele, e de sub classes que estendem (todo mundo pra baixo), você acaba meio que indicando que aceita toda a cadeia de herança.
+
+Bom, esse é um caso muito específico, porque se você vai aceitar que os elementos estejam em qualquer tipo da cadeira de herança, isso faz com que você não possa definir com segurança o tipo exato de um elemento específico, sendo assim, nesses casos fica impossibilitado de se fazer a leitura de elementos dessa lista, mas é possível fazer a adição, desde que o elemento tenha o seu tipo na cadeia hereditária. 
+
+**OBS**: O acesso até é permitido, mas você fica obrigado a marcar o elemento como sendo do tipo `Object` que é o tipo mais primitivo da linguagem, o que vai limitar e muito as possibilidade de ações a se fazer nesse valor.
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class App {
+	public static void main(String[] args) {
+		List<String> strings = List.of("apple", "banana", "orange");
+		List<Integer> integers = List.of(1, 2, 3, 4, 5);
+		List<Double> doubles = List.of(1.1, 2.2, 3.3, 4.4, 5.5);	
+
+		List<Object> objects = new ArrayList<>();
+
+		copy(integers, objects);
+		printList(objects);
+
+		copy(doubles, objects);
+		printList(objects);
+
+		// copy(strings, objects); - error: String is not part of Number inheritance hierarchy
+	}	
+
+	public static void copy(List<? extends Number> source, List<? super Number> destination) {
+		for (Number obj : source) {
+			destination.add(obj);
+		}
+
+		Object number = destination.get(0); // Object is the only class that can be used to store any type of object
+	}
+
+	public static void printList(List<?> list) {
+		for (Object obj : list) {
+			System.out.println(obj);
+		}
+	}
+}
+```
+
+### Aula 243 - HashCode e Equals
+
+Esses são dois métodos que são herdados do `Object`, portanto qualquer dado em Java vai ter acesso a esses métodos. Eles são utilizados para se fazer comparação de dados em estrutura de  objeto uma vez que esses dados são armazenados como referência pela variável. O comparador `==` verifica o valor da variável em si, o que em casos de objetos, esse valor acaba sendo a valor da referência e não dos dados, o que faz com que mesmo objetos com os mesmos dados, sejam vistos como diferentes quando utilizado esse comparador.
+
+Se precisarmos verificar igualdade de dados entre objetos, nós temos duas estratégias, sendo que a primeira é utilizar o método `.hashCode()`. Esse método passa os dados do objeto por um algoritmo gerando um número inteiro, então se dois objetos tiverem os mesmos dados, eles devem gerar o mesmo hashCode. Porém esse método apresenta a possibilidade de conflito, onde objetos com diferentes dados acabam gerando o mesmo hashCode. Então ele acaba sendo utilizado mais para a verificação da diferença do que da igualdade. Em uma busca contra vários elementos, é comum que primeiro se elimine os certamente diferentes com a comparação de hashCode, para então verificar a igualdade com o próximo método.
+
+A verificação de igualdade é feita através do método `.equals(other)` e esse vai ter uma garantia quanto ao seu resultado. Como contra partida, é um  método mais lento, por isso em situações de comparação contra vários elementos, deve ser evitado, ou utilizado como estratégia complementar.
+
+Por serem métodos herdados, eles podem ser sobrescritos, para por exemplo ignorar um dos atributos de uma classe. Outro detalhe é que apesar de strings serem consideradas instâncias de uma classe, quando declaradas de forma literal, podem ser comparadas normalmente com o `==`, mas um cuidado que se deve ter é ao comparar uma string, que são valores entre aspas duplas, com apenas um caractere, com um char, que é um valor entre aspas simples. Para o Java, isso são valores diferentes.
+
+```java
+package model.entities;
+
+public class Client {
+  private String name;
+  private String email;
+
+  public Client(String name, String email) {
+    this.name = name;
+    this.email = email;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Client other = (Client) obj;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (email == null) {
+      if (other.email != null)
+        return false;
+    } else if (!email.equals(other.email))
+      return false;
+    return true;
+  }
+}
+```
+
+```java
+import model.entities.Client;
+
+public class App {
+	public static void main(String[] args) {
+		Client c1 = new Client("Maria", "maria@gmail.com");
+		Client c2 = new Client("Maria", "maria@gmail.com");
+		Client c3 = new Client("Alex", "alex.gmail.com");
+
+		String s1 = "Test";
+		String s2 = "Test";
+
+		String s3 = new String("Test");
+		String s4 = new String("Test");
+
+		System.out.println(c1.hashCode());
+		System.out.println(c2.hashCode());
+		System.out.println(c3.hashCode());
+		System.out.println(c1.equals(c2));
+		System.out.println(c1 == c2);
+		System.out.println(s1 == s2);
+		System.out.println(s3 == s4);
+	}
+}
+```
+
+### 244 - Set
+
+Representa um conjunto de elementos, igual a conceito de álgebra, e similar ao do `Set` do JavaScript, mas com algumas diferenças. Primeiro que o `Set` do Java é uma interface genérica, igual ao `List`, e vai ter como classes que implementam as classes `HashSet`, `TreeSet` e `LinkedHashSet`. 
+
+O **HashSet** é o tipo de `Set` mais rápido, com todas as suas operações tendo uma complexidade O(1), porém ele não garante nenhum tipo de ordem nos elementos, nem mesmo a ordem em que eles foram inseridos no agrupamento. Já o **TreeSet** vai sempre manter os elementos em uma ordem utilizando o *Comparator* dos elementos, como resultado, as suas manipulações são mais lentas, com complexidade de O(log(n)). Na última opção, o **LinkedHashSet** tenta ser uma opção intermediária, pois ele vai ter manipulações melhores que o TreeSet, e também vai garantir uma ordem do elementos como sendo a mesma ordem de entrada, o que não pode ser garantido com o HashSet.
+
+Alguns dos métodos que essa interface apresenta são o `.add(obj)` que vai adicionar um elemento ao agrupamento, `.remove(obj)` que vai remover o elemento, `.contains(obj)` que vai indicar se o elemento existe no agrupamento. Como métodos de informação do agrupamento, temos o `.clear()` e o `.size()` que vão limpar e trazer o tamanho do agrupamento, respectivamente.
+
+Existem outros métodos, que podem ser aplicados em todos os elementos como um todo, entre eles temos o `.removeIf(predicate)` que vai remover do agrupamento todos os elementos que atenderem ao predicado. Já os métodos `.addAll(otherSet)`, `.retainAll(otherSet)` e `.removeAll(otherSet)` vão fazer a união, interseção e diferença, respectivamente, entre dois agrupamentos.
+
+```java
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class App {
+	public static void main(String[] args) {
+		String[] array = new String[] { "Tv", "Tablet", "Notebook" };
+		Set<String> hashSet = new HashSet<>(Arrays.asList(array));
+		Set<String> linkedHashSet = new LinkedHashSet<>(Arrays.asList(array));
+		Set<String> treeSet = new TreeSet<>(Arrays.asList(array));
+
+		// Prints out of order
+		for (String s : hashSet) {
+			System.out.println(s);
+		}
+
+		// Prints in order it was added
+		for (String s : linkedHashSet) {
+			System.out.println(s);
+		}
+
+		// Prints in Comparator order
+		for (String s : treeSet) {
+			System.out.println(s);
+		}
+
+		hashSet.add("Smartphone");
+		hashSet.remove("Notebook");
+		hashSet.removeIf(el -> el.startsWith("T"));
+
+		System.out.println(hashSet);
+		
+		Set<Integer> a = new TreeSet<>(Arrays.asList(0, 2, 4, 5, 6, 8, 10));
+		Set<Integer> b = new TreeSet<>(Arrays.asList(5, 6, 7, 8, 9, 10));
+		
+		// union
+		Set<Integer> c = new TreeSet<>(a);
+		c.addAll(b);
+		System.out.println(c);
+		
+		// intersection
+		Set<Integer> d = new TreeSet<>(a);
+		d.retainAll(b);
+		System.out.println(d);
+		
+		// difference
+		Set<Integer> e = new TreeSet<>(a);
+		e.removeAll(b);
+		System.out.println(e);
+	}
+}
+```
+
+### Aulas 245-246 - Comparações dos Set
+
+O **HashSet** vai testar a igualdade no método `.contains(obj)` utilizando os conceitos de *hashCode* e *equals*. Porém é preciso garantir que a classe desse objeto tenha esses métodos de comparação, que apesar de serem herdados, não possuem uma implementação padrão. Caso essa classe não possua uma implementação dos métodos, a comparação é feita pela igualdade simples do valor da referência, ou seja, apenas a mesma instância seria indicada como igual.
+
+Já a ordenação de uma **TreeSet** também faz com que se torne obrigatório que a classe dos elementos implementem a interface *Comparator* já que ele vai utilizar o método `.compareTo()`. Então um exemplo para essas comparações e verificações seriam mais ou menos assim:
+
+```java
+package model.entities;
+
+public class Product implements Comparable<Product> {
+  private String name;
+  private Double price;
+
+  public Product(String name, Double price) {
+    this.name = name;
+    this.price = price;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return "Product [name=" + name + ", price=" + price + "]";
+  }
+
+  @Override
+  public int compareTo(Product other) {
+    return name.toUpperCase().compareTo(other.getName().toUpperCase());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((price == null) ? 0 : price.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Product other = (Product) obj;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (price == null) {
+      if (other.price != null)
+        return false;
+    } else if (!price.equals(other.price))
+      return false;
+    return true;
+  }
+}
+```
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import model.entities.Product;
+
+public class App {
+	public static void main(String[] args) {
+		Set<Product> hashSet = new HashSet<>();
+		
+		hashSet.add(new Product("TV", 900.0));
+		hashSet.add(new Product("Notebook", 1200.0));
+		hashSet.add(new Product("Tablet", 400.0));
+
+		System.out.println(hashSet.contains(new Product("Notebook", 1200.0))); // returns false if hashCode and equals are not implemented
+
+		Set<Product> treeSet = new TreeSet<>(hashSet);
+
+		for (Product p : treeSet) {
+			System.out.println(p); // will crash if Product class does not implements Comparable
+		}
+	}
+}
+```
+
+Essas mesmas estratégias são utilizadas tanto para o `.contains()` quanto para a adição, uma vez que o set precisa verificar se o agrupamento já apresenta tal elemento, para descartá-lo em caso positivo.
+
+### Aula 249 - Map
+
+O `Map`é um conceito muito parecido com o `Set`, porém ao invés de ser um agrupamento em formato de lista de dados não repetitivos, o `Map` vai ser um agrupamento, também não repetitivo, mas em um formato chave/valor. Então, apenas para repassar, o `Map` vai ser uma interface de tipo genérico, mas o interessante é que vai ser na verdade de dois tipos genéricos, sendo um o tipo da chave, e outro o tipo do valor (e esses tipos podem ser qualquer coisa).
+
+Ele também vai apresentar 3 classes que implementam essa interface, sendo que elas se assemelham em nome e comportamento com o `Set`, portanto, teremos o `HashMap`, `TreeMap` e `LinkedHashMap`. Elas vão apresentar as mesmas características quanto à complexidade de operações, e questões de ordenação e comparação.
+
+De diferença o que temos é que, por se tratar de um agrupamento do tipo chave/valor, o que acontece ao se tentar inserir um elemento com uma chave que já existe no agrupamento, é que o valor será sobrescrito, já que não há como termos chaves repetidas. Lembrando que, caso as chaves sejam de um tipo de classe, essa comparação pode ser dar pelo *hashCode/equals* assim como pelo *compareTo* ou pelo valor da referência se esses métodos não estiverem presentes.
+
+```java
+import java.util.Map;
+import java.util.TreeMap;
+
+public class App {
+	public static void main(String[] args) {
+		Map<String, String> cookies = new TreeMap<>();
+
+		cookies.put("username", "john");
+		cookies.put("email", "john@email.com");
+		cookies.put("phone", "1234567890");
+
+		cookies.remove("email");
+		cookies.put("phone", "0987654321");
+
+		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
+		System.out.println("Phone: " + cookies.get("phone"));
+		System.out.println("Email: " + cookies.get("email"));
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
+
+		System.out.println();
+		System.out.println("COOKIES:");
+		for (String key : cookies.keySet()) {
+			System.out.println(key + ": " + cookies.get(key));
+		}
+		
+		System.out.println();
+		cookies.clear();
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
+	}
+}
+```

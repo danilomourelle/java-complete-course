@@ -1,26 +1,32 @@
-import java.util.Locale;
-import java.util.Scanner;
-
-import model.services.IInterestService;
-import model.services.UsaInterestService;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class App {
 	public static void main(String[] args) {
-		Locale.setDefault(Locale.US);
-		Scanner sc = new Scanner(System.in);
+		Map<String, String> cookies = new TreeMap<>();
 
-		System.out.print("Amount: ");
-		double amount = sc.nextDouble();
-		System.out.print("Months: ");
-		int months = sc.nextInt();
+		cookies.put("username", "john");
+		cookies.put("email", "john@email.com");
+		cookies.put("phone", "1234567890");
 
-		// IInterestService interestService = new BrazilianService(2.0);
-		IInterestService interestService = new UsaInterestService(1.0);
-		double payment = interestService.payment(amount, months);
+		cookies.remove("email");
+		cookies.put("phone", "0987654321");
 
-		System.out.println("Payment after " + months + " months:");
-		System.out.println(String.format("%.2f", payment));
+		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
+		System.out.println("Phone: " + cookies.get("phone"));
+		System.out.println("Email: " + cookies.get("email"));
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
 
-		sc.close();
+		System.out.println();
+		System.out.println("COOKIES:");
+		for (String key : cookies.keySet()) {
+			System.out.println(key + ": " + cookies.get(key));
+		}
+		
+		System.out.println();
+		cookies.clear();
+		System.out.println("Size: " + cookies.size());
+		System.out.println(cookies);
 	}
 }
