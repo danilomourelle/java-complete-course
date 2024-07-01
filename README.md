@@ -2687,3 +2687,13 @@ public class App {
 	}
 }
 ```
+
+### Aula 255 - Interface funcional
+
+Bom, pelo que eu entendi, esse conceito responde uma dúvida que ficou da aula anterior. A gente partiu de uma classe que implementava a interface `Comparator` e definia o método *compare*. No frio da questão, isso em nada mudava o ponto de você ainda ter uma classe, implementando uma interface, e definindo um método, que se tivesse que ser diferente, teria que ser feito uma outra estrutura.
+
+Mas quando a gente reduz isso para uma classe anônima no ato da utilização, isso já melhora, mas ainda assim continuou bastante verboso. E a solução foi transformar essa classe anônima em uma função lambda. Mas ficou a dúvida, onde raios ficou definido que aquela função vai ser utilizada no lugar do método *compare*? Porque até então, a gente tinha bem explícito a definição do método nas outras alternativas.
+
+É aí que entra a definição de **Interface funcional**. Essas são interfaces que vão apresentar um único método abstrato, sendo que nesses casos, o compilador vai saber que ao receber uma função lambda como argumento onde se é esperado um objeto implementando uma **Interface funcional**, essa função lambda vai representar a definição desse único método da interface.
+
+Esse é o caso da interface `Comparator` que apresenta apenas o método *compare*, e portanto vai aceitar uma função lambda no lugar do objeto, e assim, ela será executada sempre que o método *compare* for chamado. Além dela, ainda temos outras **Interfaces funcionais** que são a `Predicate`, `Function` e a `Consumer`.
