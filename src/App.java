@@ -1,32 +1,35 @@
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.MyComparator;
+import model.entities.Product;
 
 public class App {
 	public static void main(String[] args) {
-		Map<String, String> cookies = new TreeMap<>();
+		List<Product> list = new ArrayList<>();
 
-		cookies.put("username", "john");
-		cookies.put("email", "john@email.com");
-		cookies.put("phone", "1234567890");
+		list.add(new Product("TV", 900.0));
+		list.add(new Product("Notebook", 1200.0));
+		list.add(new Product("Tablet", 450.0));
 
-		cookies.remove("email");
-		cookies.put("phone", "0987654321");
+		// Using the class MyComparator
+		list.sort(new MyComparator());
 
-		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
-		System.out.println("Phone: " + cookies.get("phone"));
-		System.out.println("Email: " + cookies.get("email"));
-		System.out.println("Size: " + cookies.size());
-		System.out.println(cookies);
+		// Anonymous class implementation
+		Comparator<Product> comp = new Comparator<Product>() {
+			@Override
+			public int compare(Product p1, Product p2) {
+				return p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase());
+			}
+		};
+		list.sort(comp);
 
-		System.out.println();
-		System.out.println("COOKIES:");
-		for (String key : cookies.keySet()) {
-			System.out.println(key + ": " + cookies.get(key));
+		// Lambda expression
+		list.sort((p1, p2) -> p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase()));
+
+		for (Product p : list) {
+			System.out.println(p);
 		}
-		
-		System.out.println();
-		cookies.clear();
-		System.out.println("Size: " + cookies.size());
-		System.out.println(cookies);
 	}
 }

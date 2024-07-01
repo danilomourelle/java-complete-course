@@ -2616,3 +2616,74 @@ public class App {
 	}
 }
 ```
+
+## Sessão 20: Programação funcional e expressões Lambda
+
+### Aula 253 - Comparator
+
+Esse tópico me parece uma tentativa de resolver uma séries de problemas do Java, que eu já venho indicando, pelo fato de ela ser uma linguagem obrigada a objetos. Tem vários momentos que é interessante você ter as funções livres, não atreladas a um conjunto de dados. Isso facilitaria a reutilização, desacopla um pouco os dados, e uma tipagem forte, o que a linguagem já tem, iria evitar os problemas de nulidade.
+
+Um dos pontos que mais achava entrando até então, é que para se trabalhar com listas, é quase que imprescindível que a classe dos elementos implemente a interface `Comparable`, porque aí você garante que ela vai implementar o método *compareTo*, ou seja, você vai começar a ter uma série de implementações e as classes vão ficando cada vez mais poluídas.
+
+Pior do que isso, imagina que você define uma implementação de comparação na classe, mas em determinado momento, você quer fazer uma comparação diferente, e aí, muda a classe? Cria um *setter* para ficar alterando a função conforme o código executa? Então ter uma forma de você definir a função de comparação no momento em que ela for usada, é uma estratégia que existe no JavaScript e parece muito mais eficiente.
+
+É nessa que surgem as funções lambdas, elas tem um conceito muito semelhando aos *callbacks* de métodos de array do JavaScript, além disso, vão ter uma implementação muito parecida com uma *arrow function* do JavaScript. Então, em determinadas situações, onde um método vai precisar receber um objeto que implemente uma interface para que se tenha um método padrão, é possível ao invés de fazer toda a declaração da classe, já passar essa função lambda, deixando o código mais limpo e mais dinâmico.
+
+```java
+package model.entities;
+
+import java.util.Comparator;
+
+public class MyComparator implements Comparator<Product> {
+
+  @Override
+  public int compare(Product product1, Product product2) {
+    return product1
+	    .getName()
+	    .toUpperCase()
+	    .compareTo(
+		    product2
+			    .getName()
+			    .toUpperCase()
+			);
+  }
+}
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.MyComparator;
+import model.entities.Product;
+
+public class App {
+	public static void main(String[] args) {
+		List<Product> list = new ArrayList<>();
+
+		list.add(new Product("TV", 900.0));
+		list.add(new Product("Notebook", 1200.0));
+		list.add(new Product("Tablet", 450.0));
+
+		// Using the class MyComparator
+		list.sort(new MyComparator());
+
+		// Anonymous class implementation
+		Comparator<Product> comp = new Comparator<Product>() {
+			@Override
+			public int compare(Product p1, Product p2) {
+				return p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase());
+			}
+		};
+		list.sort(comp);
+
+		// Lambda expression
+		list.sort((p1, p2) -> p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase()));
+
+		for (Product p : list) {
+			System.out.println(p);
+		}
+	}
+}
+```
