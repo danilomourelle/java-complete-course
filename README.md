@@ -2414,3 +2414,69 @@ public class App {
 	}
 }
 ```
+
+### 244 - Set
+
+Representa um conjunto de elementos, igual a conceito de álgebra, e similar ao do `Set` do JavaScript, mas com algumas diferenças. Primeiro que o `Set` do Java é uma interface genérica, igual ao `List`, e vai ter como classes que implementam as classes `HashSet`, `TreeSet` e `LinkedHashSet`. 
+
+O **HashSet** é o tipo de `Set` mais rápido, com todas as suas operações tendo uma complexidade O(1), porém ele não garante nenhum tipo de ordem nos elementos, nem mesmo a ordem em que eles foram inseridos no agrupamento. Já o **TreeSet** vai sempre manter os elementos em uma ordem utilizando o *Comparator* dos elementos, como resultado, as suas manipulações são mais lentas, com complexidade de O(log(n)). Na última opção, o **LinkedHashSet** tenta ser uma opção intermediária, pois ele vai ter manipulações melhores que o TreeSet, e também vai garantir uma ordem do elementos como sendo a mesma ordem de entrada, o que não pode ser garantido com o HashSet.
+
+Alguns dos métodos que essa interface apresenta são o `.add(obj)` que vai adicionar um elemento ao agrupamento, `.remove(obj)` que vai remover o elemento, `.contains(obj)` que vai indicar se o elemento existe no agrupamento. Como métodos de informação do agrupamento, temos o `.clear()` e o `.size()` que vão limpar e trazer o tamanho do agrupamento, respectivamente.
+
+Existem outros métodos, que podem ser aplicados em todos os elementos como um todo, entre eles temos o `.removeIf(predicate)` que vai remover do agrupamento todos os elementos que atenderem ao predicado. Já os métodos `.addAll(otherSet)`, `.retainAll(otherSet)` e `.removeAll(otherSet)` vão fazer a união, interseção e diferença, respectivamente, entre dois agrupamentos.
+
+```java
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class App {
+	public static void main(String[] args) {
+		String[] array = new String[] { "Tv", "Tablet", "Notebook" };
+		Set<String> hashSet = new HashSet<>(Arrays.asList(array));
+		Set<String> linkedHashSet = new LinkedHashSet<>(Arrays.asList(array));
+		Set<String> treeSet = new TreeSet<>(Arrays.asList(array));
+
+		// Prints out of order
+		for (String s : hashSet) {
+			System.out.println(s);
+		}
+
+		// Prints in order it was added
+		for (String s : linkedHashSet) {
+			System.out.println(s);
+		}
+
+		// Prints in Comparator order
+		for (String s : treeSet) {
+			System.out.println(s);
+		}
+
+		hashSet.add("Smartphone");
+		hashSet.remove("Notebook");
+		hashSet.removeIf(el -> el.startsWith("T"));
+
+		System.out.println(hashSet);
+		
+		Set<Integer> a = new TreeSet<>(Arrays.asList(0, 2, 4, 5, 6, 8, 10));
+		Set<Integer> b = new TreeSet<>(Arrays.asList(5, 6, 7, 8, 9, 10));
+		
+		// union
+		Set<Integer> c = new TreeSet<>(a);
+		c.addAll(b);
+		System.out.println(c);
+		
+		// intersection
+		Set<Integer> d = new TreeSet<>(a);
+		d.retainAll(b);
+		System.out.println(d);
+		
+		// difference
+		Set<Integer> e = new TreeSet<>(a);
+		e.removeAll(b);
+		System.out.println(e);
+	}
+}
+```
