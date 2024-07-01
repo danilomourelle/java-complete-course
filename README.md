@@ -2480,3 +2480,96 @@ public class App {
 	}
 }
 ```
+
+### Aulas 245-246 - Comparações dos Set
+
+O **HashSet** vai testar a igualdade no método `.contains(obj)` utilizando os conceitos de *hashCode* e *equals*. Porém é preciso garantir que a classe desse objeto tenha esses métodos de comparação, que apesar de serem herdados, não possuem uma implementação padrão. Caso essa classe não possua uma implementação dos métodos, a comparação é feita pela igualdade simples do valor da referência, ou seja, apenas a mesma instância seria indicada como igual.
+
+Já a ordenação de uma **TreeSet** também faz com que se torne obrigatório que a classe dos elementos implementem a interface *Comparator* já que ele vai utilizar o método `.compareTo()`. Então um exemplo para essas comparações e verificações seriam mais ou menos assim:
+
+```java
+package model.entities;
+
+public class Product implements Comparable<Product> {
+  private String name;
+  private Double price;
+
+  public Product(String name, Double price) {
+    this.name = name;
+    this.price = price;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return "Product [name=" + name + ", price=" + price + "]";
+  }
+
+  @Override
+  public int compareTo(Product other) {
+    return name.toUpperCase().compareTo(other.getName().toUpperCase());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((price == null) ? 0 : price.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Product other = (Product) obj;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (price == null) {
+      if (other.price != null)
+        return false;
+    } else if (!price.equals(other.price))
+      return false;
+    return true;
+  }
+}
+```
+
+```java
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import model.entities.Product;
+
+public class App {
+	public static void main(String[] args) {
+		Set<Product> hashSet = new HashSet<>();
+		
+		hashSet.add(new Product("TV", 900.0));
+		hashSet.add(new Product("Notebook", 1200.0));
+		hashSet.add(new Product("Tablet", 400.0));
+
+		System.out.println(hashSet.contains(new Product("Notebook", 1200.0))); // returns false if hashCode and equals are not implemented
+
+		Set<Product> treeSet = new TreeSet<>(hashSet);
+
+		for (Product p : treeSet) {
+			System.out.println(p); // will crash if Product class does not implements Comparable
+		}
+	}
+}
+```
+
+Essas mesmas estratégias são utilizadas tanto para o `.contains()` quanto para a adição, uma vez que o set precisa verificar se o agrupamento já apresenta tal elemento, para descartá-lo em caso positivo.
