@@ -1,32 +1,38 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
-import model.entities.MyComparator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
 import model.entities.Product;
+import utils.ProductPredicate;
 
 public class App {
 	public static void main(String[] args) {
+
 		List<Product> list = new ArrayList<>();
 
-		list.add(new Product("TV", 900.0));
-		list.add(new Product("Notebook", 1200.0));
-		list.add(new Product("Tablet", 450.0));
+		list.add(new Product("Tv", 900.00));
+		list.add(new Product("Mouse", 50.00));
+		list.add(new Product("Tablet", 350.50));
+		list.add(new Product("HD Case", 80.90));
 
-		// Using the class MyComparator
-		list.sort(new MyComparator());
+		double min = 100.0;
 
-		// Anonymous class implementation
-		Comparator<Product> comp = new Comparator<Product>() {
-			@Override
-			public int compare(Product p1, Product p2) {
-				return p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase());
-			}
-		};
-		list.sort(comp);
+		// Predicate
+		list.removeIf(new ProductPredicate());
 
-		// Lambda expression
-		list.sort((p1, p2) -> p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase()));
+		// Reference method com método estático
+		list.removeIf(Product::staticProductPredicate);
+
+		// Reference method com método não estático
+		list.removeIf(Product::nonStaticProductPredicate);
+
+		// Expressão lambda declarada
+		Predicate<Product> pred = p -> p.getPrice() >= min;
+		list.removeIf(pred);
+
+		// Expressão lambda inline
+		list.removeIf(p -> p.getPrice() >= min);
 
 		for (Product p : list) {
 			System.out.println(p);

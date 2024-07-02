@@ -2697,3 +2697,8 @@ Mas quando a gente reduz isso para uma classe anônima no ato da utilização, i
 É aí que entra a definição de **Interface funcional**. Essas são interfaces que vão apresentar um único método abstrato, sendo que nesses casos, o compilador vai saber que ao receber uma função lambda como argumento onde se é esperado um objeto implementando uma **Interface funcional**, essa função lambda vai representar a definição desse único método da interface.
 
 Esse é o caso da interface `Comparator` que apresenta apenas o método *compare*, e portanto vai aceitar uma função lambda no lugar do objeto, e assim, ela será executada sempre que o método *compare* for chamado. Além dela, ainda temos outras **Interfaces funcionais** que são a `Predicate`, `Function` e a `Consumer`.
+
+### Aula 256 - Predicate
+
+A interface Predicate<T> vai apresentar como método abstrato o test(T) que deve retornar retornar um valor booleano de acordo com o teste realizado no objeto. Como exemplo para esse predicado, a gente pode considerar o método de array .removeIf(predicate), que é um método onde se esse predicado voltar um valor true, o elemento será removido. E esse retorno vai ser de acordo com a definição do método test. É um caso de muita semelhança com a função de callback do .filter do JavaScript.
+
