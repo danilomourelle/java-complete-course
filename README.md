@@ -2700,8 +2700,12 @@ Esse é o caso da interface `Comparator` que apresenta apenas o método *compare
 
 ### Aula 256 - Predicate
 
-A interface Predicate<T> vai apresentar como método abstrato o test(T) que deve retornar retornar um valor booleano de acordo com o teste realizado no objeto. Como exemplo para esse predicado, a gente pode considerar o método de array .removeIf(predicate), que é um método onde se esse predicado voltar um valor true, o elemento será removido. E esse retorno vai ser de acordo com a definição do método test. É um caso de muita semelhança com a função de callback do .filter do JavaScript.
+A interface `Predicate<T>` vai apresentar como método abstrato o `boolean test(T)` que deve retornar retornar um valor booleano de acordo com o teste realizado no objeto. Como exemplo para esse predicado, a gente pode considerar o método de array `.removeIf(predicate)`, que é um método onde se esse predicado voltar um valor true, o elemento será removido. E esse retorno vai ser de acordo com a definição do método test. É um caso de muita semelhança com a função de callback do .filter do JavaScript.
 
 ### Aula 257 - Consumer
 
-A interface Consumer<T> vai apresentar como método abstrato o accept(T) que retorna void e é um dos poucos casos onde se espera que a função cause um efeito colateral no dado original. Neste caso, temos uma semelhança com o callback do .forEach do JavaScript. Aliás, é nesse caso que melhor se exemplifica a sua utilização, como por exemplo, rodar por uma lista alterando em 10%. list.forEach(product -> product.setPrice(product.getPrice * 1.1). Lembrando que esse é um caso em que o dado original foi perdido.
+A interface `Consumer<T>` vai apresentar como método abstrato o `void accept(T)` que retorna void e é um dos poucos casos onde se espera que a função cause um efeito colateral no dado original. Neste caso, temos uma semelhança com o callback do .forEach do JavaScript. Aliás, é nesse caso que melhor se exemplifica a sua utilização, como por exemplo, rodar por uma lista alterando em 10%. `list.forEach(product -> product.setPrice(product.getPrice * 1.1))`. Lembrando que esse é um caso em que o dado original foi perdido.
+
+### Aula 258 - Function
+
+A interface `Function<T, R>` vai apresentar como método abstrato o `R apply(T)` que retorna o tipo R. Essa interface vai se assemelhar em muito com o callback do .map do JavaScript. Inclusive esse é um dos principais exemplos de uso, onde uma lista de um tipo T é transformada em stream, passa pelo método `apply` transformando o tipo T no tipo R, e então esse novo stream é retornado para o tipo lista.

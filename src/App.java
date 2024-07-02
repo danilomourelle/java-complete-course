@@ -1,10 +1,11 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import model.entities.Product;
-import utils.ProductConsumer;
+import utils.ProductFunction;
 
 public class App {
 	public static void main(String[] args) {
@@ -16,24 +17,24 @@ public class App {
 		list.add(new Product("Tablet", 350.50));
 		list.add(new Product("HD Case", 80.90));
 
-		double rate = 1.1;
+		List<String> names;
 
-		// Consumer
-		list.forEach(new ProductConsumer());
+		// Function
+		names = list.stream().map(new ProductFunction()).collect(Collectors.toList());
 
 		// Reference method com método estático
-		list.forEach(Product::staticProductConsumer);
+		names = list.stream().map(Product::staticProductFunction).collect(Collectors.toList());
 
 		// Reference method com método não estático
-		list.forEach(Product::nonStaticProductConsumer);
+		names = list.stream().map(Product::nonStaticProductFunction).collect(Collectors.toList());
 
 		// Expressão lambda declarada
-		Consumer<Product> consumer = p -> p.setPrice(p.getPrice() * rate); 
-		list.forEach(consumer);
+		Function<Product, String> func = p -> p.getName().toUpperCase();
+		names = list.stream().map(func).collect(Collectors.toList());
 
 		// Expressão lambda inline
-		list.forEach(p -> p.setPrice(p.getPrice() * rate));
+		names = list.stream().map(p -> p.getName().toUpperCase()).collect(Collectors.toList());
 
-		list.forEach(System.out::println);
+		names.forEach(System.out::println);
 	}
 }
