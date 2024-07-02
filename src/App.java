@@ -1,11 +1,9 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import model.entities.Product;
-import utils.ProductFunction;
+import model.service.ProductService;
 
 public class App {
 	public static void main(String[] args) {
@@ -17,24 +15,12 @@ public class App {
 		list.add(new Product("Tablet", 350.50));
 		list.add(new Product("HD Case", 80.90));
 
-		List<String> names;
+		ProductService ps = new ProductService();
 
-		// Function
-		names = list.stream().map(new ProductFunction()).collect(Collectors.toList());
+		double sum = ps.filteredSum(list, p -> p.getPrice() < 100.0);
+		System.out.println("Sum under 100 = " + String.format("%.2f", sum));
 
-		// Reference method com método estático
-		names = list.stream().map(Product::staticProductFunction).collect(Collectors.toList());
-
-		// Reference method com método não estático
-		names = list.stream().map(Product::nonStaticProductFunction).collect(Collectors.toList());
-
-		// Expressão lambda declarada
-		Function<Product, String> func = p -> p.getName().toUpperCase();
-		names = list.stream().map(func).collect(Collectors.toList());
-
-		// Expressão lambda inline
-		names = list.stream().map(p -> p.getName().toUpperCase()).collect(Collectors.toList());
-
-		names.forEach(System.out::println);
+		sum = ps.filteredSum(list, p -> p.getName().charAt(0) == 'T');
+		System.out.println("Sum starting with 'T' = " + String.format("%.2f", sum));
 	}
 }

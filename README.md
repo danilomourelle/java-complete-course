@@ -2709,3 +2709,61 @@ A interface `Consumer<T>` vai apresentar como método abstrato o `void accept(T)
 ### Aula 258 - Function
 
 A interface `Function<T, R>` vai apresentar como método abstrato o `R apply(T)` que retorna o tipo R. Essa interface vai se assemelhar em muito com o callback do .map do JavaScript. Inclusive esse é um dos principais exemplos de uso, onde uma lista de um tipo T é transformada em stream, passa pelo método `apply` transformando o tipo T no tipo R, e então esse novo stream é retornado para o tipo lista.
+
+### 259 - Funções que recebem funções
+
+Pelo título da aula, a gente facilmente já pensa nos callbacks do JavaScript e a ideia é exatamente essa, fora a empolgação do professor ao mostrar que isso existe no Java. *No more comments*.
+
+A ideia de camadas em OOP é que a gente vai ter a classe que representa a entidade, e uma classe de serviços que vai representar as ações que a gente pode executar nessa entidade. Mas ao invés de criar uma biblioteca enorme para cada manipulação possível, a gente pode ter métodos genéricos que esperam receber uma função lambda como parte da sua implementação, e que quando utilizada vão definir sob demanda o critério utilizado.
+
+Isso é basicamente o conceito de funções de callback do JavaScript.
+
+```java
+package model.service;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+import model.entities.Product;
+
+public class ProductService {
+  public double filteredSum(List<Product> list, Predicate<Product> criteria) {
+    double sum = 0.0;
+    for (Product p : list) {
+      if (criteria.test(p)) {
+        sum += p.getPrice();
+      }
+    }
+    return sum;
+  }
+}
+
+```
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+import model.entities.Product;
+import model.service.ProductService;
+
+public class App {
+	public static void main(String[] args) {
+
+		List<Product> list = new ArrayList<>();
+
+		list.add(new Product("Tv", 900.00));
+		list.add(new Product("Mouse", 50.00));
+		list.add(new Product("Tablet", 350.50));
+		list.add(new Product("HD Case", 80.90));
+
+		ProductService ps = new ProductService();
+
+		double sum = ps.filteredSum(list, p -> p.getPrice() < 100.0);
+		System.out.println("Sum under 100 = " + String.format("%.2f", sum));
+
+		sum = ps.filteredSum(list, p -> p.getName().charAt(0) == 'T');
+		System.out.println("Sum starting with 'T' = " + String.format("%.2f", sum));
+	}
+}
+```
