@@ -1128,7 +1128,7 @@ public static void main(String[] args) throws Exception {
     
 Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
 
-Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em u **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em um **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
 
 Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
 
@@ -2767,3 +2767,21 @@ public class App {
 	}
 }
 ```
+
+### 260 - Stream
+
+A gente já fez uma boa discussão na Aula 98-99, mas vou copiar o conteúdo aqui
+
+Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
+
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em um **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+
+Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
+
+Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
+
+Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.
+
+Um outro detalhe que foi acrescentado nessa aula 260 é que o stream vai ter métodos que são chamados de intermediários, ou seja, eles retornam um stream, o que faz com que um novo método possa que ser acrescentado formando pipeline, e a sua execução é considerada *lazy evaluation*, ou seja, só ocorre quando o elemento passa por um método terminal.
+
+Método terminal é o outro tipo de método existente, e eles não retornam um stream, portanto sempre estarão como ultimo método do pipeline. O fato de que o elemento passa por todos os métodos intermediários, para só quando chegar em um método terminal, ter de fato as transformações executadas, é o que garante a performance do stream, e a característica de que um elemento percorre a cadeia inteira para só então o segundo iniciar a sua jornada. O que possibilita a condição de *curto-circuito*.

@@ -1,26 +1,21 @@
-
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import model.entities.Product;
-import model.service.ProductService;
+import java.util.stream.Stream;
 
 public class App {
 	public static void main(String[] args) {
+		List<Integer> list = List.of(3, 4, 5, 10, 7);
 
-		List<Product> list = new ArrayList<>();
+		Stream<Integer> st1 = list.stream().map(x -> x * 10);
+		System.out.println(Arrays.toString(st1.toArray()));
 
-		list.add(new Product("Tv", 900.00));
-		list.add(new Product("Mouse", 50.00));
-		list.add(new Product("Tablet", 350.50));
-		list.add(new Product("HD Case", 80.90));
+		Stream<String> st2 = Stream.of("Maria", "Alex", "Bob");
+		System.out.println(Arrays.toString(st2.toArray()));
 
-		ProductService ps = new ProductService();
+		Stream<Integer> st3 = Stream.iterate(0, x -> x + 2);
+		System.out.println(Arrays.toString(st3.limit(10).toArray()));
 
-		double sum = ps.filteredSum(list, p -> p.getPrice() < 100.0);
-		System.out.println("Sum under 100 = " + String.format("%.2f", sum));
-
-		sum = ps.filteredSum(list, p -> p.getName().charAt(0) == 'T');
-		System.out.println("Sum starting with 'T' = " + String.format("%.2f", sum));
+		Stream<Long> st4 = Stream.iterate(new long[] { 0L, 1L }, p -> new long[] { p[1], p[0] + p[1] }).map(p -> p[0]);
+		System.out.println(Arrays.toString(st4.limit(10).toArray()));
 	}
 }
