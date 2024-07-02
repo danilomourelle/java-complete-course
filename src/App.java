@@ -1,21 +1,54 @@
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import model.entities.Product;
 
 public class App {
 	public static void main(String[] args) {
-		List<Integer> list = List.of(3, 4, 5, 10, 7);
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
 
-		Stream<Integer> st1 = list.stream().map(x -> x * 10);
-		System.out.println(Arrays.toString(st1.toArray()));
+		System.out.println("Enter full file path: ");
+		String path = sc.nextLine();
 
-		Stream<String> st2 = Stream.of("Maria", "Alex", "Bob");
-		System.out.println(Arrays.toString(st2.toArray()));
+		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+			List<Product> list = new ArrayList<>();
+			
+			String line = br.readLine();
+			while (line != null) {
+				String[] fields = line.split(",");
+				list.add(new Product(fields[0], Double.parseDouble(fields[1])));
+				line = br.readLine();
+			}
 
-		Stream<Integer> st3 = Stream.iterate(0, x -> x + 2);
-		System.out.println(Arrays.toString(st3.limit(10).toArray()));
+			double average = list
+					.stream()
+					.map(p -> p.getPrice())
+					.reduce(0.0, (x, y) -> x + y) / list.size();
+			System.out.println("Average price: " + String.format("%.2f", average));
 
-		Stream<Long> st4 = Stream.iterate(new long[] { 0L, 1L }, p -> new long[] { p[1], p[0] + p[1] }).map(p -> p[0]);
-		System.out.println(Arrays.toString(st4.limit(10).toArray()));
+			Comparator<String> comp = (s1, s2) -> s1.toUpperCase().compareTo(s2.toUpperCase());
+
+			List<String> names = list
+					.stream()
+					.filter(p -> p.getPrice() < average)
+					.map(p -> p.getName())
+					.sorted(comp.reversed())
+					.collect(Collectors.toList());
+
+			names.forEach(System.out::println);
+
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			sc.close();
+		}
 	}
 }
