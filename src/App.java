@@ -1,32 +1,54 @@
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import model.entities.Product;
 
 public class App {
 	public static void main(String[] args) {
-		Map<String, String> cookies = new TreeMap<>();
+		Locale.setDefault(Locale.US);
+		Scanner sc = new Scanner(System.in);
 
-		cookies.put("username", "john");
-		cookies.put("email", "john@email.com");
-		cookies.put("phone", "1234567890");
+		System.out.println("Enter full file path: ");
+		String path = sc.nextLine();
 
-		cookies.remove("email");
-		cookies.put("phone", "0987654321");
+		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+			List<Product> list = new ArrayList<>();
+			
+			String line = br.readLine();
+			while (line != null) {
+				String[] fields = line.split(",");
+				list.add(new Product(fields[0], Double.parseDouble(fields[1])));
+				line = br.readLine();
+			}
 
-		System.out.println("Contains 'phone' key: " + cookies.containsKey("phone"));
-		System.out.println("Phone: " + cookies.get("phone"));
-		System.out.println("Email: " + cookies.get("email"));
-		System.out.println("Size: " + cookies.size());
-		System.out.println(cookies);
+			double average = list
+					.stream()
+					.map(p -> p.getPrice())
+					.reduce(0.0, (x, y) -> x + y) / list.size();
+			System.out.println("Average price: " + String.format("%.2f", average));
 
-		System.out.println();
-		System.out.println("COOKIES:");
-		for (String key : cookies.keySet()) {
-			System.out.println(key + ": " + cookies.get(key));
+			Comparator<String> comp = (s1, s2) -> s1.toUpperCase().compareTo(s2.toUpperCase());
+
+			List<String> names = list
+					.stream()
+					.filter(p -> p.getPrice() < average)
+					.map(p -> p.getName())
+					.sorted(comp.reversed())
+					.collect(Collectors.toList());
+
+			names.forEach(System.out::println);
+
+		} catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			sc.close();
 		}
-		
-		System.out.println();
-		cookies.clear();
-		System.out.println("Size: " + cookies.size());
-		System.out.println(cookies);
 	}
 }

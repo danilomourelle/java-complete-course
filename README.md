@@ -1128,7 +1128,7 @@ public static void main(String[] args) throws Exception {
     
 Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
 
-Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em u **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em um **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
 
 Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
 
@@ -2616,3 +2616,172 @@ public class App {
 	}
 }
 ```
+
+## Sessão 20: Programação funcional e expressões Lambda
+
+### Aula 253 - Comparator
+
+Esse tópico me parece uma tentativa de resolver uma séries de problemas do Java, que eu já venho indicando, pelo fato de ela ser uma linguagem obrigada a objetos. Tem vários momentos que é interessante você ter as funções livres, não atreladas a um conjunto de dados. Isso facilitaria a reutilização, desacopla um pouco os dados, e uma tipagem forte, o que a linguagem já tem, iria evitar os problemas de nulidade.
+
+Um dos pontos que mais achava entrando até então, é que para se trabalhar com listas, é quase que imprescindível que a classe dos elementos implemente a interface `Comparable`, porque aí você garante que ela vai implementar o método *compareTo*, ou seja, você vai começar a ter uma série de implementações e as classes vão ficando cada vez mais poluídas.
+
+Pior do que isso, imagina que você define uma implementação de comparação na classe, mas em determinado momento, você quer fazer uma comparação diferente, e aí, muda a classe? Cria um *setter* para ficar alterando a função conforme o código executa? Então ter uma forma de você definir a função de comparação no momento em que ela for usada, é uma estratégia que existe no JavaScript e parece muito mais eficiente.
+
+É nessa que surgem as funções lambdas, elas tem um conceito muito semelhando aos *callbacks* de métodos de array do JavaScript, além disso, vão ter uma implementação muito parecida com uma *arrow function* do JavaScript. Então, em determinadas situações, onde um método vai precisar receber um objeto que implemente uma interface para que se tenha um método padrão, é possível ao invés de fazer toda a declaração da classe, já passar essa função lambda, deixando o código mais limpo e mais dinâmico.
+
+```java
+package model.entities;
+
+import java.util.Comparator;
+
+public class MyComparator implements Comparator<Product> {
+
+  @Override
+  public int compare(Product product1, Product product2) {
+    return product1
+	    .getName()
+	    .toUpperCase()
+	    .compareTo(
+		    product2
+			    .getName()
+			    .toUpperCase()
+			);
+  }
+}
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import model.entities.MyComparator;
+import model.entities.Product;
+
+public class App {
+	public static void main(String[] args) {
+		List<Product> list = new ArrayList<>();
+
+		list.add(new Product("TV", 900.0));
+		list.add(new Product("Notebook", 1200.0));
+		list.add(new Product("Tablet", 450.0));
+
+		// Using the class MyComparator
+		list.sort(new MyComparator());
+
+		// Anonymous class implementation
+		Comparator<Product> comp = new Comparator<Product>() {
+			@Override
+			public int compare(Product p1, Product p2) {
+				return p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase());
+			}
+		};
+		list.sort(comp);
+
+		// Lambda expression
+		list.sort((p1, p2) -> p1.getName().toUpperCase().compareTo(p2.getName().toUpperCase()));
+
+		for (Product p : list) {
+			System.out.println(p);
+		}
+	}
+}
+```
+
+### Aula 255 - Interface funcional
+
+Bom, pelo que eu entendi, esse conceito responde uma dúvida que ficou da aula anterior. A gente partiu de uma classe que implementava a interface `Comparator` e definia o método *compare*. No frio da questão, isso em nada mudava o ponto de você ainda ter uma classe, implementando uma interface, e definindo um método, que se tivesse que ser diferente, teria que ser feito uma outra estrutura.
+
+Mas quando a gente reduz isso para uma classe anônima no ato da utilização, isso já melhora, mas ainda assim continuou bastante verboso. E a solução foi transformar essa classe anônima em uma função lambda. Mas ficou a dúvida, onde raios ficou definido que aquela função vai ser utilizada no lugar do método *compare*? Porque até então, a gente tinha bem explícito a definição do método nas outras alternativas.
+
+É aí que entra a definição de **Interface funcional**. Essas são interfaces que vão apresentar um único método abstrato, sendo que nesses casos, o compilador vai saber que ao receber uma função lambda como argumento onde se é esperado um objeto implementando uma **Interface funcional**, essa função lambda vai representar a definição desse único método da interface.
+
+Esse é o caso da interface `Comparator` que apresenta apenas o método *compare*, e portanto vai aceitar uma função lambda no lugar do objeto, e assim, ela será executada sempre que o método *compare* for chamado. Além dela, ainda temos outras **Interfaces funcionais** que são a `Predicate`, `Function` e a `Consumer`.
+
+### Aula 256 - Predicate
+
+A interface `Predicate<T>` vai apresentar como método abstrato o `boolean test(T)` que deve retornar retornar um valor booleano de acordo com o teste realizado no objeto. Como exemplo para esse predicado, a gente pode considerar o método de array `.removeIf(predicate)`, que é um método onde se esse predicado voltar um valor true, o elemento será removido. E esse retorno vai ser de acordo com a definição do método test. É um caso de muita semelhança com a função de callback do .filter do JavaScript.
+
+### Aula 257 - Consumer
+
+A interface `Consumer<T>` vai apresentar como método abstrato o `void accept(T)` que retorna void e é um dos poucos casos onde se espera que a função cause um efeito colateral no dado original. Neste caso, temos uma semelhança com o callback do .forEach do JavaScript. Aliás, é nesse caso que melhor se exemplifica a sua utilização, como por exemplo, rodar por uma lista alterando em 10%. `list.forEach(product -> product.setPrice(product.getPrice * 1.1))`. Lembrando que esse é um caso em que o dado original foi perdido.
+
+### Aula 258 - Function
+
+A interface `Function<T, R>` vai apresentar como método abstrato o `R apply(T)` que retorna o tipo R. Essa interface vai se assemelhar em muito com o callback do .map do JavaScript. Inclusive esse é um dos principais exemplos de uso, onde uma lista de um tipo T é transformada em stream, passa pelo método `apply` transformando o tipo T no tipo R, e então esse novo stream é retornado para o tipo lista.
+
+### 259 - Funções que recebem funções
+
+Pelo título da aula, a gente facilmente já pensa nos callbacks do JavaScript e a ideia é exatamente essa, fora a empolgação do professor ao mostrar que isso existe no Java. *No more comments*.
+
+A ideia de camadas em OOP é que a gente vai ter a classe que representa a entidade, e uma classe de serviços que vai representar as ações que a gente pode executar nessa entidade. Mas ao invés de criar uma biblioteca enorme para cada manipulação possível, a gente pode ter métodos genéricos que esperam receber uma função lambda como parte da sua implementação, e que quando utilizada vão definir sob demanda o critério utilizado.
+
+Isso é basicamente o conceito de funções de callback do JavaScript.
+
+```java
+package model.service;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+import model.entities.Product;
+
+public class ProductService {
+  public double filteredSum(List<Product> list, Predicate<Product> criteria) {
+    double sum = 0.0;
+    for (Product p : list) {
+      if (criteria.test(p)) {
+        sum += p.getPrice();
+      }
+    }
+    return sum;
+  }
+}
+
+```
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+import model.entities.Product;
+import model.service.ProductService;
+
+public class App {
+	public static void main(String[] args) {
+
+		List<Product> list = new ArrayList<>();
+
+		list.add(new Product("Tv", 900.00));
+		list.add(new Product("Mouse", 50.00));
+		list.add(new Product("Tablet", 350.50));
+		list.add(new Product("HD Case", 80.90));
+
+		ProductService ps = new ProductService();
+
+		double sum = ps.filteredSum(list, p -> p.getPrice() < 100.0);
+		System.out.println("Sum under 100 = " + String.format("%.2f", sum));
+
+		sum = ps.filteredSum(list, p -> p.getName().charAt(0) == 'T');
+		System.out.println("Sum starting with 'T' = " + String.format("%.2f", sum));
+	}
+}
+```
+
+### 260 - Stream
+
+A gente já fez uma boa discussão na Aula 98-99, mas vou copiar o conteúdo aqui
+
+Eu pensei em algumas alternativas para esse treco, por exemplo, transformar o resultado do filtro em uma lista e pegar o primeiro elemento já que `findFirst` faz basicamente isso. Mas descobri que isso também não é performático, principalmente se a lista original for muito grande.
+
+Isso acontece pelo comportamento natural de um **stream**. Quando você transforma a lista em um **stream** e monta uma cadeia de transformadores, o que acontece é que cada item desse **stream** vai passar por todos os transformadores por vez, ou seja, o primeiro item passa pelo filtro, qualquer outra coisa, e então pelo *findFirst*, e só então o segundo elemento vai passar pelo filtro.
+
+Acontece que alguns desses transformadores apresentam uma ação de finalização de curto circuito (*shot-circuit terminal*), uma vez que elas já cumpriram a sua função no meio do processamento da lista. O *findFirst* é um desses casos, uma vez que depois de encontrar o primeiro item, não tem mais porque continuar o processamento.
+
+Então o que acontece aqui é que o primeiro nome vai passar no predicado do filtro, se ele for eliminado, esse item cai fora, e vem o segundo. Se esse segundo passar, ele vai para o *findFirst* que como não faz nada a não ser pegar o primeiro item que chega nele, já vai avisar o **stream** que ele completou a sua missão e portanto o **stream** pode parar de mandar item, ou seja, o terceiro item nunca nem passa pelo filtro ou qualquer outro transformador. Isso é muito poderoso, tanto é que uma das definições do **stream** é que ele pode transformar algo infinito em finito, porque de fato uma vez que a “missão” foi cumprida, não tem porque aquele transformador continuar recebendo itens.
+
+Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades, você vai precisar saber quais são os métodos do **stream** que fazem essa terminação, e saber encadear os transformadores de forma coerente. Um exemplo é a combinação do transformador `limit()` com o `skip()`. O primeiro limita a quantidade de itens que passa por ele para no máximo o valor recebido como argumento, e o segundo descarta os primeiros n itens de acordo com o valor no parâmetro. Ou seja algo como `.stream().limit(2).skip(3)` não vai fazer sentido, já que o **limit** vai falar para o **stream** parar de mandar itens depois que receber o segundo, enquanto que o **skip** só repassa do item 4 em diante. Ou seja, essa combinação causa um **stream** vazio SEMPRE.
+
+Um outro detalhe que foi acrescentado nessa aula 260 é que o stream vai ter métodos que são chamados de intermediários, ou seja, eles retornam um stream, o que faz com que um novo método possa que ser acrescentado formando pipeline, e a sua execução é considerada *lazy evaluation*, ou seja, só ocorre quando o elemento passa por um método terminal.
+
+Método terminal é o outro tipo de método existente, e eles não retornam um stream, portanto sempre estarão como ultimo método do pipeline. O fato de que o elemento passa por todos os métodos intermediários, para só quando chegar em um método terminal, ter de fato as transformações executadas, é o que garante a performance do stream, e a característica de que um elemento percorre a cadeia inteira para só então o segundo iniciar a sua jornada. O que possibilita a condição de *curto-circuito*.
