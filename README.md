@@ -2922,4 +2922,8 @@ O objeto `PreparedStatement` vai ter alguns outros método *execute* que podem d
 
 ### Aula 273 - Atualizando dados
 
-É exatamente a mesma coisa que um INSERT mas usando um query do tipo UPDATE.
+É exatamente a mesma coisa que um **INSERT** mas usando um query do tipo **UPDATE**.
+
+### Aula 274 - Deletando dados
+
+É exatamente a mesma coisa que um **INSERT** mas usando um query do tipo **DELETE**.
