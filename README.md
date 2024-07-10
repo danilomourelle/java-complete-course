@@ -1975,7 +1975,7 @@ public class App {
 }
 ```
 
-## Sessão 18 - Interfaces
+## Sessão 18: Interfaces
 
 ### Aula 225 - Interface
 
@@ -2119,7 +2119,7 @@ Agora, a gente pode declarar um método em uma interface e marcar ela com a pala
 
 Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.
 
-## Sessão 19 - Generics, Set, Map
+## Sessão 19: Generics, Set, Map
 
 ### Aula 239 - Introdução ao Generics
 
@@ -2785,3 +2785,68 @@ Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades,
 Um outro detalhe que foi acrescentado nessa aula 260 é que o stream vai ter métodos que são chamados de intermediários, ou seja, eles retornam um stream, o que faz com que um novo método possa que ser acrescentado formando pipeline, e a sua execução é considerada *lazy evaluation*, ou seja, só ocorre quando o elemento passa por um método terminal.
 
 Método terminal é o outro tipo de método existente, e eles não retornam um stream, portanto sempre estarão como ultimo método do pipeline. O fato de que o elemento passa por todos os métodos intermediários, para só quando chegar em um método terminal, ter de fato as transformações executadas, é o que garante a performance do stream, e a característica de que um elemento percorre a cadeia inteira para só então o segundo iniciar a sua jornada. O que possibilita a condição de *curto-circuito*.
+
+## Session 21: Database e JDBC
+
+### Aula 266-67 - JDBC
+
+O JDBC é um driver nativo do Java para conexões com bando de dados. Ele age como um intermediário, dado ao programador uma interface única, independente do banco SQL utilizado, fazendo as modificações necessárias para as características específicas do banco escolhido. É basicamente um ORM nativo da linguagem.
+
+Porém, para que essa adaptação aconteça de forma adequada, é preciso que primeiro seja instalado a biblioteca do banco que esta sendo utilizada, então no meu caso, eu tive que ir ao site do PostgresSQL e baixar o arquivo **.jar** para inseri-lo como uma biblioteca no meu projeto.
+
+O curso utiliza a IDE Eclipse e mostra como fazer uma biblioteca customizada, inclusive dando nome. No VSCode é um pouco diferente, e não sei nem se dá para colocar um nome na biblioteca. No workspace do projeto, na aba de Explorer mesmo, o último agrupamento é o **Java Projects** e nele você tem a opção **Referenced Libraries**, onde você consegue adicionar manualmente as bibliotecas terceiras a partir de um arquivo **.jar**.
+
+Depois que essas bibliotecas foram instaladas, que o plugin foi linkado, que o projeto está pronto para ser desenvolvido, nós podemos fazer um pacote novo chamado *db* e dentro dele ter o controle da conexão com o nosso banco. Nós podemos ter uma classe que vai representar as exceções lançadas devido a falha durante uma comunicação com o banco, nós podemos ter uma classe que vai ter métodos que vão abrir e que vão fechar a conexão. Inclusive, para abrir a conexão, foi criado um arquivo `db.properties` na raiz do projeto, e ele funciona como uma espécie de `.env` do JavaScript, mas não foi comentado nada sobre o fato de ele aparecer no gitignore.
+
+```java
+package db;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
+public class DB {
+
+  private static Connection conn = null;
+
+  public static Connection getConnection() {
+    if (conn == null) {
+      try {
+        Properties props = loadProperties();
+        String url = props.getProperty("dburl");
+        conn = DriverManager.getConnection(url, props);
+      } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+      }
+    }
+
+    return conn;
+  }
+
+  public static void closeConnection() {
+    if (conn != null) {
+      try {
+        conn.close();
+      } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+      }
+    }
+  }
+
+  private static Properties loadProperties() {
+    try (FileInputStream fs = new FileInputStream("db.properties")) {
+      Properties props = new Properties();
+      props.load(fs);
+
+      return props;
+    } catch (IOException e) {
+      throw new DbException(e.getMessage());
+    }
+  }
+}
+```
