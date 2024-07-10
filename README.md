@@ -2894,3 +2894,28 @@ public class App {
 	}
 }
 ```
+
+### Aula 272 - Inserir dados
+
+Para inserir dados, o início, permanece o mesmo, a gente precisa primeiro ter uma conexão aberta com o banco de dados, porém ao invés de gerar um *Statement*, nós temos a opção de criar um `PreparedStatement`. Esse é um tipo que vai receber uma query com *placeholders*, uma estratégia muito comum na inserção de dados, para suprimir a famosa injeção de SQL. Então, apenas depois da criação desse tipo, você tem a métodos para inserir os valores que deverão substituir os *placeholder*. E uma vez com o objeto todo configurado, ele pode chamar o método `.executeUpdate()` que aí sim, vai executar a query, na sua forma final, contra o banco de dados.
+
+```java
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+Connection conn = DB.getConnection();
+PreparedStatement st = conn.prepareStatement(
+		"INSERT INTO seller " +
+		"(Name, Email, BirthDate, BaseSalary, DepartmentId) " +
+		"VALUES " +
+		"(?, ?, ?, ?, ?)"
+		);
+
+st.setString(1, "Carl Purple");
+st.setString(2, "carl@gmail.com");
+st.setDate(3, java.sql.Date.valueOf(LocalDate.parse("22/03/1985", formatter));
+st.setDouble(4, seller.getBaseSalary());
+st.setInt(5, seller.getDepartmentId());
+
+int rowsAffected = st.executeUpdate();
+```
+
+O objeto `PreparedStatement` vai ter alguns outros método *execute* que podem dar uma variedade de ações para o objeto. Por exemplo, no caso de se fazer uma inserção dupla, você pode seguir o mesmo roteiro acima, mas após fazer as configurações de um registro, você chama o método `st.addBatch()`, e pode repetir os *sets* quantas vezes forem necessárias. Após a formação do *batch*, basta chamar o `.executeBatch()`.
