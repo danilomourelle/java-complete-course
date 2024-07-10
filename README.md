@@ -2919,3 +2919,7 @@ int rowsAffected = st.executeUpdate();
 ```
 
 O objeto `PreparedStatement` vai ter alguns outros método *execute* que podem dar uma variedade de ações para o objeto. Por exemplo, no caso de se fazer uma inserção dupla, você pode seguir o mesmo roteiro acima, mas após fazer as configurações de um registro, você chama o método `st.addBatch()`, e pode repetir os *sets* quantas vezes forem necessárias. Após a formação do *batch*, basta chamar o `.executeBatch()`.
+
+### Aula 273 - Atualizando dados
+
+É exatamente a mesma coisa que um INSERT mas usando um query do tipo UPDATE.
