@@ -2850,3 +2850,47 @@ public class DB {
   }
 }
 ```
+
+### Aula 271 - Recuperar dados
+
+Quando precisamos recuperar algum dado do banco, a primeira coisa a se fazer é abrir uma conexão com o banco. De posse dessa conexão a gente precisa entender como as estruturas auxiliares funcionam. 
+
+A primeira delas é um objeto do tipo `Statement` que é quem vai receber a query a ser executada no banco de dados. Esse objeto é obtido através do método `.createStatement()` que está presente no objeto de conexão. Com esse objeto em mãos, nós podemos chamar o método `.executeQuery()`, que vai receber uma string como parâmetro. Essa string é a query que deve ser executada contra o banco.
+
+Como resultado, esse método devolve um objeto do tipo `ResultSet`, que como o nome diz, é uma coleção, um conjunto de elementos. Esse objeto vai ter alguns métodos que vão ajudar a percorrer pelas respostas enviadas pelo banco. O método `.first()` move para o primeiro elemento, caso haja. O método `.beforeFirst()` move para antes do primeiro elemento, mesmo que não haja um. O método `.next()` move para o próximo elemento e vai retornar falso caso já não se tenha mais elementos, e o método `.absolite(int n)` vai diretamente para o elemento na posição **n** (lembrando que essa coleção, o primeiro elemento é considerado posição 1 e não 0).
+
+Quando em um elemento, o objeto vai apresentar métodos que ajudam na captura de dados do elemento, como por exemplo, se quisermos pegar um dado que representa um número inteiro, e sabemos que ele está na coluna “Id”, nós podemos chamar o método `.getInt("Id")`.
+
+```java
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import db.DB;
+
+public class App {
+	public static void main(String[] args) {
+		
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DB.getConnection();
+			st = conn.createStatement();
+			rs = st.executeQuery("select * from department");
+
+			while (rs.next()) {
+				System.out.println(rs.getInt("Id") + ", " + rs.getString("Name"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+			DB.closeConnection();
+		}
+	}
+}
+```
