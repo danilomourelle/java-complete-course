@@ -2927,3 +2927,43 @@ O objeto `PreparedStatement` vai ter alguns outros método *execute* que podem d
 ### Aula 274 - Deletando dados
 
 É exatamente a mesma coisa que um **INSERT** mas usando um query do tipo **DELETE**.
+
+### Aula 275 - Transações
+
+Transações são quando você precisa de uma ação atômica. Em banco de dados, uma ação atômica indica que é uma ação tudo ou nada, dessa forma, ou todas as ações funcionam, ou nenhuma delas. A forma mais comum de fazer isso é tirar o auto commit das execuções de query, e apenas ao final, sabendo que todas elas podem ser rodadas com sucesso, é feito um último comando commitando todas as alterações. Caso alguma delas tenha algum problema, é executado o comando de rollback que vai desfazer todas as alterações previamente bem sucedidas dessa transação.
+
+```java
+public class App {
+	public static void main(String[] args) {
+		Connection conn = null;
+		Statement st = null;
+
+		try {
+			conn = DB.getConnection();
+			conn.setAutoCommit(false);
+
+			st = conn.createStatement();
+
+			int rows1 = st.executeUpdate("UPDATE seller SET BaseSalary = 2090 WHERE DepartmentId = 1");
+
+			if (true) {
+				throw new SQLException("Fake error");
+			}
+
+			int rows2 = st.executeUpdate("UPDATE seller SET BaseSalary = 3090 WHERE DepartmentId = 2");
+
+			System.out.println("Done! Rows1: " + rows1 + ", Rows2: " + rows2);
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+				throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+			} catch (SQLException e1) {
+				throw new DbException("Error trying to rollback! Caused by: " + e1.getMessage());
+			}
+		} finally {
+			DB.closeStatement(st);
+			DB.closeConnection();
+		}
+	}
+}
+```
