@@ -1975,7 +1975,7 @@ public class App {
 }
 ```
 
-## Sessão 18 - Interfaces
+## Sessão 18: Interfaces
 
 ### Aula 225 - Interface
 
@@ -2119,7 +2119,7 @@ Agora, a gente pode declarar um método em uma interface e marcar ela com a pala
 
 Isso faz com que você tenha um herança múltipla caso uma classe implemente mais de uma interface com esses métodos *default*. Mas vamos lá, primeiro que isso resolve apenas o ponto do reuso de funções, ou seja, ainda temos problemas de reuso de atributos. Daqui a pouco aparece um maluco falando que vai ser uma boa prática cada método estar em uma interface para ser implementada nas classes e que essas devem ter apenas *getters* e *setters*.
 
-## Sessão 19 - Generics, Set, Map
+## Sessão 19: Generics, Set, Map
 
 ### Aula 239 - Introdução ao Generics
 
@@ -2785,3 +2785,187 @@ Mas aquela velha máxima né, com grandes poderes vem grandes responsabilidades,
 Um outro detalhe que foi acrescentado nessa aula 260 é que o stream vai ter métodos que são chamados de intermediários, ou seja, eles retornam um stream, o que faz com que um novo método possa que ser acrescentado formando pipeline, e a sua execução é considerada *lazy evaluation*, ou seja, só ocorre quando o elemento passa por um método terminal.
 
 Método terminal é o outro tipo de método existente, e eles não retornam um stream, portanto sempre estarão como ultimo método do pipeline. O fato de que o elemento passa por todos os métodos intermediários, para só quando chegar em um método terminal, ter de fato as transformações executadas, é o que garante a performance do stream, e a característica de que um elemento percorre a cadeia inteira para só então o segundo iniciar a sua jornada. O que possibilita a condição de *curto-circuito*.
+
+## Session 21: Database e JDBC
+
+### Aula 266-67 - JDBC
+
+O JDBC é um driver nativo do Java para conexões com bando de dados. Ele age como um intermediário, dado ao programador uma interface única, independente do banco SQL utilizado, fazendo as modificações necessárias para as características específicas do banco escolhido. É basicamente um ORM nativo da linguagem.
+
+Porém, para que essa adaptação aconteça de forma adequada, é preciso que primeiro seja instalado a biblioteca do banco que esta sendo utilizada, então no meu caso, eu tive que ir ao site do PostgresSQL e baixar o arquivo **.jar** para inseri-lo como uma biblioteca no meu projeto.
+
+O curso utiliza a IDE Eclipse e mostra como fazer uma biblioteca customizada, inclusive dando nome. No VSCode é um pouco diferente, e não sei nem se dá para colocar um nome na biblioteca. No workspace do projeto, na aba de Explorer mesmo, o último agrupamento é o **Java Projects** e nele você tem a opção **Referenced Libraries**, onde você consegue adicionar manualmente as bibliotecas terceiras a partir de um arquivo **.jar**.
+
+Depois que essas bibliotecas foram instaladas, que o plugin foi linkado, que o projeto está pronto para ser desenvolvido, nós podemos fazer um pacote novo chamado *db* e dentro dele ter o controle da conexão com o nosso banco. Nós podemos ter uma classe que vai representar as exceções lançadas devido a falha durante uma comunicação com o banco, nós podemos ter uma classe que vai ter métodos que vão abrir e que vão fechar a conexão. Inclusive, para abrir a conexão, foi criado um arquivo `db.properties` na raiz do projeto, e ele funciona como uma espécie de `.env` do JavaScript, mas não foi comentado nada sobre o fato de ele aparecer no gitignore.
+
+```java
+package db;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
+public class DB {
+
+  private static Connection conn = null;
+
+  public static Connection getConnection() {
+    if (conn == null) {
+      try {
+        Properties props = loadProperties();
+        String url = props.getProperty("dburl");
+        conn = DriverManager.getConnection(url, props);
+      } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+      }
+    }
+
+    return conn;
+  }
+
+  public static void closeConnection() {
+    if (conn != null) {
+      try {
+        conn.close();
+      } catch (SQLException e) {
+        throw new DbException(e.getMessage());
+      }
+    }
+  }
+
+  private static Properties loadProperties() {
+    try (FileInputStream fs = new FileInputStream("db.properties")) {
+      Properties props = new Properties();
+      props.load(fs);
+
+      return props;
+    } catch (IOException e) {
+      throw new DbException(e.getMessage());
+    }
+  }
+}
+```
+
+### Aula 271 - Recuperar dados
+
+Quando precisamos recuperar algum dado do banco, a primeira coisa a se fazer é abrir uma conexão com o banco. De posse dessa conexão a gente precisa entender como as estruturas auxiliares funcionam. 
+
+A primeira delas é um objeto do tipo `Statement` que é quem vai receber a query a ser executada no banco de dados. Esse objeto é obtido através do método `.createStatement()` que está presente no objeto de conexão. Com esse objeto em mãos, nós podemos chamar o método `.executeQuery()`, que vai receber uma string como parâmetro. Essa string é a query que deve ser executada contra o banco.
+
+Como resultado, esse método devolve um objeto do tipo `ResultSet`, que como o nome diz, é uma coleção, um conjunto de elementos. Esse objeto vai ter alguns métodos que vão ajudar a percorrer pelas respostas enviadas pelo banco. O método `.first()` move para o primeiro elemento, caso haja. O método `.beforeFirst()` move para antes do primeiro elemento, mesmo que não haja um. O método `.next()` move para o próximo elemento e vai retornar falso caso já não se tenha mais elementos, e o método `.absolite(int n)` vai diretamente para o elemento na posição **n** (lembrando que essa coleção, o primeiro elemento é considerado posição 1 e não 0).
+
+Quando em um elemento, o objeto vai apresentar métodos que ajudam na captura de dados do elemento, como por exemplo, se quisermos pegar um dado que representa um número inteiro, e sabemos que ele está na coluna “Id”, nós podemos chamar o método `.getInt("Id")`.
+
+```java
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import db.DB;
+
+public class App {
+	public static void main(String[] args) {
+		
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+
+		try {
+			conn = DB.getConnection();
+			st = conn.createStatement();
+			rs = st.executeQuery("select * from department");
+
+			while (rs.next()) {
+				System.out.println(rs.getInt("Id") + ", " + rs.getString("Name"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+			DB.closeConnection();
+		}
+	}
+}
+```
+
+### Aula 272 - Inserir dados
+
+Para inserir dados, o início, permanece o mesmo, a gente precisa primeiro ter uma conexão aberta com o banco de dados, porém ao invés de gerar um *Statement*, nós temos a opção de criar um `PreparedStatement`. Esse é um tipo que vai receber uma query com *placeholders*, uma estratégia muito comum na inserção de dados, para suprimir a famosa injeção de SQL. Então, apenas depois da criação desse tipo, você tem a métodos para inserir os valores que deverão substituir os *placeholder*. E uma vez com o objeto todo configurado, ele pode chamar o método `.executeUpdate()` que aí sim, vai executar a query, na sua forma final, contra o banco de dados.
+
+```java
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+Connection conn = DB.getConnection();
+PreparedStatement st = conn.prepareStatement(
+		"INSERT INTO seller " +
+		"(Name, Email, BirthDate, BaseSalary, DepartmentId) " +
+		"VALUES " +
+		"(?, ?, ?, ?, ?)"
+		);
+
+st.setString(1, "Carl Purple");
+st.setString(2, "carl@gmail.com");
+st.setDate(3, java.sql.Date.valueOf(LocalDate.parse("22/03/1985", formatter));
+st.setDouble(4, seller.getBaseSalary());
+st.setInt(5, seller.getDepartmentId());
+
+int rowsAffected = st.executeUpdate();
+```
+
+O objeto `PreparedStatement` vai ter alguns outros método *execute* que podem dar uma variedade de ações para o objeto. Por exemplo, no caso de se fazer uma inserção dupla, você pode seguir o mesmo roteiro acima, mas após fazer as configurações de um registro, você chama o método `st.addBatch()`, e pode repetir os *sets* quantas vezes forem necessárias. Após a formação do *batch*, basta chamar o `.executeBatch()`.
+
+### Aula 273 - Atualizando dados
+
+É exatamente a mesma coisa que um **INSERT** mas usando um query do tipo **UPDATE**.
+
+### Aula 274 - Deletando dados
+
+É exatamente a mesma coisa que um **INSERT** mas usando um query do tipo **DELETE**.
+
+### Aula 275 - Transações
+
+Transações são quando você precisa de uma ação atômica. Em banco de dados, uma ação atômica indica que é uma ação tudo ou nada, dessa forma, ou todas as ações funcionam, ou nenhuma delas. A forma mais comum de fazer isso é tirar o auto commit das execuções de query, e apenas ao final, sabendo que todas elas podem ser rodadas com sucesso, é feito um último comando commitando todas as alterações. Caso alguma delas tenha algum problema, é executado o comando de rollback que vai desfazer todas as alterações previamente bem sucedidas dessa transação.
+
+```java
+public class App {
+	public static void main(String[] args) {
+		Connection conn = null;
+		Statement st = null;
+
+		try {
+			conn = DB.getConnection();
+			conn.setAutoCommit(false);
+
+			st = conn.createStatement();
+
+			int rows1 = st.executeUpdate("UPDATE seller SET BaseSalary = 2090 WHERE DepartmentId = 1");
+
+			if (true) {
+				throw new SQLException("Fake error");
+			}
+
+			int rows2 = st.executeUpdate("UPDATE seller SET BaseSalary = 3090 WHERE DepartmentId = 2");
+
+      conn.commit();
+
+			System.out.println("Done! Rows1: " + rows1 + ", Rows2: " + rows2);
+		} catch (SQLException e) {
+			try {
+				conn.rollback();
+				throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+			} catch (SQLException e1) {
+				throw new DbException("Error trying to rollback! Caused by: " + e1.getMessage());
+			}
+		} finally {
+			DB.closeStatement(st);
+			DB.closeConnection();
+		}
+	}
+}
+```

@@ -1,54 +1,45 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.stream.Collectors;
 
-import model.entities.Product;
+import model.dao.DaoFactory;
+import model.dao.SellerDao;
+import model.entities.Department;
+import model.entities.Seller;
 
 public class App {
 	public static void main(String[] args) {
-		Locale.setDefault(Locale.US);
-		Scanner sc = new Scanner(System.in);
+		SellerDao sellerDao = DaoFactory.createSellerDao();
 
-		System.out.println("Enter full file path: ");
-		String path = sc.nextLine();
+		System.out.println("=== TEST 1: seller findById ===");
+		Seller seller = sellerDao.findById(3);
+		System.out.println(seller);
 
-		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-			List<Product> list = new ArrayList<>();
-			
-			String line = br.readLine();
-			while (line != null) {
-				String[] fields = line.split(",");
-				list.add(new Product(fields[0], Double.parseDouble(fields[1])));
-				line = br.readLine();
-			}
-
-			double average = list
-					.stream()
-					.map(p -> p.getPrice())
-					.reduce(0.0, (x, y) -> x + y) / list.size();
-			System.out.println("Average price: " + String.format("%.2f", average));
-
-			Comparator<String> comp = (s1, s2) -> s1.toUpperCase().compareTo(s2.toUpperCase());
-
-			List<String> names = list
-					.stream()
-					.filter(p -> p.getPrice() < average)
-					.map(p -> p.getName())
-					.sorted(comp.reversed())
-					.collect(Collectors.toList());
-
-			names.forEach(System.out::println);
-
-		} catch (IOException e) {
-			System.out.println("Error: " + e.getMessage());
-		} finally {
-			sc.close();
+		System.out.println("\n=== TEST 2: seller findByDepartment ===");
+		List<Seller> list = sellerDao.findByDepartmentId(2);
+		for (Seller obj : list) {
+			System.out.println(obj);
 		}
+
+		System.out.println("\n=== TEST 3: seller findAll ===");
+		list = sellerDao.findAll();
+		for (Seller obj : list) {
+			System.out.println(obj);
+		}
+
+		System.out.println("\n=== TEST 4: seller insert ===");
+		Department department = new Department(2, null);
+		Seller newSeller = new Seller(null, "Greg Pink", "greg@gmail.com", LocalDate.now(), 4000.0, department);
+		sellerDao.insert(newSeller);
+		System.out.println("Inserted! New id = " + newSeller.getId());
+
+		System.out.println("\n=== TEST 5: seller update ===");
+		seller = sellerDao.findById(1);
+		seller.setName("Martha Waine");
+		sellerDao.update(seller);
+		System.out.println("Update completed");
+
+		System.out.println("\n=== TEST 6: seller delete ===");
+		sellerDao.deleteById(9);
+		System.out.println("Delete completed");
 	}
 }
