@@ -2952,6 +2952,8 @@ public class App {
 
 			int rows2 = st.executeUpdate("UPDATE seller SET BaseSalary = 3090 WHERE DepartmentId = 2");
 
+      conn.commit();
+
 			System.out.println("Done! Rows1: " + rows1 + ", Rows2: " + rows2);
 		} catch (SQLException e) {
 			try {
