@@ -87,13 +87,17 @@ public class UI {
 
   public static void printMatch(Match match, List<ChessPiece> captured) {
     printBoard(match.getPieces());
-    
+
     System.out.println();
     printCapturedPieces(captured);
 
     System.out.println();
     System.out.println("Turn : " + match.getTurn());
     System.out.println("Waiting player: " + match.getCurrentPlayer());
+
+    if (match.isInCheck()) {
+      System.out.println("CHECK!");
+    }
   }
 
   private static void printCapturedPieces(List<ChessPiece> capturedPieces) {
@@ -107,25 +111,26 @@ public class UI {
         .filter(p -> p.getColor() == Color.BLACK)
         .collect(Collectors.toList());
 
-        System.out.println("Captured pieces");
-        System.out.print("White: ");
-        System.out.print(ANSI_WHITE);
-        System.out.println(Arrays.toString(whitePieces.toArray()));
-        System.out.print(ANSI_RESET);
-        
-        System.out.println("Black: ");
-        System.out.print(ANSI_YELLOW);
-        System.out.println(Arrays.toString(blackPieces.toArray()));
-        System.out.print(ANSI_RESET);
+    System.out.println("Captured pieces");
+    System.out.print("White: ");
+    System.out.print(ANSI_WHITE);
+    System.out.println(Arrays.toString(whitePieces.toArray()));
+    System.out.print(ANSI_RESET);
+
+    System.out.print("Black: ");
+    System.out.print(ANSI_YELLOW);
+    System.out.println(Arrays.toString(blackPieces.toArray()));
+    System.out.print(ANSI_RESET);
   }
 
+  // todo
   private List<ChessPiece> filterListByColor(List<ChessPiece> list, Color color) {
     List<ChessPiece> piecesOfColor = list
         .stream()
         .filter(p -> p.getColor() == color)
         .collect(Collectors.toList());
 
-        return piecesOfColor;
+    return piecesOfColor;
   }
 
   public static void clearScream() {
