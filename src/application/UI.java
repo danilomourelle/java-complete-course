@@ -65,4 +65,9 @@ public class UI {
 
     System.out.print(" ");
   }
+
+  public static void clearScream() {
+    System.out.print("\033[H\033[2J");
+    System.out.flush();
+  }
 }
