@@ -23,7 +23,7 @@ public class Rook extends ChessPiece {
 
     // above
     spotToCheck.setValues(super.position.getRow() - 1, super.position.getColumn());
-    while (getBoard().positionExists(spotToCheck) && !getBoard().spotHasPiece(spotToCheck)) {
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
       matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       spotToCheck.setValues(spotToCheck.getRow() - 1, spotToCheck.getColumn());
     }
@@ -33,7 +33,7 @@ public class Rook extends ChessPiece {
 
     // below
     spotToCheck.setValues(super.position.getRow() + 1, super.position.getColumn());
-    while (getBoard().positionExists(spotToCheck) && !getBoard().spotHasPiece(spotToCheck)) {
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
       matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       spotToCheck.setValues(spotToCheck.getRow() + 1, spotToCheck.getColumn());
     }
@@ -43,7 +43,7 @@ public class Rook extends ChessPiece {
 
     // right
     spotToCheck.setValues(super.position.getRow(), super.position.getColumn() + 1);
-    while (getBoard().positionExists(spotToCheck) && !getBoard().spotHasPiece(spotToCheck)) {
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
       matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       spotToCheck.setValues(spotToCheck.getRow(), spotToCheck.getColumn() + 1);
     }
@@ -53,7 +53,7 @@ public class Rook extends ChessPiece {
 
     // left
     spotToCheck.setValues(super.position.getRow(), super.position.getColumn() - 1);
-    while (getBoard().positionExists(spotToCheck) && !getBoard().spotHasPiece(spotToCheck)) {
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
       matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       spotToCheck.setValues(spotToCheck.getRow(), spotToCheck.getColumn() - 1);
     }

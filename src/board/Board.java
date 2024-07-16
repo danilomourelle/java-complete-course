@@ -5,7 +5,7 @@ public class Board {
   private Integer columns;
   private Piece[][] spots;
 
-  public Board(int rows, int columns){
+  public Board(int rows, int columns) {
     if (rows < 1 || columns < 1) {
       throw new BoardException("Error creating board: there must be at least 1 row and 1 column");
     }
@@ -24,21 +24,21 @@ public class Board {
   }
 
   public Piece pieceOnSpot(int row, int column) {
-    if (!positionExists(row, column)){
+    if (!positionExists(row, column)) {
       throw new BoardException("Position not on the board");
     }
     return spots[row][column];
   }
-  
-  public Piece pieceOnSpot(Position position){
-    if (!positionExists(position)){
+
+  public Piece pieceOnSpot(Position position) {
+    if (!positionExists(position)) {
       throw new BoardException("Position not on the board");
     }
     return spots[position.getRow()][position.getColumn()];
   }
 
-  public void placePiece(Piece piece, Position position){
-    if (spotHasPiece(position) ) {
+  public void placePiece(Piece piece, Position position) {
+    if (thereIsAPiece(position)) {
       throw new BoardException("This spot already has a piece");
     }
 
@@ -47,10 +47,10 @@ public class Board {
   }
 
   public Piece remoPiece(Position position) {
-    if (!positionExists(position) ){
+    if (!positionExists(position)) {
       throw new BoardException("Position not on the Board");
     }
-    
+
     Piece pieceToRemove = pieceOnSpot(position);
     if (pieceToRemove == null) {
       return null;
@@ -73,8 +73,9 @@ public class Board {
     return positionExists(position.getRow(), position.getColumn());
   }
 
-  public boolean spotHasPiece(Position position) {
-    if (!positionExists(position)){
+  // todo
+  public boolean thereIsAPiece(Position position) {
+    if (!positionExists(position)) {
       throw new BoardException("Position not on the board");
     }
     return pieceOnSpot(position) != null;
