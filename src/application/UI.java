@@ -6,6 +6,7 @@ import java.util.Scanner;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Color;
+import chess.Match;
 
 public class UI {
 
@@ -78,6 +79,13 @@ public class UI {
     }
 
     System.out.print(" ");
+  }
+
+  public static void printMatch(Match match) {
+    printBoard(match.getPieces());
+    System.out.println();
+    System.out.println("Turn : " + match.getTurn());
+    System.out.println("Waiting player: " + match.getCurrentPlayer());
   }
 
   public static void clearScream() {
