@@ -5,9 +5,9 @@ import board.Position;
 import chess.ChessPiece;
 import chess.Color;
 
-public class Bishop extends ChessPiece {
+public class Queen extends ChessPiece {
 
-  public Bishop(Board board, Color color) {
+  public Queen(Board board, Color color) {
     super(board, color);
   }
 
@@ -56,11 +56,51 @@ public class Bishop extends ChessPiece {
       matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
     }
 
+    // above
+    spotToCheck.setValues(super.position.getRow() - 1, super.position.getColumn());
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+      spotToCheck.setValues(spotToCheck.getRow() - 1, spotToCheck.getColumn());
+    }
+    if (getBoard().positionExists(spotToCheck) && super.isThereOpponentPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+    }
+
+    // below
+    spotToCheck.setValues(super.position.getRow() + 1, super.position.getColumn());
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+      spotToCheck.setValues(spotToCheck.getRow() + 1, spotToCheck.getColumn());
+    }
+    if (getBoard().positionExists(spotToCheck) && super.isThereOpponentPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+    }
+
+    // right
+    spotToCheck.setValues(super.position.getRow(), super.position.getColumn() + 1);
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+      spotToCheck.setValues(spotToCheck.getRow(), spotToCheck.getColumn() + 1);
+    }
+    if (getBoard().positionExists(spotToCheck) && super.isThereOpponentPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+    }
+
+    // left
+    spotToCheck.setValues(super.position.getRow(), super.position.getColumn() - 1);
+    while (getBoard().positionExists(spotToCheck) && !getBoard().thereIsAPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+      spotToCheck.setValues(spotToCheck.getRow(), spotToCheck.getColumn() - 1);
+    }
+    if (getBoard().positionExists(spotToCheck) && super.isThereOpponentPiece(spotToCheck)) {
+      matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
+    }
+
     return matrix;
   }
 
   @Override
   public String toString() {
-    return "B";
+    return "Q";
   }
 }
