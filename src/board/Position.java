@@ -20,7 +20,7 @@ public class Position {
     return column;
   }
 
-  public void setPosition(Integer row, Integer column) {
+  public void setValues(Integer row, Integer column) {
     this.row = row;
     this.column = column;
   }
