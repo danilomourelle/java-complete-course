@@ -108,7 +108,8 @@ public class Match {
   }
 
   private Piece makeMove(Position original, Position target) {
-    Piece p = board.remoPiece(original);
+    ChessPiece p = (ChessPiece) board.remoPiece(original);
+
     Piece capturedPiece = board.remoPiece(target);
     if (capturedPiece != null) {
       onBoardPieces.remove(capturedPiece);
@@ -116,12 +117,16 @@ public class Match {
     }
     board.placePiece(p, target);
 
+    p.increaseMoveCount();
+
     return capturedPiece;
   }
 
   private void undoMove(Position source, Position target, Piece capturedPiece) {
-    Piece p = board.remoPiece(target);
+    ChessPiece p = (ChessPiece) board.remoPiece(target);
     board.placePiece(p, source);
+
+    p.decreaseMoveCount();
 
     if (capturedPiece != null) {
       board.placePiece(capturedPiece, target);
@@ -183,7 +188,7 @@ public class Match {
       for (int i = 0; i < matrix.length; i++) {
         for (int j = 0; j < matrix[i].length; j++) {
           if (matrix[i][j]) {
-            Position source = ((ChessPiece)piece).getChessPosition().toPosition();
+            Position source = ((ChessPiece) piece).getChessPosition().toPosition();
             Position target = new Position(i, j);
             Piece capturedPiece = makeMove(source, target);
             boolean keptInCheck = testCheck(color);
