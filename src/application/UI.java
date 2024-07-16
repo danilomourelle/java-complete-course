@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import chess.ChessPiece;
@@ -93,10 +92,15 @@ public class UI {
 
     System.out.println();
     System.out.println("Turn : " + match.getTurn());
-    System.out.println("Waiting player: " + match.getCurrentPlayer());
-
-    if (match.isInCheck()) {
-      System.out.println("CHECK!");
+    if (!match.isInCheckMate()){
+      System.out.println("Waiting player: " + match.getCurrentPlayer());
+      
+      if (match.isInCheck()) {
+        System.out.println("CHECK!");
+      }
+    } else {
+      System.out.println("CHECK-MATE!");
+      System.out.println("Winner: " + match.getCurrentPlayer());
     }
   }
 

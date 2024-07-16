@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import board.Board;
@@ -16,6 +15,7 @@ public class Match {
   private Color currentPlayer;
   private Integer turn;
   private boolean isInCheck;
+  private boolean isInCheckMate;
 
   private List<Piece> capturedPieces = new ArrayList<>();
   private List<Piece> onBoardPieces = new ArrayList<>();
@@ -39,20 +39,17 @@ public class Match {
     return isInCheck;
   }
 
-  private void initialSetup() {
-    placeNewPiece('c', 1, new Rook(board, Color.WHITE));
-    placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-    placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-    placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-    placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-    placeNewPiece('d', 1, new King(board, Color.WHITE));
+  public boolean isInCheckMate() {
+    return isInCheckMate;
+  }
 
-    placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-    placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-    placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-    placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-    placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-    placeNewPiece('d', 8, new King(board, Color.BLACK));
+  private void initialSetup() {
+    placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+    placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+    placeNewPiece('e', 1, new King(board, Color.WHITE));
+
+    placeNewPiece('b', 8, new Rook(board, Color.BLACK));
+    placeNewPiece('a', 8, new King(board, Color.BLACK));
   }
 
   private void placeNewPiece(char column, int row, ChessPiece piece) {
@@ -82,7 +79,11 @@ public class Match {
     // todo
     this.isInCheck = (testCheck(opponent(currentPlayer))) ? true : false;
 
-    nextTurn();
+    if (testCheckMate(opponent(currentPlayer))) {
+      isInCheckMate = true;
+    } else {
+      nextTurn();
+    }
 
     return (ChessPiece) capturedPiece;
 
@@ -165,6 +166,37 @@ public class Match {
     }
 
     return false;
+  }
+
+  private boolean testCheckMate(Color color) {
+    if (!testCheck(color)) {
+      return false;
+    }
+
+    List<Piece> list = onBoardPieces
+        .stream()
+        .filter(p -> ((ChessPiece) p).getColor() == color)
+        .collect(Collectors.toList());
+
+    for (Piece piece : list) {
+      boolean[][] matrix = piece.possibleMoves();
+      for (int i = 0; i < matrix.length; i++) {
+        for (int j = 0; j < matrix[i].length; j++) {
+          if (matrix[i][j]) {
+            Position source = ((ChessPiece)piece).getChessPosition().toPosition();
+            Position target = new Position(i, j);
+            Piece capturedPiece = makeMove(source, target);
+            boolean keptInCheck = testCheck(color);
+            undoMove(source, target, capturedPiece);
+            if (!keptInCheck) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   public ChessPiece[][] getPieces() {

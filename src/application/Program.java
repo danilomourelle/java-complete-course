@@ -16,7 +16,7 @@ public class Program {
         Match match = new Match();
         List<ChessPiece> captured = new ArrayList<>(); //todo
 
-        while (true) {
+        while (!match.isInCheckMate()) {
             try {
                 UI.clearScream();
                 UI.printMatch(match, captured);
@@ -45,5 +45,8 @@ public class Program {
                 scanner.nextLine();
             }
         }
+
+        UI.clearScream();
+        UI.printMatch(match, captured);
     }
 }
