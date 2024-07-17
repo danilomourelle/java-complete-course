@@ -14,12 +14,12 @@ public class Program {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Match match = new Match();
-        List<ChessPiece> captured = new ArrayList<>(); // todo
+        List<ChessPiece> allCapturesPieces = new ArrayList<>();
 
         while (!match.isInCheckMate()) {
             try {
                 UI.clearScream();
-                UI.printMatch(match, captured);
+                UI.printMatch(match, allCapturesPieces);
                 System.out.println();
                 System.out.print("Source: ");
                 ChessPosition source = UI.readChessPosition(scanner);
@@ -34,7 +34,7 @@ public class Program {
 
                 ChessPiece capturedPiece = match.performChessMove(source, target);
                 if (capturedPiece != null) {
-                    captured.add(capturedPiece);
+                    allCapturesPieces.add(capturedPiece);
                 }
 
                 if (match.getPromoted() != null) {
@@ -58,6 +58,6 @@ public class Program {
         }
 
         UI.clearScream();
-        UI.printMatch(match, captured);
+        UI.printMatch(match, allCapturesPieces);
     }
 }
