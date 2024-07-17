@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class Match {
   private boolean isInCheck;
   private boolean isInCheckMate;
   private ChessPiece enPassantVulnerable;
+  private ChessPiece promoted;
 
   private List<Piece> capturedPieces = new ArrayList<>();
   private List<Piece> onBoardPieces = new ArrayList<>();
@@ -50,6 +52,10 @@ public class Match {
 
   public ChessPiece getEnPassantVulnerable() {
     return enPassantVulnerable;
+  }
+
+  public ChessPiece getPromoted() {
+    return promoted;
   }
 
   private void initialSetup() {
@@ -112,6 +118,26 @@ public class Match {
       throw new ChessException("You can't put yourself in a check position");
     }
 
+    ChessPiece movedPiece = (ChessPiece) board.pieceOnSpot(targetPosition);
+    // en passant
+    if (movedPiece instanceof Pawn
+        && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
+      enPassantVulnerable = movedPiece;
+    } else {
+      enPassantVulnerable = null;
+    }
+
+    // promotion
+    // todo - does it need to replace by a queen? if we just set pawn as promoted?
+    promoted = null;
+    if (movedPiece instanceof Pawn) {
+      if ((movedPiece.getColor() == Color.WHITE && targetPosition.getRow() == 0)
+          || (movedPiece.getColor() == Color.BLACK && targetPosition.getRow() == 7)) {
+        promoted = (ChessPiece) board.pieceOnSpot(targetPosition);
+        promoted = replacePromotedPiece("Q");
+      }
+    }
+
     // todo
     this.isInCheck = (testCheck(opponent(currentPlayer))) ? true : false;
 
@@ -119,15 +145,6 @@ public class Match {
       isInCheckMate = true;
     } else {
       nextTurn();
-    }
-
-    // en passant
-    ChessPiece movedPiece = (ChessPiece) board.pieceOnSpot(targetPosition);
-    if (movedPiece instanceof Pawn
-        && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
-      enPassantVulnerable = movedPiece;
-    } else {
-      enPassantVulnerable = null;
     }
 
     return (ChessPiece) capturedPiece;
@@ -249,6 +266,34 @@ public class Match {
 
   private Color opponent(Color color) {
     return (color == Color.WHITE) ? Color.BLACK : Color.WHITE;
+  }
+
+  public ChessPiece replacePromotedPiece(String type) {
+    if (promoted == null) {
+      throw new IllegalStateException("There is no piece to be promoted");
+    }
+
+    if (!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
+      throw new InvalidParameterException("Invalida type for promotion");
+    }
+
+    Position position = promoted.getChessPosition().toPosition();
+    Piece piece = board.remoPiece(position);
+    onBoardPieces.remove(piece);
+
+    ChessPiece newPiece = newPiece(type, promoted.getColor());
+    board.placePiece(newPiece, position);
+    onBoardPieces.add(newPiece);
+
+    return newPiece;
+  }
+
+  private ChessPiece newPiece(String type, Color color) {
+    // todo - switch
+    if (type.equals("B")) return new Bishop(board, color);
+    if (type.equals("N")) return new Knight(board, color);
+    if (type.equals("R")) return new Rook(board, color);
+    return new Queen(board, color);
   }
 
   // todo
