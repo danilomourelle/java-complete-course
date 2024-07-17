@@ -82,26 +82,24 @@ public class King extends ChessPiece {
     // castling
     if (super.getMoveCount() == 0 && !match.isInCheck()) {
       // king-side
-      // todo - possibleRook - interPosition
-      Position posT1 = new Position(position.getRow(), position.getColumn() + 3);
-      if (testRookCastling(posT1)) {
-        Position p1 = new Position(position.getRow(), position.getColumn() + 1);
-        Position p2 = new Position(position.getRow(), position.getColumn() + 2);
-        if (super.getBoard().pieceOnSpot(p1) == null
-            && super.getBoard().pieceOnSpot(p2) == null) {
+      Position possibleRook = new Position(position.getRow(), position.getColumn() + 3);
+      if (testRookCastling(possibleRook)) {
+        Position interPosition1 = new Position(position.getRow(), position.getColumn() + 1);
+        Position interPosition2 = new Position(position.getRow(), position.getColumn() + 2);
+        if (super.getBoard().pieceOnSpot(interPosition1) == null
+            && super.getBoard().pieceOnSpot(interPosition2) == null) {
           matrix[position.getRow()][position.getColumn() + 2] = true;
         }
       }
       // queen-side
-      // todo
-      Position posT2 = new Position(position.getRow(), position.getColumn() - 4);
-      if (testRookCastling(posT2)) {
-        Position p1 = new Position(position.getRow(), position.getColumn() - 1);
-        Position p2 = new Position(position.getRow(), position.getColumn() - 2);
-        Position p3 = new Position(position.getRow(), position.getColumn() - 3);
-        if (super.getBoard().pieceOnSpot(p1) == null
-            && super.getBoard().pieceOnSpot(p2) == null
-            && super.getBoard().pieceOnSpot(p3) == null) {
+      possibleRook = new Position(position.getRow(), position.getColumn() - 4);
+      if (testRookCastling(possibleRook)) {
+        Position interPosition1 = new Position(position.getRow(), position.getColumn() - 1);
+        Position interPosition2 = new Position(position.getRow(), position.getColumn() - 2);
+        Position interPosition3 = new Position(position.getRow(), position.getColumn() - 3);
+        if (super.getBoard().pieceOnSpot(interPosition1) == null
+            && super.getBoard().pieceOnSpot(interPosition2) == null
+            && super.getBoard().pieceOnSpot(interPosition3) == null) {
           matrix[position.getRow()][position.getColumn() - 2] = true;
         }
       }
@@ -111,8 +109,8 @@ public class King extends ChessPiece {
   }
 
   private boolean testRookCastling(Position position) {
-    ChessPiece p = (ChessPiece) super.getBoard().pieceOnSpot(position);
+    ChessPiece possibleRook = (ChessPiece) super.getBoard().pieceOnSpot(position);
 
-    return p != null && p instanceof Rook && p.getColor() == this.getColor() && p.getMoveCount() == 0;
+    return possibleRook != null && possibleRook instanceof Rook && possibleRook.getColor() == this.getColor() && possibleRook.getMoveCount() == 0;
   }
 }
