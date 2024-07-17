@@ -166,13 +166,9 @@ public class Match {
   }
 
   private Piece makeMove(Position source, Position target) {
-    // todo
     ChessPiece pieceOnPlay = (ChessPiece) board.remoPiece(source);
     Piece capturedPiece = board.remoPiece(target);
-    if (capturedPiece != null) {
-      onBoardPieces.remove(capturedPiece);
-      capturedPieces.add(capturedPiece);
-    }
+    
     board.placePiece(pieceOnPlay, target);
 
     // castling king side
@@ -199,9 +195,12 @@ public class Match {
           pawPosition = new Position(target.getRow() - 1, target.getColumn());
         }
         capturedPiece = board.remoPiece(pawPosition);
-        onBoardPieces.remove(capturedPiece); // todo - move if down
-        capturedPieces.add(capturedPiece);
       }
+    }
+
+    if (capturedPiece != null) {
+      onBoardPieces.remove(capturedPiece);
+      capturedPieces.add(capturedPiece);
     }
 
     pieceOnPlay.increaseMoveCount();
