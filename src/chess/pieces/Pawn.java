@@ -28,12 +28,11 @@ public class Pawn extends ChessPiece {
       }
 
       spotToCheck.setValues(super.position.getRow() - 2, super.position.getColumn());
-      Position p2 = new Position(super.position.getRow() - 1, super.position.getColumn());
-      if (super.getBoard().positionExists(spotToCheck)
+      Position pathToSpot = new Position(super.position.getRow() - 1, super.position.getColumn());
+      if (getMoveCount() == 0
+          && super.getBoard().positionExists(spotToCheck)
           && !super.getBoard().thereIsAPiece(spotToCheck)
-          && super.getBoard().positionExists(p2) // todo
-          && !super.getBoard().thereIsAPiece(p2)
-          && getMoveCount() == 0) {
+          && !super.getBoard().thereIsAPiece(pathToSpot)) {
         matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       }
 
@@ -49,7 +48,6 @@ public class Pawn extends ChessPiece {
 
       // en passant
       if (position.getRow() == 3) {
-        // todo
         Position left = new Position(position.getRow(), position.getColumn() - 1);
         if (getBoard().positionExists(left) && isThereOpponentPiece(left)
             && getBoard().pieceOnSpot(left) == match.getEnPassantVulnerable()) {
@@ -68,12 +66,11 @@ public class Pawn extends ChessPiece {
       }
 
       spotToCheck.setValues(super.position.getRow() + 2, super.position.getColumn());
-      Position p2 = new Position(super.position.getRow() + 1, super.position.getColumn());
-      if (super.getBoard().positionExists(spotToCheck)
+      Position pathToSpot = new Position(super.position.getRow() + 1, super.position.getColumn());
+      if (getMoveCount() == 0
+          && super.getBoard().positionExists(spotToCheck)
           && !super.getBoard().thereIsAPiece(spotToCheck)
-          && super.getBoard().positionExists(p2) // todo
-          && !super.getBoard().thereIsAPiece(p2)
-          && getMoveCount() == 0) {
+          && !super.getBoard().thereIsAPiece(pathToSpot)) {
         matrix[spotToCheck.getRow()][spotToCheck.getColumn()] = true;
       }
 
@@ -89,7 +86,6 @@ public class Pawn extends ChessPiece {
 
       // en passant
       if (position.getRow() == 4) {
-        // todo
         Position left = new Position(position.getRow(), position.getColumn() - 1);
         if (getBoard().positionExists(left) && isThereOpponentPiece(left)
             && getBoard().pieceOnSpot(left) == match.getEnPassantVulnerable()) {
