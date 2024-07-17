@@ -105,15 +105,8 @@ public class UI {
   }
 
   private static void printCapturedPieces(List<ChessPiece> capturedPieces) {
-    List<ChessPiece> whitePieces = capturedPieces
-        .stream()
-        .filter(p -> p.getColor() == Color.WHITE)
-        .collect(Collectors.toList());
-
-    List<ChessPiece> blackPieces = capturedPieces
-        .stream()
-        .filter(p -> p.getColor() == Color.BLACK)
-        .collect(Collectors.toList());
+    List<ChessPiece> whitePieces = filterListByColor(capturedPieces, Color.WHITE);
+    List<ChessPiece> blackPieces = filterListByColor(capturedPieces, Color.BLACK);
 
     System.out.println("Captured pieces");
     System.out.print("White: ");
@@ -127,8 +120,7 @@ public class UI {
     System.out.print(ANSI_RESET);
   }
 
-  // todo
-  private List<ChessPiece> filterListByColor(List<ChessPiece> list, Color color) {
+  private static List<ChessPiece> filterListByColor(List<ChessPiece> list, Color color) {
     List<ChessPiece> piecesOfColor = list
         .stream()
         .filter(p -> p.getColor() == color)
