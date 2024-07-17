@@ -135,8 +135,7 @@ public class Match {
       }
     }
 
-    // todo
-    this.isInCheck = (testCheck(opponent(currentPlayer))) ? true : false;
+    this.isInCheck = testCheck(opponent(currentPlayer));
 
     if (testCheckMate(opponent(currentPlayer))) {
       isInCheckMate = true;
