@@ -167,17 +167,16 @@ public class Match {
 
   private Piece makeMove(Position source, Position target) {
     // todo
-    ChessPiece p = (ChessPiece) board.remoPiece(source);
+    ChessPiece pieceOnPlay = (ChessPiece) board.remoPiece(source);
     Piece capturedPiece = board.remoPiece(target);
     if (capturedPiece != null) {
       onBoardPieces.remove(capturedPiece);
       capturedPieces.add(capturedPiece);
     }
-    board.placePiece(p, target);
+    board.placePiece(pieceOnPlay, target);
 
     // castling king side
-    // todo - renaming and recursion
-    if (p instanceof King && target.getColumn() == source.getColumn() + 2) {
+    if (pieceOnPlay instanceof King && target.getColumn() == source.getColumn() + 2) {
       Position sourceT = new Position(source.getRow(), source.getColumn() + 3);
       Position targeT = new Position(source.getRow(), source.getColumn() + 1);
       ChessPiece rook = (ChessPiece) board.remoPiece(sourceT);
@@ -186,7 +185,7 @@ public class Match {
     }
 
     // castling queen side
-    if (p instanceof King && target.getColumn() == source.getColumn() - 2) {
+    if (pieceOnPlay instanceof King && target.getColumn() == source.getColumn() - 2) {
       Position sourceT = new Position(source.getRow(), source.getColumn() - 4);
       Position targeT = new Position(source.getRow(), source.getColumn() - 1);
       ChessPiece rook = (ChessPiece) board.remoPiece(sourceT);
@@ -195,10 +194,10 @@ public class Match {
     }
 
     // en passant
-    if (p instanceof Pawn) {
+    if (pieceOnPlay instanceof Pawn) {
       if (source.getColumn() != target.getColumn() && capturedPiece == null) {
         Position pawPosition;
-        if (p.getColor() == Color.WHITE) {
+        if (pieceOnPlay.getColor() == Color.WHITE) {
           pawPosition = new Position(target.getRow() + 1, target.getColumn());
         } else {
           pawPosition = new Position(target.getRow() - 1, target.getColumn());
@@ -209,7 +208,7 @@ public class Match {
       }
     }
 
-    p.increaseMoveCount();
+    pieceOnPlay.increaseMoveCount();
 
     return capturedPiece;
   }
