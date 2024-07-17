@@ -280,11 +280,16 @@ public class Match {
   }
 
   private ChessPiece newPiece(String type, Color color) {
-    // todo - switch
-    if (type.equals("B")) return new Bishop(board, color);
-    if (type.equals("N")) return new Knight(board, color);
-    if (type.equals("R")) return new Rook(board, color);
-    return new Queen(board, color);
+    switch (type) {
+      case "B":
+        return new Bishop(board, color);
+      case "N":
+        return new Knight(board, color);
+      case "R":
+        return new Rook(board, color);
+      default:
+        return new Queen(board, color);
+    }
   }
 
   // todo
