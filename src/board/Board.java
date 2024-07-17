@@ -37,6 +37,7 @@ public class Board {
     return spots[position.getRow()][position.getColumn()];
   }
 
+  // todo - return a piece if it is captured. This should have position check?
   public void placePiece(Piece piece, Position position) {
     if (thereIsAPiece(position)) {
       throw new BoardException("This spot already has a piece");
