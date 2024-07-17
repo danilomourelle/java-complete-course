@@ -127,13 +127,11 @@ public class Match {
     }
 
     // promotion
-    // todo - does it need to replace by a queen? if we just set pawn as promoted?
     promoted = null;
     if (movedPiece instanceof Pawn) {
       if ((movedPiece.getColor() == Color.WHITE && targetPosition.getRow() == 0)
           || (movedPiece.getColor() == Color.BLACK && targetPosition.getRow() == 7)) {
-        promoted = (ChessPiece) board.pieceOnSpot(targetPosition);
-        promoted = replacePromotedPiece("Q");
+        promoted = movedPiece;
       }
     }
 
