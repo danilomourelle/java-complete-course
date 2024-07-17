@@ -168,7 +168,7 @@ public class Match {
   private Piece makeMove(Position source, Position target) {
     ChessPiece pieceOnPlay = (ChessPiece) board.remoPiece(source);
     Piece capturedPiece = board.remoPiece(target);
-    
+
     board.placePiece(pieceOnPlay, target);
 
     // castling king side
@@ -285,12 +285,8 @@ public class Match {
     }
   }
 
-  // todo
   private ChessPiece king(Color color) {
-    List<Piece> list = onBoardPieces
-        .stream()
-        .filter(p -> ((ChessPiece) p).getColor() == color)
-        .collect(Collectors.toList());
+    List<Piece> list = filterPiecesByColor(onBoardPieces, color);
 
     for (Piece piece : list) {
       if (piece instanceof King) {
@@ -301,13 +297,9 @@ public class Match {
     throw new IllegalStateException("There is no " + color + " king on the board");
   }
 
-  // todo
   private boolean testCheck(Color color) {
     Position kingPosition = king(color).getChessPosition().toPosition();
-    List<Piece> opponentsPieces = onBoardPieces
-        .stream()
-        .filter(p -> ((ChessPiece) p).getColor() == opponent(color))
-        .collect(Collectors.toList());
+    List<Piece> opponentsPieces = filterPiecesByColor(onBoardPieces, opponent(color));
 
     for (Piece piece : opponentsPieces) {
       boolean[][] matrix = piece.possibleMoves();
@@ -364,5 +356,12 @@ public class Match {
   private void nextTurn() {
     turn++;
     currentPlayer = opponent(currentPlayer);
+  }
+
+  private List<Piece> filterPiecesByColor(List<Piece> list, Color color) {
+    return list
+        .stream()
+        .filter(p -> ((ChessPiece) p).getColor() == color)
+        .collect(Collectors.toList());
   }
 }
