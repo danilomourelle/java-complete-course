@@ -370,6 +370,6 @@ public class Match {
 
   private void nextTurn() {
     turn++;
-    currentPlayer = currentPlayer == Color.WHITE ? Color.BLACK : Color.WHITE; // todo
+    currentPlayer = opponent(currentPlayer);
   }
 }
