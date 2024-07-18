@@ -37,7 +37,7 @@ public class Program {
                     allCapturesPieces.add(capturedPiece);
                 }
 
-                if (match.getPromoted() != null) {
+                if (match.getPawnInPromotion() != null) {
                     String type;
                     do {
                         System.out.print("Enter piece for promotion (B/N/R/Q)");
