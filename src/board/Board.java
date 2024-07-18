@@ -37,17 +37,19 @@ public class Board {
     return spots[position.getRow()][position.getColumn()];
   }
 
-  // todo - return a piece if it is captured. This should have position check?
-  public void placePiece(Piece piece, Position position) {
-    if (thereIsAPiece(position)) {
-      throw new BoardException("This spot already has a piece");
+  public Piece placePiece(Piece piece, Position position) {
+    Piece possibleCapture = pieceOnSpot(position);
+    if (possibleCapture != null) {
+      possibleCapture.position = null;
     }
 
-    spots[position.getRow()][position.getColumn()] = piece;
     piece.position = position;
+    spots[position.getRow()][position.getColumn()] = piece;
+
+    return possibleCapture;
   }
 
-  public Piece remoPiece(Position position) {
+  public Piece removePiece(Position position) {
     if (!positionExists(position)) {
       throw new BoardException("Position not on the Board");
     }
@@ -74,7 +76,6 @@ public class Board {
     return positionExists(position.getRow(), position.getColumn());
   }
 
-  // todo
   public boolean thereIsAPiece(Position position) {
     if (!positionExists(position)) {
       throw new BoardException("Position not on the board");
