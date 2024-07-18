@@ -21,7 +21,7 @@ public class Match {
   private boolean isInCheck;
   private boolean isInCheckMate;
   private ChessPiece enPassantVulnerable;
-  private ChessPiece promoted;
+  private ChessPiece pawnInPromotion;
 
   private List<Piece> capturedPieces = new ArrayList<>();
   private List<Piece> onBoardPieces = new ArrayList<>();
@@ -53,8 +53,8 @@ public class Match {
     return enPassantVulnerable;
   }
 
-  public ChessPiece getPromoted() {
-    return promoted;
+  public ChessPiece getPawnInPromotion() {
+    return pawnInPromotion;
   }
 
   private void initialSetup() {
@@ -118,33 +118,29 @@ public class Match {
     }
 
     ChessPiece movedPiece = (ChessPiece) board.pieceOnSpot(targetPosition);
-    // en passant
-    if (movedPiece instanceof Pawn
-        && (target.getRow() == source.getRow() - 2 || target.getRow() == source.getRow() + 2)) {
-      enPassantVulnerable = movedPiece;
-    } else {
-      enPassantVulnerable = null;
-    }
-
-    // promotion
-    promoted = null;
     if (movedPiece instanceof Pawn) {
+      // en passant
+      if (Math.abs(targetPosition.getRow() - sourcePosition.getRow()) == 2) {
+        enPassantVulnerable = movedPiece;
+      } else {
+        enPassantVulnerable = null;
+      }
+      // promotion
       if ((movedPiece.getColor() == Color.WHITE && targetPosition.getRow() == 0)
           || (movedPiece.getColor() == Color.BLACK && targetPosition.getRow() == 7)) {
-        promoted = movedPiece;
+        pawnInPromotion = movedPiece;
+        return (ChessPiece) capturedPiece;
       }
     }
 
     this.isInCheck = testCheck(opponent(currentPlayer));
-
     if (testCheckMate(opponent(currentPlayer))) {
-      isInCheckMate = true;
+      this.isInCheckMate = true;
     } else {
       nextTurn();
     }
 
     return (ChessPiece) capturedPiece;
-
   }
 
   private void validateOriginalPosition(Position position) {
@@ -166,10 +162,8 @@ public class Match {
   }
 
   private Piece makeMove(Position source, Position target) {
-    ChessPiece pieceOnPlay = (ChessPiece) board.remoPiece(source);
-    Piece capturedPiece = board.remoPiece(target);
-
-    board.placePiece(pieceOnPlay, target);
+    ChessPiece pieceOnPlay = (ChessPiece) board.removePiece(source);
+    Piece capturedPiece = board.placePiece(pieceOnPlay, target);
 
     // castling king side
     if (pieceOnPlay instanceof King && target.getColumn() == source.getColumn() + 2) {
@@ -194,7 +188,7 @@ public class Match {
         } else {
           pawPosition = new Position(target.getRow() - 1, target.getColumn());
         }
-        capturedPiece = board.remoPiece(pawPosition);
+        capturedPiece = board.removePiece(pawPosition);
       }
     }
 
@@ -209,7 +203,7 @@ public class Match {
   }
 
   private void undoMove(Position source, Position target, Piece capturedPiece) {
-    ChessPiece pieceOnPlay = (ChessPiece) board.remoPiece(target);
+    ChessPiece pieceOnPlay = (ChessPiece) board.removePiece(target);
     board.placePiece(pieceOnPlay, source);
     if (capturedPiece != null) {
       board.placePiece(capturedPiece, target);
@@ -234,7 +228,7 @@ public class Match {
     // en passant
     if (pieceOnPlay instanceof Pawn) {
       if (source.getColumn() != target.getColumn() && capturedPiece == enPassantVulnerable) {
-        board.remoPiece(target);
+        board.removePiece(target);
         Position pawPosition;
         if (pieceOnPlay.getColor() == Color.WHITE) {
           pawPosition = new Position(3, target.getColumn());
@@ -253,21 +247,28 @@ public class Match {
   }
 
   public ChessPiece replacePromotedPiece(String type) {
-    if (promoted == null) {
+    if (pawnInPromotion == null) {
       throw new IllegalStateException("There is no piece to be promoted");
     }
 
     if (!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")) {
-      return promoted;
+      return pawnInPromotion;
     }
 
-    Position position = promoted.getChessPosition().toPosition();
-    Piece piece = board.remoPiece(position);
-    onBoardPieces.remove(piece);
+    ChessPiece newPiece = newPiece(type, pawnInPromotion.getColor());
+    Position position = pawnInPromotion.getChessPosition().toPosition();
+    Piece oldPawn = board.placePiece(newPiece, position);
 
-    ChessPiece newPiece = newPiece(type, promoted.getColor());
-    board.placePiece(newPiece, position);
+    onBoardPieces.remove(oldPawn);
     onBoardPieces.add(newPiece);
+    pawnInPromotion = null;
+
+    this.isInCheck = testCheck(opponent(currentPlayer));
+    if (testCheckMate(opponent(currentPlayer))) {
+      this.isInCheckMate = true;
+    } else {
+      nextTurn();
+    }
 
     return newPiece;
   }
